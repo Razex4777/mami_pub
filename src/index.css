@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Premium Dark Enterprise Theme */
+    --background: 222 20% 7%;        /* #0F1117 deep slate */
+    --foreground: 210 20% 98%;       /* crisp white text */
+
+    --card: 220 15% 11%;             /* #1A1D24 elevated panels */
+    --card-foreground: 210 20% 98%;
+
+    --popover: 220 15% 14%;          /* #252932 popovers */
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 200 25% 52%;          /* #5B8FA8 steel blue accent */
+    --primary-foreground: 210 20% 98%;
+
+    --secondary: 220 12% 25%;        /* #3A4550 charcoal */
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 220 15% 14%;            /* #252932 muted areas */
+    --muted-foreground: 210 10% 65%;
+
+    --accent: 200 25% 52%;           /* #5B8FA8 accents */
+    --accent-foreground: 210 20% 98%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 220 15% 18%;           /* subtle borders */
+    --input: 220 15% 18%;
+    --ring: 200 25% 52%;
+
+    --radius: 0.5rem;
+
+    /* Sidebar */
+    --sidebar-background: 222 20% 7%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 200 25% 52%;
+    --sidebar-primary-foreground: 210 20% 98%;
+    --sidebar-accent: 220 15% 11%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 220 15% 18%;
+    --sidebar-ring: 200 25% 52%;
+
+    /* Custom tokens */
+    --panel: 220 15% 11%;
+    --panel-elevated: 220 15% 14%;
+    --text-primary: 210 20% 98%;
+    --text-secondary: 210 10% 70%;
+    --text-muted: 210 8% 50%;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Modern Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(200 30% 45%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(220 15% 13%) 100%);
+    --gradient-glow: radial-gradient(circle at 50% 0%, hsl(var(--primary) / 0.15) 0%, transparent 50%);
+    
+    /* Enhanced Shadows */
+    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.3);
+    --shadow-intense: 0 20px 40px -10px rgb(0 0 0 / 0.6);
+    
+    /* Animations */
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight;
+  }
+}
+
+@layer utilities {
+  .text-primary {
+    color: hsl(var(--text-primary));
+  }
+  
+  .text-secondary {
+    color: hsl(var(--text-secondary));
+  }
+  
+  .text-muted {
+    color: hsl(var(--text-muted));
+  }
+
+  .panel {
+    background-color: hsl(var(--panel));
+  }
+
+  .panel-elevated {
+    background-color: hsl(var(--panel-elevated));
+  }
+
+  .shadow-refined {
+    box-shadow: var(--shadow-md);
+  }
+
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .hover-lift {
+    @apply transition-smooth;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-intense);
+  }
+
+  .hover-glow {
+    @apply transition-smooth;
+  }
+
+  .hover-glow:hover {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .animate-slide-in-up {
+    animation: slideInUp 0.5s ease-out forwards;
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .backdrop-blur-glass {
+    backdrop-filter: blur(12px);
+    background: hsl(var(--card) / 0.8);
+  }
+}
