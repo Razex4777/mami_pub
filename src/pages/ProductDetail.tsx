@@ -1,367 +1,388 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/interactive/button";
-import { Badge } from "@/components/ui/data-display/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/navigation/tabs";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
-  ShoppingCart, 
+  ArrowLeft, 
   Heart, 
   Share2, 
   Star, 
-  Truck, 
-  Shield, 
-  Zap,
-  ChevronLeft,
+  ShoppingBag, 
+  ShoppingCart,
+  Truck,
+  ShieldCheck,
+  RotateCcw,
+  CheckCircle2,
+  ChevronRight,
   Minus,
   Plus
 } from "lucide-react";
+import { Button } from "@/components/ui/interactive/button";
+import { Badge } from "@/components/ui/data-display/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/navigation/tabs";
 import { toast } from "sonner";
-import productImage1 from "@/assets/product-dtf-transfers.jpg";
-import productImage2 from "@/assets/product-heat-press.jpg";
-import productImage3 from "@/assets/product-vinyl.jpg";
+import { useCart } from "@/contexts/CartContext";
+import { products } from "./store/data";
+import RefinedProductCard from "@/components/product/RefinedProductCard";
+import { cn } from "@/lib/utils";
 
-const products = [
-  {
-    id: 1,
-    name: "Premium DTF Transfer - Vibrant Graphics",
-    category: "DTF Transfers",
-    price: 24.99,
-    image: productImage1,
-    specs: "Full color, 300 DPI, washable",
-    description: "Professional-grade DTF transfers featuring vivid colors and exceptional durability. Perfect for apparel decoration, merchandise creation, and custom design projects. Each transfer is precision-cut and ready to apply.",
+// Extended data for the product view
+const EXTENDED_PRODUCT_DATA: Record<number, any> = {
+  1: {
+    description: "Elevate your apparel business with our Premium DTF Transfers. Engineered for vibrancy and durability, these transfers allow you to print full-color designs on virtually any fabric without weeding.",
     features: [
-      "300 DPI resolution for crystal-clear graphics",
-      "50+ wash durability with proper application",
-      "Compatible with cotton, polyester, and blends",
-      "Easy application with standard heat press",
-      "Vibrant colors that won't fade or crack"
+      "Hot peel for instant gratification",
+      "Stretchable and crack-resistant ink",
+      "Compatible with Cotton, Polyester, Blends, Leather, and more",
+      "Wash-tested 50+ cycles at 40°C",
+      "Eco-friendly water-based inks"
     ],
-    specs_detail: {
-      "Print Quality": "300 DPI",
-      "Material": "Premium DTF film",
-      "Temperature": "320°F (160°C)",
-      "Press Time": "15 seconds",
-      "Pressure": "Medium",
-      "Peel": "Hot peel"
+    specs: {
+      "Print Resolution": "1440 x 1440 DPI",
+      "Transfer Time": "10-15 Seconds",
+      "Transfer Temp": "150°C - 160°C",
+      "Pressure": "Medium-High (4-5 Bar)",
+      "Peel Type": "Instant Hot Peel"
     }
   },
-  {
-    id: 2,
-    name: "Commercial Heat Press - 16x20",
-    category: "Equipment",
-    price: 1299.99,
-    image: productImage2,
-    specs: "Digital display, auto-release",
-    description: "Industrial-grade heat press machine designed for high-volume production. Features precision temperature control, digital timer, and automatic pressure release for consistent, professional results every time.",
+  2: {
+    description: "The Commercial Heat Press 16x20 is a workhorse for any print shop. Featuring a magnetic auto-open feature and digital controls, it ensures consistent pressure and temperature for perfect transfers every time.",
     features: [
-      "16x20 inch heating platen for large designs",
-      "Digital temperature display (32-430°F)",
-      "Adjustable pressure control system",
-      "Automatic timer with audio alert",
-      "Commercial-grade heating element"
+      "Magnetic auto-open prevents over-application",
+      "Slide-out lower platen for easy layout",
+      "Digital temperature and time control",
+      "Even heat distribution edge-to-edge",
+      "Heavy-duty steel construction"
     ],
-    specs_detail: {
-      "Platen Size": "16 x 20 inches",
-      "Temperature Range": "32-430°F",
-      "Timer": "0-999 seconds",
-      "Pressure": "Adjustable",
+    specs: {
+      "Platen Size": "16\" x 20\" (40x50cm)",
+      "Voltage": "110V / 220V",
       "Power": "1800W",
-      "Voltage": "110V"
+      "Temp Range": "0°F - 570°F",
+      "Warranty": "2 Years Parts & Labor"
     }
   },
-  {
-    id: 3,
-    name: "Premium Heat Transfer Vinyl",
-    category: "Materials",
-    price: 39.99,
-    image: productImage3,
-    specs: "50-yard roll, multiple colors",
-    description: "High-quality heat transfer vinyl perfect for creating custom apparel, signage, and decorative items. Available in a wide range of colors with excellent stretchability and durability.",
+  3: {
+    description: "Our Premium Heat Transfer Vinyl is the gold standard for custom garment decoration. Easy to cut, weed, and apply, it offers a soft matte finish that feels like part of the fabric.",
     features: [
-      "50-yard continuous roll for bulk projects",
-      "Superior stretchability for activewear",
-      "Easy to weed and apply",
-      "Compatible with all major cutters",
-      "Long-lasting adhesive backing"
+      "Ultra-easy weeding (hot or cold)",
+      "Soft, matte finish",
+      "Layerable for multi-color designs",
+      "CPSIA Certified (Safe for kids clothing)",
+      "Pressure-sensitive carrier"
     ],
-    specs_detail: {
-      "Roll Length": "50 yards",
-      "Width": "12 inches",
-      "Thickness": "3.2 mil",
-      "Application": "305°F, 15 seconds",
-      "Durability": "100+ washes",
-      "Finish": "Matte"
+    specs: {
+      "Thickness": "90 Microns",
+      "Application Temp": "150°C",
+      "Application Time": "10-12 Seconds",
+      "Peel": "Hot or Cold",
+      "Washability": "60°C"
     }
   }
-];
+};
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
-  const product = products.find(p => p.id === Number(id)) || products[0];
+  const product = products.find(p => p.id === Number(id));
+  const extendedData = product ? (EXTENDED_PRODUCT_DATA[product.id] || EXTENDED_PRODUCT_DATA[1]) : null;
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
+  if (!product) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Produit non trouvé</h2>
+          <Button onClick={() => navigate("/store")}>Retour au magasin</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const relatedProducts = products
+    .filter(p => p.id !== product.id)
+    .sort((a, b) => {
+      // Prioritize same category
+      if (a.category === product.category && b.category !== product.category) return -1;
+      if (a.category !== product.category && b.category === product.category) return 1;
+      return 0;
+    })
+    .slice(0, 4);
 
   const handleAddToCart = () => {
-    toast.success("Added to cart!", {
-      description: `${quantity}x ${product.name}`,
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category,
+      quantity: quantity
+    });
+    toast.success("Ajouté au panier", {
+      description: `${quantity}x ${product.name}`
     });
   };
 
-  const handleShare = () => {
-    toast.success("Link copied to clipboard!");
+  const handleBuyNow = () => {
+    handleAddToCart();
+    navigate("/checkout");
   };
 
+  // Discount calculation
+  const originalPrice = product.discount 
+    ? product.price / (1 - product.discount / 100) 
+    : product.price * 1.2;
+
   return (
-    <div className="min-h-screen">
-      {/* Back Button */}
-      <div className="sticky top-16 z-40 backdrop-blur-glass border-b border-border">
-        <div className="max-w-7xl mx-auto px-8 py-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="hover:bg-muted/50"
-          >
-            <ChevronLeft className="h-4 w-4 mr-2" />
-            Retour aux Produits
-          </Button>
-        </div>
+    <div className="min-h-screen bg-background pb-24 lg:pb-0">
+      {/* Mobile Header / Nav */}
+      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-lg border-b border-white/5 px-4 h-14 flex items-center justify-between lg:hidden">
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <span className="font-semibold text-sm truncate max-w-[200px]">{product.name}</span>
+        <Button variant="ghost" size="icon" onClick={() => setIsWishlisted(!isWishlisted)}>
+          <Heart className={cn("h-5 w-5", isWishlisted && "fill-red-500 text-red-500")} />
+        </Button>
       </div>
 
-      <div className="max-w-7xl mx-auto px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-          {/* Image Section */}
-          <div className="space-y-4 animate-fade-in">
-            <div className="aspect-square rounded-2xl overflow-hidden bg-card border border-border hover-glow group">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
+        {/* Breadcrumb (Desktop) */}
+        <nav className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground mb-8">
+          <span className="hover:text-primary cursor-pointer" onClick={() => navigate("/")}>Accueil</span>
+          <ChevronRight className="h-4 w-4" />
+          <span className="hover:text-primary cursor-pointer" onClick={() => navigate("/store")}>Store</span>
+          <ChevronRight className="h-4 w-4" />
+          <span className="text-foreground font-medium">{product.name}</span>
+        </nav>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+          {/* Left Column: Images */}
+          <div className="space-y-4">
+            <div className="relative aspect-square rounded-3xl overflow-hidden bg-card border border-white/10 group">
+              <img 
+                src={product.image} 
+                alt={product.name} 
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
+              {product.discount && (
+                <Badge className="absolute top-4 left-4 bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-sm font-bold shadow-lg">
+                  -{product.discount}%
+                </Badge>
+              )}
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="absolute top-4 right-4 rounded-full bg-background/50 backdrop-blur-md border-white/10 hidden lg:flex hover:bg-background"
+                onClick={() => setIsWishlisted(!isWishlisted)}
+              >
+                <Heart className={cn("h-5 w-5", isWishlisted && "fill-red-500 text-red-500")} />
+              </Button>
             </div>
-            
-            {/* Thumbnails - could be expanded with multiple images */}
+            {/* Thumbnails (Mock) */}
             <div className="grid grid-cols-4 gap-3">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="aspect-square rounded-lg overflow-hidden bg-card border-2 border-primary cursor-pointer hover-lift"
+              {[product.image, product.image, product.image, product.image].map((img, idx) => (
+                <div 
+                  key={idx} 
+                  className={cn(
+                    "aspect-square rounded-xl overflow-hidden border-2 cursor-pointer transition-all",
+                    activeImage === idx ? "border-primary ring-2 ring-primary/20" : "border-transparent opacity-60 hover:opacity-100"
+                  )}
+                  onClick={() => setActiveImage(idx)}
                 >
-                  <img
-                    src={product.image}
-                    alt={`View ${i}`}
-                    className="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity"
-                  />
+                  <img src={img} alt="" className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Product Info */}
-          <div className="space-y-6 animate-slide-up">
-            <div>
-              <Badge variant="secondary" className="mb-3">
-                {product.category}
-              </Badge>
-              <h1 className="text-4xl font-bold mb-4 leading-tight">
+          {/* Right Column: Product Info */}
+          <div className="lg:sticky lg:top-24 space-y-8">
+            {/* Header */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-primary border-primary/30 bg-primary/5">
+                  {product.category}
+                </Badge>
+                {product.inStock ? (
+                  <Badge variant="outline" className="text-green-500 border-green-500/30 bg-green-500/5 flex items-center gap-1">
+                    <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                    En Stock
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="text-destructive border-destructive/30 bg-destructive/5">
+                    Rupture
+                  </Badge>
+                )}
+              </div>
+              
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight tracking-tight">
                 {product.name}
               </h1>
-              
-              {/* Rating */}
-              <div className="flex items-center gap-4 mb-4">
+
+              <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className="h-5 w-5 fill-primary text-primary"
-                    />
+                  {[1,2,3,4,5].map(s => (
+                    <Star key={s} className={cn("h-5 w-5", s <= Math.round(product.rating || 5) ? "fill-yellow-400 text-yellow-400" : "text-muted")} />
                   ))}
                 </div>
-                <span className="text-sm text-muted-foreground">
-                  (124 avis)
+                <span className="text-sm font-medium underline decoration-muted-foreground/30 underline-offset-4">
+                  {product.reviews || 0} Avis clients
                 </span>
               </div>
-
-              <p className="text-lg text-secondary leading-relaxed mb-6">
-                {product.description}
-              </p>
             </div>
 
             {/* Price */}
-            <div className="py-6 border-y border-border">
-              <div className="flex items-baseline gap-3">
-                <span className="text-5xl font-bold gradient-primary bg-clip-text text-transparent">
-                  {product.price.toFixed(2)}€
+            <div className="p-6 rounded-2xl bg-card/50 border border-white/5 backdrop-blur-sm">
+              <div className="flex items-baseline gap-3 mb-6">
+                <span className="text-4xl sm:text-5xl font-black text-primary">
+                  {product.price.toFixed(0)} <span className="text-xl sm:text-2xl font-bold text-muted-foreground">DA</span>
                 </span>
-                <span className="text-sm text-muted-foreground line-through">
-                  {(product.price * 1.3).toFixed(2)}€
+                <span className="text-lg text-muted-foreground line-through decoration-red-500/50">
+                  {originalPrice.toFixed(0)} DA
                 </span>
-                <Badge variant="destructive" className="ml-2">
-                  -23%
-                </Badge>
               </div>
-            </div>
 
-            {/* Quantity Selector */}
-            <div>
-              <label className="text-sm font-medium mb-3 block">
-                Quantité
-              </label>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-3 panel-elevated rounded-lg p-1 border border-border">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="h-10 w-10 hover:bg-muted"
-                  >
-                    <Minus className="h-4 w-4" />
+              {/* Quantity & Actions */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center bg-background rounded-full border border-white/10 p-1">
+                    <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 hover:bg-white/5" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="w-12 text-center font-bold text-lg">{quantity}</span>
+                    <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 hover:bg-white/5" onClick={() => setQuantity(quantity + 1)}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">Livraison Gratuite</span>
+                    <br />pour les commandes &gt; 10000 DA
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                  <Button size="lg" className="h-14 text-lg rounded-xl bg-primary hover:bg-primary/90" onClick={handleAddToCart}>
+                    <ShoppingBag className="mr-2 h-5 w-5" />
+                    Ajouter au panier
                   </Button>
-                  <span className="text-lg font-semibold w-12 text-center">
-                    {quantity}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="h-10 w-10 hover:bg-muted"
-                  >
-                    <Plus className="h-4 w-4" />
+                  <Button size="lg" variant="outline" className="h-14 text-lg rounded-xl border-primary/20 hover:bg-primary/5 text-primary hover:text-primary" onClick={handleBuyNow}>
+                    Acheter maintenant
                   </Button>
                 </div>
-                <span className="text-sm text-muted-foreground">
-                  2 847 en stock
-                </span>
               </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3">
-              <Button
-                size="lg"
-                className="flex-1 h-14 text-lg gradient-primary hover:opacity-90 transition-opacity animate-glow"
-                onClick={handleAddToCart}
-              >
-                <ShoppingCart className="h-5 w-5 mr-2" />
-                Ajouter au Panier
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className={`h-14 px-6 border-border hover:bg-muted ${
-                  isFavorite ? "text-red-500 border-red-500" : ""
-                }`}
-                onClick={() => setIsFavorite(!isFavorite)}
-              >
-                <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="h-14 px-6 border-border hover:bg-muted"
-                onClick={handleShare}
-              >
-                <Share2 className="h-5 w-5" />
-              </Button>
             </div>
 
             {/* Trust Badges */}
-            <div className="grid grid-cols-3 gap-4 pt-6">
-              <div className="text-center p-4 rounded-lg panel-elevated border border-border">
-                <Truck className="h-6 w-6 mx-auto mb-2 text-primary" />
-                <p className="text-xs font-medium">Livraison Rapide</p>
-                <p className="text-xs text-muted-foreground">2-3 jours</p>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="flex flex-col items-center text-center gap-2 p-4 rounded-xl bg-card/30 border border-white/5">
+                <Truck className="h-6 w-6 text-blue-400" />
+                <span className="text-xs font-bold">Livraison 48h</span>
               </div>
-              <div className="text-center p-4 rounded-lg panel-elevated border border-border">
-                <Shield className="h-6 w-6 mx-auto mb-2 text-primary" />
-                <p className="text-xs font-medium">Garantie Qualité</p>
-                <p className="text-xs text-muted-foreground">100% sécurisé</p>
+              <div className="flex flex-col items-center text-center gap-2 p-4 rounded-xl bg-card/30 border border-white/5">
+                <ShieldCheck className="h-6 w-6 text-green-400" />
+                <span className="text-xs font-bold">Garantie 100%</span>
               </div>
-              <div className="text-center p-4 rounded-lg panel-elevated border border-border">
-                <Zap className="h-6 w-6 mx-auto mb-2 text-primary" />
-                <p className="text-xs font-medium">Retours Faciles</p>
-                <p className="text-xs text-muted-foreground">Politique 30 jours</p>
+              <div className="flex flex-col items-center text-center gap-2 p-4 rounded-xl bg-card/30 border border-white/5">
+                <RotateCcw className="h-6 w-6 text-purple-400" />
+                <span className="text-xs font-bold">Retours Simples</span>
               </div>
             </div>
+
+            {/* Details Tabs */}
+            <Tabs defaultValue="description" className="w-full">
+              <TabsList className="w-full grid grid-cols-3 bg-card/50 p-1 rounded-xl">
+                <TabsTrigger value="description" className="rounded-lg">Description</TabsTrigger>
+                <TabsTrigger value="specs" className="rounded-lg">Spécifications</TabsTrigger>
+                <TabsTrigger value="reviews" className="rounded-lg">Avis</TabsTrigger>
+              </TabsList>
+              <div className="mt-6 min-h-[200px]">
+                <TabsContent value="description" className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <p className="text-lg leading-relaxed text-muted-foreground">
+                    {extendedData?.description || product.specs}
+                  </p>
+                  <div className="space-y-3 mt-6">
+                    <h4 className="font-bold text-foreground">Points forts</h4>
+                    <ul className="grid gap-3">
+                      {extendedData?.features?.map((feature: string, idx: number) => (
+                        <li key={idx} className="flex items-center gap-3 text-sm text-muted-foreground">
+                          <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
+                          {feature}
+                        </li>
+                      )) || (
+                        <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                          <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
+                          {product.specs}
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </TabsContent>
+                <TabsContent value="specs" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {Object.entries(extendedData?.specs || {}).map(([key, value]: [string, any]) => (
+                      <div key={key} className="flex flex-col p-3 rounded-lg bg-white/5 border border-white/5">
+                        <span className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{key}</span>
+                        <span className="font-medium">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </TabsContent>
+                <TabsContent value="reviews" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="text-center py-12">
+                    <Star className="h-12 w-12 text-muted mx-auto mb-4 opacity-20" />
+                    <p className="text-muted-foreground">Aucun avis pour le moment.</p>
+                    <Button variant="link" className="mt-2 text-primary">Soyez le premier à donner votre avis</Button>
+                  </div>
+                </TabsContent>
+              </div>
+            </Tabs>
           </div>
         </div>
 
-        {/* Detailed Information Tabs */}
-        <Tabs defaultValue="features" className="animate-fade-in">
-          <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-8">
-            <TabsTrigger value="features">Caractéristiques</TabsTrigger>
-            <TabsTrigger value="specs">Spécifications</TabsTrigger>
-            <TabsTrigger value="reviews">Avis</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="features" className="space-y-4">
-            <div className="panel-elevated rounded-xl p-8 border border-border">
-              <h3 className="text-2xl font-semibold mb-6">Caractéristiques Principales</h3>
-              <ul className="space-y-4">
-                {product.features?.map((feature, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                      <div className="h-2 w-2 rounded-full bg-primary" />
-                    </div>
-                    <span className="text-secondary leading-relaxed">{feature}</span>
-                  </li>
-                ))}
-              </ul>
+        {/* You May Also Like */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-24 space-y-8">
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold">Vous aimerez aussi</h3>
+              <Button variant="ghost" className="text-primary hover:text-primary/80" onClick={() => navigate("/store")}>
+                Voir tout <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
             </div>
-          </TabsContent>
-
-          <TabsContent value="specs">
-            <div className="panel-elevated rounded-xl p-8 border border-border">
-              <h3 className="text-2xl font-semibold mb-6">Spécifications Techniques</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {Object.entries(product.specs_detail || {}).map(([key, value]) => (
-                  <div
-                    key={key}
-                    className="flex justify-between items-center pb-4 border-b border-border"
-                  >
-                    <span className="font-medium">{key}</span>
-                    <span className="text-secondary">{value}</span>
-                  </div>
-                ))}
-              </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {relatedProducts.map((p, idx) => (
+                <RefinedProductCard 
+                  key={p.id} 
+                  product={p} 
+                  index={idx} 
+                  onQuickView={() => {}} 
+                  prefersReducedMotion={false}
+                />
+              ))}
             </div>
-          </TabsContent>
+          </div>
+        )}
+      </div>
 
-          <TabsContent value="reviews">
-            <div className="panel-elevated rounded-xl p-8 border border-border">
-              <h3 className="text-2xl font-semibold mb-6">Avis Clients</h3>
-              <div className="space-y-6">
-                {[1, 2, 3].map((review) => (
-                  <div key={review} className="pb-6 border-b border-border last:border-0">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="font-semibold text-primary">JD</span>
-                      </div>
-                      <div>
-                        <p className="font-medium">John Doe</p>
-                        <div className="flex items-center gap-2">
-                          <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className="h-4 w-4 fill-primary text-primary"
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs text-muted-foreground">Il y a 2 jours</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-secondary leading-relaxed">
-                      Excellente qualité et livraison rapide ! Les couleurs sont éclatantes et l'application était fluide. Hautement recommandé pour un usage professionnel.
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+      {/* Mobile Sticky Bottom Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background/90 backdrop-blur-xl border-t border-white/10 p-4 lg:hidden z-50 safe-area-bottom">
+        <div className="flex gap-3">
+          <div className="flex flex-col justify-center flex-1">
+             <span className="text-xs text-muted-foreground uppercase">Total</span>
+             <span className="font-bold text-lg text-primary">{(product.price * quantity).toFixed(0)} DA</span>
+          </div>
+          <Button size="lg" className="flex-1 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold shadow-lg shadow-primary/25" onClick={handleAddToCart}>
+            Ajouter
+          </Button>
+        </div>
       </div>
     </div>
   );

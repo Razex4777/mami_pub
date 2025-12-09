@@ -82,10 +82,24 @@ const Designer = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8 relative">
+      {/* Coming Soon Overlay */}
+      <div className="absolute inset-0 z-50 backdrop-blur-md bg-background/70 flex items-center justify-center">
+        <div className="text-center p-8 rounded-2xl bg-card/80 border border-border shadow-2xl max-w-md mx-4">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center">
+            <Palette className="h-10 w-10 text-white" />
+          </div>
+          <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">Bientôt Disponible</h2>
+          <p className="text-muted-foreground mb-6">Notre concepteur personnalisé est en cours de développement. Revenez bientôt pour créer vos propres designs DTF !</p>
+          <Button onClick={() => window.history.back()} variant="outline" className="mr-2">Retour</Button>
+          <Button asChild>
+            <a href="/store">Voir les Produits</a>
+          </Button>
+        </div>
+      </div>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-semibold mb-4 gradient-text">Concepteur Personnalisé</h1>
+          <h1 className="text-4xl font-semibold mb-4 text-primary">Concepteur Personnalisé</h1>
           <p className="text-secondary text-lg">
             Outils de conception professionnels pour créer des transferts DTF sur mesure
           </p>

@@ -1,0 +1,174 @@
+# Lifeguard Custom Rules - MAMI PUB E-commerce Platform
+# AI Code Reviewer Configuration for Premium DTF Print Solutions
+
+rules:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # 🎨 UI/UX & ACCESSIBILITY RULES
+  # ═══════════════════════════════════════════════════════════════════════════
+  
+  - name: "Button text must have sufficient contrast"
+    description: |
+      CRITICAL: All buttons must have explicit text color classes for visibility.
+      - Dark backgrounds (bg-slate-*, bg-gray-*, bg-primary) MUST use 'text-white'
+      - Light backgrounds MUST use 'text-slate-900' or 'text-gray-900'
+      - Always add 'font-semibold' or 'font-medium' for better readability
+      - Check: backdrop-blur buttons need high-contrast text colors
+      - Verify icons have proper brightness/invert filters when on colored backgrounds
+
+  - name: "Responsive design must follow mobile-first approach"
+    description: |
+      All components must be designed mobile-first (320px → 768px → 1024px+):
+      - Use responsive Tailwind classes: sm:, md:, lg:, xl:
+      - Text sizes must scale appropriately (text-sm on mobile, text-base on desktop)
+      - Touch targets must be at least 44x44px on mobile
+      - Avoid fixed widths; use max-w-* and w-full with constraints
+      - Test hover states have touch equivalents for mobile
+
+  - name: "Animation performance must be optimized"
+    description: |
+      Framer Motion and CSS animations must respect performance:
+      - Check for 'prefersReducedMotion' support in all animated components
+      - Use 'will-change' sparingly and only when needed
+      - Prefer 'transform' and 'opacity' for animations (GPU-accelerated)
+      - Lazy load Lottie animations and heavy assets
+      - Intersection Observer should be used for scroll-triggered animations
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # 🛒 E-COMMERCE & CART LOGIC RULES
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - name: "Cart operations must handle edge cases"
+    description: |
+      All cart-related operations must be robust:
+      - Check stock availability before adding items
+      - Handle out-of-stock scenarios gracefully with user feedback
+      - Validate quantity limits (min: 1, max: stock available)
+      - Price calculations must handle discounts correctly
+      - Toast notifications must confirm all cart actions
+      - Prevent duplicate rapid clicks (debounce add-to-cart)
+
+  - name: "Product data must be validated"
+    description: |
+      Product interfaces and data must be complete:
+      - Required fields: id, name, price, image, category
+      - Optional fields must have sensible defaults
+      - Prices must be positive numbers
+      - Images must have alt text for accessibility
+      - Rating must be between 0-5, reviews must be non-negative
+
+  - name: "Price display must be consistent"
+    description: |
+      All price displays must follow the same format:
+      - Use .toFixed(2) for Euro amounts
+      - Currency symbol (€) must be after the number (French format)
+      - Discounted prices must show original price with line-through
+      - Discount percentage must be calculated correctly
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # 🔐 SECURITY & AUTHENTICATION RULES
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - name: "Admin routes must be protected"
+    description: |
+      All /admin/* routes must have authentication guards:
+      - Check AuthContext for valid user session
+      - Redirect unauthenticated users to login
+      - Admin actions must verify user role
+      - Session data must not expose sensitive information
+      - localStorage tokens must be validated on each protected action
+
+  - name: "User input must be sanitized"
+    description: |
+      All user inputs must be validated and sanitized:
+      - Form inputs must use React Hook Form validation
+      - Search queries must be escaped before use
+      - File uploads must validate type and size
+      - Prevent XSS by not using dangerouslySetInnerHTML
+      - API payloads must be validated before sending
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # 📁 CODE ORGANIZATION & ARCHITECTURE RULES
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - name: "Component files must not exceed 500 lines"
+    description: |
+      STRICT LIMIT: No component file may exceed 500 lines.
+      If approaching limit:
+      1. Extract sub-components into separate files
+      2. Move utility functions to /lib or /utils
+      3. Extract hooks into /hooks directory
+      4. Create a component folder with index.ts re-export
+      Current large files to monitor: RefinedProductCard.tsx (377 lines)
+
+  - name: "Imports must be organized and at file top"
+    description: |
+      Import organization standard:
+      1. React and React-related imports first
+      2. Third-party libraries (framer-motion, lucide-react, etc.)
+      3. Internal components (@/components/*)
+      4. Hooks (@/hooks/*)
+      5. Utilities and types (@/lib/*, @/types/*)
+      6. Styles and assets last
+      - Never import in the middle of a file
+      - Use path aliases (@/) consistently
+
+  - name: "TypeScript interfaces must be complete"
+    description: |
+      All component props and data structures must have TypeScript interfaces:
+      - Define interfaces at the top of the file or in /types
+      - Use descriptive property names
+      - Mark optional properties with '?'
+      - Avoid 'any' type - use 'unknown' if type is truly unknown
+      - Export shared interfaces from /types/index.ts
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # ⚡ PERFORMANCE & OPTIMIZATION RULES
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - name: "Images must be optimized and lazy loaded"
+    description: |
+      All images must follow optimization practices:
+      - Use loading="lazy" attribute on img tags
+      - Provide width/height or aspect-ratio to prevent CLS
+      - Use appropriate image formats (WebP preferred)
+      - Implement blur placeholder for loading states
+      - Product images should use Intersection Observer
+
+  - name: "State updates must be batched efficiently"
+    description: |
+      React state management must be optimized:
+      - Avoid unnecessary re-renders with useMemo/useCallback
+      - Use React.memo for expensive child components
+      - Batch related state updates together
+      - Prefer derived state over synchronized state
+      - Use TanStack Query for server state management
+
+  - name: "Event handlers must prevent memory leaks"
+    description: |
+      All event listeners and subscriptions must be cleaned up:
+      - useEffect cleanup functions must remove listeners
+      - Intersection Observers must be disconnected
+      - Timeouts and intervals must be cleared
+      - Abort controllers for fetch requests
+      - Check for component unmount before state updates
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # 📝 DOCUMENTATION & CHANGELOG RULES
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - name: "Documentation must be updated with code changes"
+    description: |
+      MANDATORY: docs/ folder must stay synchronized:
+      - Update docs/project_structure.md when adding/moving/deleting files
+      - Log significant changes in docs/changelog.md
+      - Changelog entries must include timestamp (YYYY-MM-DD HH:MM)
+      - Keep changelog under 500 lines (trim oldest entries)
+      - Use visual tree format for project structure
+
+  - name: "Component documentation must include usage examples"
+    description: |
+      Complex components should have inline documentation:
+      - JSDoc comments for component purpose
+      - Props interface with descriptions
+      - Usage examples in comments for reusable components
+      - Note any required context providers
