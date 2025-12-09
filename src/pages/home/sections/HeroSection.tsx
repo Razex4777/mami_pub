@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/interactive/button";
 import AnimatedCounter from "@/components/ui/interactive/AnimatedCounter";
-import heroImage from "/images/hero-dtf-print.jpg";
 import { IconBadge, AnimationBubble } from "../components";
 import { heroStats } from "../data";
 
@@ -13,11 +12,7 @@ const HeroSection = ({ animations }: HeroSectionProps) => {
   return (
     <section className="relative overflow-hidden min-h-[80vh] sm:min-h-screen flex items-center">
       <div className="absolute inset-0">
-        <img
-          src={heroImage}
-          alt="Atelier d'impression MAMI PUB"
-          className="h-full w-full object-cover"
-        />
+        <div className="h-full w-full bg-gradient-to-br from-slate-900 via-blue-900/50 to-primary/30" />
         <div className="absolute inset-0 bg-gradient-to-br from-background via-background/80 to-primary/30" />
         <div className="absolute -top-32 -right-32 h-[28rem] w-[28rem] rounded-full bg-primary/30 blur-3xl" />
         <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
