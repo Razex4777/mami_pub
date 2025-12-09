@@ -145,7 +145,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
   return (data as Product[]) ?? [];
 }
 
-// Get product statistics (for admin dashboard)
+// Get product statistics (for admin dashboard) using database aggregation
 export async function getProductStats(): Promise<{
   total: number;
   active: number;
@@ -153,20 +153,43 @@ export async function getProductStats(): Promise<{
   outOfStock: number;
   totalValue: number;
 }> {
-  const { data, error } = await supabase
-    .from('products')
-    .select('*');
+  // Run parallel queries for better performance
+  const [totalResult, activeResult, outOfStockResult, valueResult, lowStockData] = await Promise.all([
+    // Total count
+    supabase.from('products').select('*', { count: 'exact', head: true }),
+    // Active count
+    supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+    // Out of stock count
+    supabase.from('products').select('*', { count: 'exact', head: true }).eq('stock', 0),
+    // Total value - need to fetch price and stock for calculation
+    supabase.from('products').select('price, stock'),
+    // Low stock - need to compare stock with min_stock
+    supabase.from('products').select('stock, min_stock').gt('stock', 0),
+  ]);
 
-  if (error) throw error;
+  if (totalResult.error) throw totalResult.error;
+  if (activeResult.error) throw activeResult.error;
+  if (outOfStockResult.error) throw outOfStockResult.error;
+  if (valueResult.error) throw valueResult.error;
+  if (lowStockData.error) throw lowStockData.error;
 
-  const products = (data as Product[]) ?? [];
-  
+  // Calculate total value from minimal data
+  const totalValue = (valueResult.data ?? []).reduce(
+    (sum: number, p: { price: number; stock: number }) => sum + (p.price * p.stock), 
+    0
+  );
+
+  // Calculate low stock count (stock <= min_stock AND stock > 0)
+  const lowStock = (lowStockData.data ?? []).filter(
+    (p: { stock: number; min_stock: number }) => p.stock <= p.min_stock
+  ).length;
+
   return {
-    total: products.length,
-    active: products.filter(p => p.status === 'active').length,
-    lowStock: products.filter(p => p.stock <= p.min_stock && p.stock > 0).length,
-    outOfStock: products.filter(p => p.stock === 0).length,
-    totalValue: products.reduce((sum, p) => sum + (p.price * p.stock), 0),
+    total: totalResult.count ?? 0,
+    active: activeResult.count ?? 0,
+    lowStock,
+    outOfStock: outOfStockResult.count ?? 0,
+    totalValue,
   };
 }
 

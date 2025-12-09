@@ -78,6 +78,7 @@ async function getCroppedImg(
         reject(new Error('Failed to generate cropped image blob'));
         return;
       }
+      // Note: Caller is responsible for revoking URL with URL.revokeObjectURL()
       resolve({
         url: URL.createObjectURL(blob),
         blob,
@@ -85,7 +86,6 @@ async function getCroppedImg(
     }, 'image/jpeg', 0.95);
   });
 }
-
 const ImageCropper: React.FC<ImageCropperProps> = ({
   open,
   onOpenChange,

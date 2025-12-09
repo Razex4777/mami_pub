@@ -14,6 +14,7 @@ export interface Product {
   tags?: string[];
   deliveryTime?: string;
   discount?: number;
+  createdAt?: string; // ISO date string for sorting by newest
 }
 
 export interface FilterState {

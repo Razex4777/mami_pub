@@ -26,6 +26,7 @@ const toStoreProduct = (p: SupabaseProduct): Product => ({
   tags: p.tags,
   deliveryTime: p.delivery_time || undefined,
   discount: p.discount,
+  createdAt: p.created_at, // For sorting by newest
 });
 
 const Store = () => {
@@ -84,7 +85,12 @@ const Store = () => {
         filtered.sort((a, b) => b.price - a.price);
         break;
       case "newest":
-        filtered.sort((a, b) => b.id.localeCompare(a.id));
+        // Sort by created_at timestamp (newest first), fallback to oldest if missing
+        filtered.sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        });
         break;
       case "featured":
       default:

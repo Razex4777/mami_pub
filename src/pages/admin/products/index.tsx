@@ -314,8 +314,18 @@ const ProductsPage: React.FC = () => {
               Supplier: p.supplier || '',
             }));
           
+          // Guard for empty array
+          if (csvData.length === 0) {
+            toast({
+              title: 'Aucun produit',
+              description: 'Aucun produit sélectionné pour l\'export.',
+              variant: 'destructive',
+            });
+            break;
+          }
+
           const csvContent = [
-            Object.keys(csvData[0] || {}).map(escapeCsvValue).join(','),
+            Object.keys(csvData[0]).map(escapeCsvValue).join(','),
             ...csvData.map(row => Object.values(row).map(escapeCsvValue).join(','))
           ].join('\n');
           
@@ -325,6 +335,7 @@ const ProductsPage: React.FC = () => {
           a.href = url;
           a.download = `products-export-${new Date().toISOString().split('T')[0]}.csv`;
           a.click();
+          window.URL.revokeObjectURL(url);
           
           toast({
             title: 'Export terminé',
