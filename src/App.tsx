@@ -19,6 +19,7 @@ import AdminLayout from "./components/admin/AdminLayout";
 import Dashboard from "./pages/admin/dashboard";
 import ProductsPage from "./pages/admin/products";
 import OrdersPage from "./pages/admin/orders";
+import BannersPage from "./pages/admin/banners";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
                 <Route index element={<Dashboard />} />
                 <Route path="products" element={<ProductsPage />} />
                 <Route path="orders" element={<OrdersPage />} />
+                <Route path="banners" element={<BannersPage />} />
                 <Route path="notifications" element={<div className="p-6"><h1 className="text-2xl font-bold">Notifications</h1><p className="text-muted-foreground">Notification center coming soon...</p></div>} />
               </Route>
               

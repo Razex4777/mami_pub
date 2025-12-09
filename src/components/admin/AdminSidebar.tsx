@@ -12,6 +12,7 @@ import {
   X,
   Home,
   Sparkles,
+  Image,
 } from 'lucide-react';
 import { Button } from '@/components/ui/interactive/button';
 import {
@@ -49,6 +50,11 @@ const navItems: NavItem[] = [
     title: 'Commandes',
     href: '/admin/orders',
     icon: ShoppingCart,
+  },
+  {
+    title: 'Bannières',
+    href: '/admin/banners',
+    icon: Image,
   },
   {
     title: 'Notifications',
