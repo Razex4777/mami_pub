@@ -34,6 +34,7 @@ export async function getProductById(id: string): Promise<Product | null> {
     .eq('id', id)
     .single();
 
+  if (error && error.code === 'PGRST116') return null; // Not found
   if (error) throw error;
   return data as Product | null;
 }

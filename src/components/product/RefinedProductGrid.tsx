@@ -7,7 +7,7 @@ import RefinedProductCard from './RefinedProductCard';
 import QuickViewModal from './QuickViewModal';
 
 interface Product {
-  id: number;
+  id: string; // UUID from Supabase
   name: string;
   category: string;
   price: number;

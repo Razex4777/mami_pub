@@ -110,9 +110,8 @@ Organized into domain-specific folders for maintainability.
 
 ### /src/pages/store - Store Page (Modular Structure)
 - `index.ts` - Main exports
-- `Store.tsx` - Main store component with state management
-- `types.ts` - TypeScript interfaces (Product, FilterState, PromoBanner)
-- `data.ts` - Product data and promo banners
+- `Store.tsx` - Main store component with Supabase integration
+- `types.ts` - TypeScript interfaces (Product with UUID id, FilterState)
 - `/components/` - Store-specific components
   - `index.ts` - Component exports
   - `PromoBannerCarousel.tsx` - Auto-rotating promo banner carousel
@@ -145,8 +144,12 @@ Organized into domain-specific folders for maintainability.
 ### /src/contexts - React Context Providers
 - `AuthContext.tsx` - Authentication state management with localStorage persistence
 
-### /src/types - TypeScript Type Definitions
-- `index.ts` - Type definitions for User, Product, Order, and dashboard entities
+### /src/supabase - Supabase Integration
+- `core.ts` - Supabase client initialization
+- `index.ts` - Main exports for all Supabase APIs
+- `banners.ts` - Banner CRUD operations
+- `products.ts` - Product CRUD operations with PGRST116 error handling
+- `/types/index.ts` - All TypeScript types (Product, AdminProduct, User, Order, etc.)
 
 ## Admin Dashboard Features
 

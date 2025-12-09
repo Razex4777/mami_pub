@@ -181,7 +181,7 @@ const ProductsPage: React.FC = () => {
     setIsFormOpen(true);
   };
 
-  const handleEditProduct = (product: Product) => {
+  const handleEditProduct = (product: AdminProduct) => {
     setEditingProduct(product);
     setFormData(product);
     setIsFormOpen(true);
@@ -293,6 +293,14 @@ const ProductsPage: React.FC = () => {
           });
           break;
         case 'export':
+          // CSV escape function: handles null/undefined, quotes, commas, newlines
+          const escapeCsvValue = (value: unknown): string => {
+            if (value === null || value === undefined) return '""';
+            const str = String(value);
+            // Replace double quotes with two double quotes, then wrap in quotes
+            return `"${str.replace(/"/g, '""')}"`;
+          };
+
           const csvData = filteredProducts
             .filter(p => selectedProducts.has(p.id))
             .map(p => ({
@@ -307,8 +315,8 @@ const ProductsPage: React.FC = () => {
             }));
           
           const csvContent = [
-            Object.keys(csvData[0] || {}).join(','),
-            ...csvData.map(row => Object.values(row).join(','))
+            Object.keys(csvData[0] || {}).map(escapeCsvValue).join(','),
+            ...csvData.map(row => Object.values(row).map(escapeCsvValue).join(','))
           ].join('\n');
           
           const blob = new Blob([csvContent], { type: 'text/csv' });

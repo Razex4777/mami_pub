@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 interface Product {
-  id: number;
+  id: string; // UUID from Supabase
   name: string;
   category: string;
   price: number;

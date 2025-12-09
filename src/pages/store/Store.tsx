@@ -13,11 +13,11 @@ import { getActiveProducts, type Product as SupabaseProduct } from "@/supabase";
 
 // Convert Supabase product to store Product type
 const toStoreProduct = (p: SupabaseProduct): Product => ({
-  id: parseInt(p.id.replace(/-/g, '').slice(0, 8), 16) || Math.random() * 1000000,
+  id: p.id, // Use full UUID as string
   name: p.name,
   category: p.category,
   price: p.price,
-  image: p.images[0] || '/images/product-dtf-transfers.jpg',
+  image: p.images[0] || '/placeholder.svg',
   specs: p.specs || p.description || '',
   rating: p.rating,
   reviews: p.reviews_count,
@@ -84,7 +84,7 @@ const Store = () => {
         filtered.sort((a, b) => b.price - a.price);
         break;
       case "newest":
-        filtered.sort((a, b) => b.id - a.id);
+        filtered.sort((a, b) => b.id.localeCompare(a.id));
         break;
       case "featured":
       default:

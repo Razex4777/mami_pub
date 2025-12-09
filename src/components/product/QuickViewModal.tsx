@@ -5,7 +5,7 @@ import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
 
 interface Product {
-  id: number;
+  id: string; // UUID from Supabase
   name: string;
   category: string;
   price: number;

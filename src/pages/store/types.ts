@@ -1,7 +1,7 @@
 // Store types and interfaces
 
 export interface Product {
-  id: number;
+  id: string; // UUID from Supabase
   name: string;
   category: string;
   price: number;

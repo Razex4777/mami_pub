@@ -2,6 +2,24 @@
 
 All notable changes to the MAMI PUB admin dashboard and e-commerce platform will be documented in this file.
 
+## 2025-12-09 20:46
+
+### 🐛 Bug Fixes & Type Improvements
+- **CSV Export Fix** (`admin/products/index.tsx`):
+  - Added `escapeCsvValue()` function to properly escape commas, quotes, and newlines
+  - All CSV values now wrapped in double-quotes with proper escaping
+- **Product ID Type Change** (UUID instead of numeric):
+  - Changed `Product.id` from `number` to `string` in `store/types.ts`
+  - Updated `RefinedProductGrid.tsx`, `RefinedProductCard.tsx`, `QuickViewModal.tsx`
+  - Updated `CartContext.tsx` - CartItem.id now string
+  - Removed collision-prone UUID truncation in `Store.tsx`
+- **Supabase Error Handling** (`supabase/products.ts`):
+  - `getProductById()` now returns `null` for PGRST116 (not found) instead of throwing
+- **Type Consolidation**:
+  - All types now in `src/supabase/types/index.ts`
+  - Removed duplicate `src/types/` folder
+  - Added `AdminProduct` type (camelCase) for UI, `Product` (snake_case) for Supabase
+
 ## 2025-11-30 21:38
 
 ### 🔄 Route Update - /transfers → /store
