@@ -2,3 +2,4 @@
 export { supabase } from './core';
 export * from './types';
 export * from './banners';
+export * from './products';

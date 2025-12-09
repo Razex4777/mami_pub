@@ -1,17 +1,35 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import RefinedProductGrid from "@/components/product/RefinedProductGrid";
 import CartButton from "@/components/cart/CartButton";
 import FloatingCart from "@/components/cart/FloatingCart";
-import { FilterState } from "./types";
-import { products } from "./data";
+import { FilterState, Product } from "./types";
 import {
   PromoBannerCarousel,
   FiltersSidebar,
   SearchBar,
   ResultsHeader
 } from "./components";
+import { getActiveProducts, type Product as SupabaseProduct } from "@/supabase";
+
+// Convert Supabase product to store Product type
+const toStoreProduct = (p: SupabaseProduct): Product => ({
+  id: parseInt(p.id.replace(/-/g, '').slice(0, 8), 16) || Math.random() * 1000000,
+  name: p.name,
+  category: p.category,
+  price: p.price,
+  image: p.images[0] || '/images/product-dtf-transfers.jpg',
+  specs: p.specs || p.description || '',
+  rating: p.rating,
+  reviews: p.reviews_count,
+  inStock: p.stock > 0,
+  featured: p.featured,
+  tags: p.tags,
+  deliveryTime: p.delivery_time || undefined,
+  discount: p.discount,
+});
 
 const Store = () => {
+  const [products, setProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("featured");
@@ -23,12 +41,27 @@ const Store = () => {
     isNew: false,
     onSale: false
   });
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getActiveProducts();
+        setProducts(data.map(toStoreProduct));
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const categories = useMemo(() => {
     const cats = [...new Set(products.map(p => p.category))];
     return cats;
-  }, []);
+  }, [products]);
 
   const filteredProducts = useMemo(() => {
     let filtered = products.filter((product) => {

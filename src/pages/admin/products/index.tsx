@@ -12,95 +12,57 @@ import ProductTable from './ProductTable';
 import ProductFilters from './ProductFilters';
 import StatsCard from '../dashboard/StatsCard';
 import { useLottieAnimation } from '@/hooks/useLottieAnimation';
+import {
+  getAllProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  bulkUpdateProductsStatus,
+  bulkDeleteProducts,
+  type Product as SupabaseProduct,
+  type ProductInsert,
+} from '@/supabase';
 
-// Mock data generator
-const generateMockProducts = (): Product[] => [
-  {
-    id: '1',
-    name: 'DTF Transfer Film',
-    description: 'High-quality DTF transfer film for textile printing',
-    category: 'Films',
-    price: 49.99,
-    cost: 25.50,
-    stock: 150,
-    minStock: 50,
-    status: 'active',
-    sku: 'DTF-FILM-001',
-    images: ['/images/product-dtf-transfers.jpg'],
-    createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2024-03-10T14:20:00Z',
-    supplier: 'FilmTech Solutions',
-    tags: ['film', 'dtf', 'textile'],
-  },
-  {
-    id: '2',
-    name: 'Heat Press Machine Pro',
-    description: 'Professional heat press machine for DTF transfers',
-    category: 'Equipment',
-    price: 299.99,
-    cost: 180.00,
-    stock: 12,
-    minStock: 5,
-    status: 'active',
-    sku: 'HP-MACHINE-PRO',
-    images: ['/images/product-heat-press.jpg'],
-    createdAt: '2024-01-20T09:15:00Z',
-    updatedAt: '2024-03-12T11:45:00Z',
-    supplier: 'PressTech Industries',
-    tags: ['equipment', 'press', 'professional'],
-  },
-  {
-    id: '3',
-    name: 'Vinyl Sheets - White',
-    description: 'Premium white vinyl sheets for cutting and printing',
-    category: 'Vinyl',
-    price: 12.99,
-    cost: 6.50,
-    stock: 25,
-    minStock: 30,
-    status: 'active',
-    sku: 'VINYL-WHITE-001',
-    images: ['/images/product-vinyl.jpg'],
-    createdAt: '2024-02-01T08:00:00Z',
-    updatedAt: '2024-03-08T16:30:00Z',
-    supplier: 'VinylPro Materials',
-    tags: ['vinyl', 'white', 'sheets'],
-  },
-  {
-    id: '4',
-    name: 'Printer Ink Set - CMYK',
-    description: 'High-capacity CMYK ink cartridges for DTF printers',
-    category: 'Ink',
-    price: 89.99,
-    cost: 45.00,
-    stock: 8,
-    minStock: 10,
-    status: 'active',
-    sku: 'INK-CMYK-SET',
-    images: ['/images/product-ink-set.jpg'],
-    createdAt: '2024-02-10T13:20:00Z',
-    updatedAt: '2024-03-14T10:15:00Z',
-    supplier: 'InkMaster Pro',
-    tags: ['ink', 'cmyk', 'cartridge'],
-  },
-  {
-    id: '5',
-    name: 'Cutting Tools Set',
-    description: 'Complete set of cutting tools for vinyl and film work',
-    category: 'Tools',
-    price: 34.99,
-    cost: 18.75,
-    stock: 0,
-    minStock: 15,
-    status: 'inactive',
-    sku: 'TOOLS-CUT-SET',
-    images: ['/images/product-tools.jpg'],
-    createdAt: '2024-02-15T11:45:00Z',
-    updatedAt: '2024-03-05T09:30:00Z',
-    supplier: 'ToolCraft Solutions',
-    tags: ['tools', 'cutting', 'set'],
-  },
-];
+// Helper to convert Supabase product to local Product type
+const toLocalProduct = (p: SupabaseProduct): Product => ({
+  id: p.id,
+  name: p.name,
+  description: p.description || '',
+  category: p.category,
+  price: p.price,
+  cost: p.cost,
+  stock: p.stock,
+  minStock: p.min_stock,
+  status: p.status,
+  sku: p.sku,
+  images: p.images,
+  createdAt: p.created_at,
+  updatedAt: p.updated_at,
+  supplier: p.supplier || undefined,
+  tags: p.tags,
+});
+
+// Helper to convert local Product to Supabase insert type
+const toSupabaseProduct = (p: Partial<Product>): ProductInsert => ({
+  name: p.name || '',
+  description: p.description || null,
+  category: p.category || '',
+  price: p.price || 0,
+  cost: p.cost || 0,
+  stock: p.stock || 0,
+  min_stock: p.minStock || 0,
+  status: p.status || 'active',
+  sku: p.sku || '',
+  images: p.images || [],
+  supplier: p.supplier || null,
+  tags: p.tags || [],
+  rating: 0,
+  reviews_count: 0,
+  featured: false,
+  discount: 0,
+  delivery_time: null,
+  specs: null,
+});
 
 const categories = ['All', 'Films', 'Equipment', 'Vinyl', 'Ink', 'Tools', 'Accessories'];
 const statuses = ['all', 'active', 'inactive', 'discontinued'];
@@ -137,15 +99,26 @@ const ProductsPage: React.FC = () => {
   const { animationData: emptyBoxAnimation } = useLottieAnimation('/animations/empty-box.json');
   const { animationData: revenueAnimation } = useLottieAnimation('/animations/revenue.json');
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const mockProducts = generateMockProducts();
-      setProducts(mockProducts);
-      setFilteredProducts(mockProducts);
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllProducts();
+      const localProducts = data.map(toLocalProduct);
+      setProducts(localProducts);
+      setFilteredProducts(localProducts);
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de charger les produits.',
+        variant: 'destructive',
+      });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
+  };
 
-    return () => clearTimeout(timer);
+  useEffect(() => {
+    fetchProducts();
   }, []);
 
   useEffect(() => {
@@ -214,7 +187,7 @@ const ProductsPage: React.FC = () => {
     setIsFormOpen(true);
   };
 
-  const handleSaveProduct = () => {
+  const handleSaveProduct = async () => {
     if (!formData.name || !formData.category || !formData.sku) {
       toast({
         title: 'Erreur de validation',
@@ -224,48 +197,67 @@ const ProductsPage: React.FC = () => {
       return;
     }
 
-    if (editingProduct) {
-      const updatedProducts = products.map(p =>
-        p.id === editingProduct.id ? { ...formData, id: editingProduct.id } as Product : p
-      );
-      setProducts(updatedProducts);
-      toast({
-        title: 'Produit mis à jour',
-        description: `${formData.name} a été mis à jour avec succès.`,
-      });
-    } else {
-      const newProduct: Product = {
-        ...formData,
-        id: Date.now().toString(),
-        images: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      } as Product;
+    try {
+      if (editingProduct) {
+        await updateProduct(editingProduct.id, {
+          name: formData.name,
+          description: formData.description || null,
+          category: formData.category,
+          price: formData.price || 0,
+          cost: formData.cost || 0,
+          stock: formData.stock || 0,
+          min_stock: formData.minStock || 0,
+          status: formData.status || 'active',
+          sku: formData.sku,
+          supplier: formData.supplier || null,
+          tags: formData.tags || [],
+        });
+        toast({
+          title: 'Produit mis à jour',
+          description: `${formData.name} a été mis à jour avec succès.`,
+        });
+      } else {
+        await createProduct(toSupabaseProduct(formData));
+        toast({
+          title: 'Produit ajouté',
+          description: `${formData.name} a été ajouté avec succès.`,
+        });
+      }
       
-      setProducts([...products, newProduct]);
+      setIsFormOpen(false);
+      setEditingProduct(null);
+      fetchProducts();
+    } catch (error) {
       toast({
-        title: 'Produit ajouté',
-        description: `${formData.name} a été ajouté avec succès.`,
+        title: 'Erreur',
+        description: 'Une erreur est survenue lors de la sauvegarde.',
+        variant: 'destructive',
       });
     }
-    
-    setIsFormOpen(false);
-    setEditingProduct(null);
   };
 
-  const handleDeleteProduct = (productId: string) => {
+  const handleDeleteProduct = async (productId: string) => {
     const product = products.find(p => p.id === productId);
     if (product) {
-      setProducts(products.filter(p => p.id !== productId));
-      setSelectedProducts(new Set([...selectedProducts].filter(id => id !== productId)));
-      toast({
-        title: 'Produit supprimé',
-        description: `${product.name} a été supprimé avec succès.`,
-      });
+      try {
+        await deleteProduct(productId);
+        setSelectedProducts(new Set([...selectedProducts].filter(id => id !== productId)));
+        toast({
+          title: 'Produit supprimé',
+          description: `${product.name} a été supprimé avec succès.`,
+        });
+        fetchProducts();
+      } catch (error) {
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de supprimer le produit.',
+          variant: 'destructive',
+        });
+      }
     }
   };
 
-  const handleBulkAction = (action: string) => {
+  const handleBulkAction = async (action: string) => {
     if (selectedProducts.size === 0) {
       toast({
         title: 'Aucune sélection',
@@ -275,66 +267,75 @@ const ProductsPage: React.FC = () => {
       return;
     }
 
-    switch (action) {
-      case 'activate':
-        setProducts(products.map(p => 
-          selectedProducts.has(p.id) ? { ...p, status: 'active' as const } : p
-        ));
-        toast({
-          title: 'Produits activés',
-          description: `${selectedProducts.size} produits ont été activés.`,
-        });
-        break;
-      case 'deactivate':
-        setProducts(products.map(p => 
-          selectedProducts.has(p.id) ? { ...p, status: 'inactive' as const } : p
-        ));
-        toast({
-          title: 'Produits désactivés',
-          description: `${selectedProducts.size} produits ont été désactivés.`,
-        });
-        break;
-      case 'delete':
-        setProducts(products.filter(p => !selectedProducts.has(p.id)));
-        toast({
-          title: 'Produits supprimés',
-          description: `${selectedProducts.size} produits ont été supprimés.`,
-        });
-        break;
-      case 'export':
-        const csvData = filteredProducts
-          .filter(p => selectedProducts.has(p.id))
-          .map(p => ({
-            Name: p.name,
-            SKU: p.sku,
-            Category: p.category,
-            Price: p.price,
-            Cost: p.cost,
-            Stock: p.stock,
-            Status: p.status,
-            Supplier: p.supplier || '',
-          }));
-        
-        const csvContent = [
-          Object.keys(csvData[0] || {}).join(','),
-          ...csvData.map(row => Object.values(row).join(','))
-        ].join('\n');
-        
-        const blob = new Blob([csvContent], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `products-export-${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
-        
-        toast({
-          title: 'Export terminé',
-          description: `${selectedProducts.size} produits exportés avec succès.`,
-        });
-        break;
+    const ids = [...selectedProducts];
+
+    try {
+      switch (action) {
+        case 'activate':
+          await bulkUpdateProductsStatus(ids, 'active');
+          toast({
+            title: 'Produits activés',
+            description: `${selectedProducts.size} produits ont été activés.`,
+          });
+          break;
+        case 'deactivate':
+          await bulkUpdateProductsStatus(ids, 'inactive');
+          toast({
+            title: 'Produits désactivés',
+            description: `${selectedProducts.size} produits ont été désactivés.`,
+          });
+          break;
+        case 'delete':
+          await bulkDeleteProducts(ids);
+          toast({
+            title: 'Produits supprimés',
+            description: `${selectedProducts.size} produits ont été supprimés.`,
+          });
+          break;
+        case 'export':
+          const csvData = filteredProducts
+            .filter(p => selectedProducts.has(p.id))
+            .map(p => ({
+              Name: p.name,
+              SKU: p.sku,
+              Category: p.category,
+              Price: p.price,
+              Cost: p.cost,
+              Stock: p.stock,
+              Status: p.status,
+              Supplier: p.supplier || '',
+            }));
+          
+          const csvContent = [
+            Object.keys(csvData[0] || {}).join(','),
+            ...csvData.map(row => Object.values(row).join(','))
+          ].join('\n');
+          
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `products-export-${new Date().toISOString().split('T')[0]}.csv`;
+          a.click();
+          
+          toast({
+            title: 'Export terminé',
+            description: `${selectedProducts.size} produits exportés avec succès.`,
+          });
+          break;
+      }
+      
+      if (action !== 'export') {
+        fetchProducts();
+      }
+      setSelectedProducts(new Set());
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Une erreur est survenue.',
+        variant: 'destructive',
+      });
     }
-    
-    setSelectedProducts(new Set());
   };
 
   const totalProducts = products.length;
