@@ -25,8 +25,3 @@ export interface FilterState {
   onSale: boolean;
 }
 
-export interface PromoBanner {
-  id: number;
-  image: string;
-  alt: string;
-}

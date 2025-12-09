@@ -1,12 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Printer, Megaphone, ShoppingCart } from "lucide-react";
+import { Home, Printer, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 
 const tabItems = [
   { icon: Home, label: "Accueil", path: "/" },
   { icon: Printer, label: "Store", path: "/store" },
-  { icon: Megaphone, label: "Designer", path: "/designer" },
   { icon: ShoppingCart, label: "Panier", path: "/cart" },
 ];
 

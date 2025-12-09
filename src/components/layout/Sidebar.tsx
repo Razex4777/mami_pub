@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, ShoppingBag, Palette } from "lucide-react";
+import { Home, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -14,7 +14,6 @@ interface SidebarProps {
 const navItems = [
   { icon: Home, label: "Accueil", path: "/", color: "from-blue-500 to-cyan-500" },
   { icon: ShoppingBag, label: "Store", path: "/store", color: "from-primary to-blue-500" },
-  { icon: Palette, label: "Designer", path: "/designer", color: "from-purple-500 to-pink-500" },
 ];
 
 const Sidebar = ({ isOpen }: SidebarProps) => {

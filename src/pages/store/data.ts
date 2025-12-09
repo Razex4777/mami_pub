@@ -1,14 +1,8 @@
-// Store data - Products and Promo Banners
-import { Product, PromoBanner } from "./types";
+// Store data - Products
+import { Product } from "./types";
 import productImage1 from "/images/product-dtf-transfers.jpg";
 import productImage2 from "/images/product-heat-press.jpg";
 import productImage3 from "/images/product-vinyl.jpg";
-
-export const promoBanners: PromoBanner[] = [
-  { id: 1, image: "/images/promo-banner-1.png", alt: "Promo -30%" },
-  { id: 2, image: "/images/promo-banner-2.png", alt: "Livraison Gratuite" },
-  { id: 3, image: "/images/promo-banner-3.png", alt: "Nouveautés" }
-];
 
 export const products: Product[] = [
   {

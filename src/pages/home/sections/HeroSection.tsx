@@ -48,11 +48,11 @@ const HeroSection = ({ animations }: HeroSectionProps) => {
                   Explorer nos solutions
                 </Button>
               </Link>
-              <Link to="/designer">
+              <a href="https://wa.me/213557914544" target="_blank" rel="noopener noreferrer">
                 <Button size="default" className="h-9 sm:h-10 md:h-12 rounded-full border-2 border-white/60 bg-white/15 backdrop-blur-sm px-4 sm:px-6 md:px-8 text-xs sm:text-sm font-semibold !text-white hover:bg-white/25 shadow-lg">
                   Lancer votre projet
                 </Button>
-              </Link>
+              </a>
             </div>
 
             <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-2 sm:pt-4">
