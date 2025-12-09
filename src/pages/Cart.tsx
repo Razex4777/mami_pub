@@ -14,8 +14,6 @@ import {
   Shield,
   Truck
 } from "lucide-react";
-import productImage1 from "/images/product-dtf-transfers.jpg";
-import productImage2 from "/images/product-heat-press.jpg";
 
 interface CartItem {
   id: number;
@@ -33,7 +31,7 @@ const Cart = () => {
       name: "Premium DTF Transfer - Vibrant Graphics",
       price: 24.99,
       quantity: 2,
-      image: productImage1,
+      image: "/placeholder.svg",
       category: "DTF Transfers"
     },
     {
@@ -41,7 +39,7 @@ const Cart = () => {
       name: "Commercial Heat Press - 16x20",
       price: 1299.99,
       quantity: 1,
-      image: productImage2,
+      image: "/placeholder.svg",
       category: "Equipment"
     }
   ]);

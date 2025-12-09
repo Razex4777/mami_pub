@@ -21,9 +21,11 @@ import { Badge } from "@/components/ui/data-display/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/navigation/tabs";
 import { toast } from "sonner";
 import { useCart } from "@/contexts/CartContext";
-import { products } from "./store/data";
 import RefinedProductCard from "@/components/product/RefinedProductCard";
 import { cn } from "@/lib/utils";
+
+// Mock products for now (will be fetched from Supabase)
+const products: any[] = [];
 
 // Extended data for the product view
 const EXTENDED_PRODUCT_DATA: Record<number, any> = {
