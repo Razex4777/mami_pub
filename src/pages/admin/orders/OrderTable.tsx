@@ -41,7 +41,7 @@ import {
   Clock,
   XCircle,
 } from 'lucide-react';
-import { Order } from '@/types';
+import { Order } from '@/supabase';
 
 interface OrderTableProps {
   orders: Order[];

@@ -6,13 +6,8 @@ import {
   Plus,
   Download,
 } from 'lucide-react';
-import { Product } from '@/types';
-import ProductForm from './ProductForm';
-import ProductTable from './ProductTable';
-import ProductFilters from './ProductFilters';
-import StatsCard from '../dashboard/StatsCard';
-import { useLottieAnimation } from '@/hooks/useLottieAnimation';
 import {
+  AdminProduct,
   getAllProducts,
   createProduct,
   updateProduct,
@@ -22,9 +17,14 @@ import {
   type Product as SupabaseProduct,
   type ProductInsert,
 } from '@/supabase';
+import ProductForm from './ProductForm';
+import ProductTable from './ProductTable';
+import ProductFilters from './ProductFilters';
+import StatsCard from '../dashboard/StatsCard';
+import { useLottieAnimation } from '@/hooks/useLottieAnimation';
 
-// Helper to convert Supabase product to local Product type
-const toLocalProduct = (p: SupabaseProduct): Product => ({
+// Helper to convert Supabase product to AdminProduct type
+const toLocalProduct = (p: SupabaseProduct): AdminProduct => ({
   id: p.id,
   name: p.name,
   description: p.description || '',
@@ -42,8 +42,8 @@ const toLocalProduct = (p: SupabaseProduct): Product => ({
   tags: p.tags,
 });
 
-// Helper to convert local Product to Supabase insert type
-const toSupabaseProduct = (p: Partial<Product>): ProductInsert => ({
+// Helper to convert AdminProduct to Supabase insert type
+const toSupabaseProduct = (p: Partial<AdminProduct>): ProductInsert => ({
   name: p.name || '',
   description: p.description || null,
   category: p.category || '',
@@ -69,8 +69,8 @@ const statuses = ['all', 'active', 'inactive', 'discontinued'];
 
 const ProductsPage: React.FC = () => {
   const { toast } = useToast();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<AdminProduct[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<AdminProduct[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -78,8 +78,8 @@ const ProductsPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState<Partial<Product>>({
+  const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
+  const [formData, setFormData] = useState<Partial<AdminProduct>>({
     name: '',
     description: '',
     category: '',

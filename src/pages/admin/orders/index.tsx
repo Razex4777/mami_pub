@@ -6,7 +6,7 @@ import {
   Plus,
   Download,
 } from 'lucide-react';
-import { Order } from '@/types';
+import { Order } from '@/supabase';
 import OrderDetails from './OrderDetails';
 import OrderTable from './OrderTable';
 import OrderFilters from './OrderFilters';

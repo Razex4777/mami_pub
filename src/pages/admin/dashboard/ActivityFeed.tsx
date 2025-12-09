@@ -6,7 +6,7 @@ import {
   Users,
   Activity,
 } from 'lucide-react';
-import { Activity as ActivityType } from '@/types';
+import { Activity as ActivityType } from '@/supabase';
 
 interface ActivityFeedProps {
   activities: ActivityType[];

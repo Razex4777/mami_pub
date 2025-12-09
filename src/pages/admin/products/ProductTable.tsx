@@ -39,19 +39,19 @@ import {
   CheckCircle,
   XCircle,
 } from 'lucide-react';
-import { Product } from '@/types';
+import { AdminProduct } from '@/supabase';
 
 interface ProductTableProps {
-  products: Product[];
+  products: AdminProduct[];
   totalProducts: number;
   selectedProducts: Set<string>;
   onSelectProduct: (productId: string) => void;
   onSelectAll: () => void;
-  onEdit: (product: Product) => void;
+  onEdit: (product: AdminProduct) => void;
   onDelete: (productId: string) => void;
 }
 
-const getStockStatus = (product: Product) => {
+const getStockStatus = (product: AdminProduct) => {
   if (product.stock === 0) return { status: 'out', color: 'destructive', icon: XCircle };
   if (product.stock <= product.minStock) return { status: 'low', color: 'secondary', icon: AlertTriangle };
   return { status: 'good', color: 'default', icon: CheckCircle };

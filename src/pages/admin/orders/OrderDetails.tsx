@@ -29,7 +29,7 @@ import {
   Truck,
   XCircle,
 } from 'lucide-react';
-import { Order } from '@/types';
+import { Order } from '@/supabase';
 
 interface OrderDetailsProps {
   open: boolean;

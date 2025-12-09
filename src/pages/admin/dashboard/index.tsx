@@ -14,7 +14,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Analytics, Activity as ActivityType } from '@/types';
+import { Analytics, Activity as ActivityType } from '@/supabase';
 import StatsCard from './StatsCard';
 import RevenueChart from './RevenueChart';
 import ActivityFeed from './ActivityFeed';

@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/overlays/dialog';
-import { Order } from '@/types';
+import { Order } from '@/supabase';
 
 interface OrderEditProps {
   open: boolean;

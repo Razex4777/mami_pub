@@ -18,14 +18,14 @@ import {
   DialogTitle,
 } from '@/components/ui/overlays/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/navigation/tabs';
-import { Product } from '@/types';
+import { AdminProduct } from '@/supabase';
 
 interface ProductFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editingProduct: Product | null;
-  formData: Partial<Product>;
-  setFormData: (data: Partial<Product>) => void;
+  editingProduct: AdminProduct | null;
+  formData: Partial<AdminProduct>;
+  setFormData: (data: Partial<AdminProduct>) => void;
   onSave: () => void;
   categories: string[];
 }
