@@ -25,7 +25,7 @@ const defaultSettings: Record<SettingKey, string | null> = {
   logo_url: null,
   favicon_url: null,
   site_name: 'MAMI PUB',
-  site_title: 'MAMI PUB - Impression & Publicité | Imprimantes Professionnelles Eulma',
+  site_title: null,
   site_tagline: 'Qualité Premium',
   contact_phone: '0557 91 45 44',
   contact_email: 'anes.mami.n@gmail.com',

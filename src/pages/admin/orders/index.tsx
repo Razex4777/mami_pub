@@ -735,7 +735,7 @@ const OrdersPage: React.FC = () => {
         onOpenChange={setIsViewDialogOpen}
         order={viewingOrder}
         translations={{
-          title: getText('details.title') || 'Commande',
+          title: (getText('details.title') || 'Commande').replace('{orderNumber}', ''),
           description: getText('details.description') || 'Détails et informations de livraison',
           tabs: {
             details: getText('details.tabs.details') || 'Détails',

@@ -30,6 +30,91 @@ import {
 import { AdminProduct, ProductSpec, ProductCondition } from '@/supabase';
 import { cn } from '@/lib/utils';
 
+// French translations (default)
+const fr = {
+  form: {
+    name: 'Nom du produit',
+    nameRequired: 'Nom du produit *',
+    namePlaceholder: 'Entrez le nom du produit',
+    description: 'Description',
+    descriptionRequired: 'Description *',
+    descriptionPlaceholder: 'Description du produit...',
+    category: 'Catégorie',
+    categoryPlaceholder: 'Sélectionner une catégorie',
+    categoryOptional: 'Optionnel - "Tous" par défaut',
+    categoryAll: 'Tous',
+    categoryDefault: 'Tous (par défaut)',
+    price: 'Prix (DA)',
+    priceRequired: 'Prix de vente (DA) *',
+    pricePlaceholder: 'Ex: 5000',
+    priceTooltipTitle: 'Prix de vente',
+    priceTooltip: "C'est le prix que vos clients paieront pour acheter ce produit.",
+    cost: 'Coût (DA)',
+    costRequired: "Prix d'achat (DA) *",
+    costPlaceholder: 'Ex: 3500',
+    costTooltipTitle: "Prix d'achat",
+    costTooltip: "C'est le prix que VOUS avez payé pour acheter ce produit (votre coût).",
+    sku: 'SKU / Référence',
+    skuPlaceholder: 'Référence produit (optionnel)',
+    skuOptional: 'Optionnel',
+    status: 'Statut',
+    statusActive: 'Actif',
+    statusInactive: 'Inactif',
+    statusDiscontinued: 'Discontinué',
+    condition: 'État du produit',
+    conditionRequired: 'État du produit *',
+    conditionPlaceholder: "Sélectionner l'état",
+    conditionNew: 'Neuf',
+    conditionUsed: 'Occasion',
+    conditionRefurbished: 'Reconditionné',
+    images: 'Images',
+    imagesRequired: 'Médias du produit (Images & Vidéos) *',
+    imagesHint: 'La première image/vidéo sera le média principal. Max 10 fichiers.',
+    imagesPending: 'fichier(s) en attente',
+    tags: 'Tags',
+    tagsPlaceholder: 'Ajouter un tag...',
+    tagsHint: 'Appuyez sur Entrée ou cliquez + pour ajouter',
+    specs: 'Spécifications',
+    specsTitle: 'Spécifications du produit',
+    addSpec: 'Ajouter',
+    specName: 'Nom',
+    specValue: 'Valeur',
+    specBlock: 'Bloc',
+    specTitlePlaceholder: 'Titre du bloc (ex: Dimensions, Matériaux...)',
+    specDescPlaceholder: 'Description détaillée...',
+    specsEmpty: 'Aucune spécification. Cliquez "Ajouter" pour en créer.',
+    specsHint: 'Ajoutez des blocs de spécifications pour décrire les caractéristiques.',
+    margin: 'Marge bénéficiaire',
+    marginTooltipTitle: 'Pourquoi calculer la marge ?',
+    marginTooltip: 'La marge vous montre combien vous gagnez sur chaque vente.',
+    marginCalc: 'Calcul :',
+    marginFormula: "Marge = Prix de vente - Prix d'achat",
+    marginPercent: "% = (Marge ÷ Prix d'achat) × 100",
+    profit: 'de profit'
+  },
+  dialog: {
+    addTitle: 'Ajouter un produit',
+    editTitle: 'Modifier le produit',
+    addDescription: 'Remplissez les détails du produit',
+    editDescription: 'Modifier les informations',
+    tabGeneral: 'Général',
+    tabMedia: 'Médias',
+    tabPricing: 'Tarifs',
+    tabSpecs: 'Specs',
+    cancel: 'Annuler',
+    add: 'Ajouter',
+    edit: 'Modifier',
+    saving: 'Enregistrement...'
+  },
+  validation: {
+    nameRequired: 'Le nom du produit est requis',
+    descriptionRequired: 'La description est requise',
+    priceRequired: 'Le prix de vente est requis',
+    costRequired: "Le prix d'achat est requis",
+    imagesRequired: 'Au moins une image est requise'
+  }
+};
+
 // Validation errors type
 interface ValidationErrors {
   name?: string;
@@ -139,9 +224,29 @@ const ProductForm: React.FC<ProductFormProps> = ({
   isSaving = false,
   setIsSaving,
 }) => {
-  const { t: translate } = useLanguage();
-  // Helper to translate with admin_products namespace
-  const t = (key: string) => translate(key, 'admin_products');
+  const { t: translate, language } = useLanguage();
+  
+  // Translation helper - French hardcoded, others from JSON
+  const getFrenchText = (key: string): string => {
+    const keys = key.split('.');
+    let value: unknown = fr;
+    for (const k of keys) {
+      if (value && typeof value === 'object') {
+        value = (value as Record<string, unknown>)[k];
+      } else {
+        return key;
+      }
+    }
+    return typeof value === 'string' ? value : key;
+  };
+  
+  const t = (key: string): string => {
+    if (language === 'fr') {
+      return getFrenchText(key);
+    }
+    const translated = translate(key, 'admin_products');
+    return translated === key ? getFrenchText(key) : translated;
+  };
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [activeTab, setActiveTab] = useState('basic');
