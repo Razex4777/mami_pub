@@ -55,7 +55,7 @@ const Topbar = ({ onMenuClick }: TopbarProps) => {
       welcome: "Bienvenue !",
       welcomeDesc: "Connexion réussie au tableau de bord admin",
       loginFailed: "Échec de connexion",
-      loginFailedDesc: "Identifiants invalides. Utilisez admin/admin",
+      loginFailedDesc: "Identifiants invalides. Veuillez réessayer.",
       error: "Erreur",
       errorDesc: "Échec de connexion. Veuillez réessayer."
     },
