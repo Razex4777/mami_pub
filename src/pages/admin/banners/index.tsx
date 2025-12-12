@@ -1,5 +1,73 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+// French translations (default)
+const fr = {
+  title: 'Bannières',
+  subtitle: 'Gérer les bannières promotionnelles de la boutique',
+  subtitleCount: 'bannière',
+  subtitleCountPlural: 'bannières',
+  addBanner: 'Ajouter une bannière',
+  createBanner: 'Créer une bannière',
+  empty: {
+    title: 'Aucune bannière',
+    description: 'Commencez par créer votre première bannière promotionnelle.'
+  },
+  status: {
+    active: 'Active',
+    inactive: 'Inactive'
+  },
+  card: {
+    viewLink: 'Voir le lien'
+  },
+  dialog: {
+    createTitle: 'Nouvelle bannière',
+    editTitle: 'Modifier la bannière',
+    createDescription: 'Créer une nouvelle bannière promotionnelle pour la boutique.',
+    editDescription: 'Modifier les informations de la bannière.',
+    cancel: 'Annuler',
+    create: 'Créer',
+    update: 'Mettre à jour'
+  },
+  form: {
+    title: 'Titre',
+    titleRequired: 'Titre *',
+    titlePlaceholder: 'Ex: Promo -30%',
+    image: 'Image de la bannière',
+    imageRequired: 'Image de la bannière *',
+    altText: 'Texte alternatif',
+    altTextRequired: 'Texte alternatif *',
+    altTextPlaceholder: "Description de l'image pour l'accessibilité",
+    linkUrl: 'Lien (optionnel)',
+    linkUrlPlaceholder: 'https://... ou /store?category=promo',
+    displayOrder: "Ordre d'affichage",
+    isActive: 'Bannière active'
+  },
+  deleteDialog: {
+    title: 'Supprimer la bannière ?',
+    description: 'Êtes-vous sûr de vouloir supprimer "{title}" ? Cette action est irréversible.',
+    cancel: 'Annuler',
+    confirm: 'Supprimer'
+  },
+  toast: {
+    loadError: 'Impossible de charger les bannières.',
+    validationError: 'Erreur de validation',
+    validationMessage: 'Veuillez remplir tous les champs requis.',
+    updated: 'Bannière mise à jour',
+    updatedDesc: '"{title}" a été mise à jour avec succès.',
+    created: 'Bannière créée',
+    createdDesc: '"{title}" a été créée avec succès.',
+    saveError: "Une erreur est survenue lors de l'enregistrement.",
+    deleted: 'Bannière supprimée',
+    deletedDesc: '"{title}" a été supprimée.',
+    deleteError: 'Impossible de supprimer la bannière.',
+    activated: 'Bannière activée',
+    deactivated: 'Bannière désactivée',
+    toggledDesc: '"{title}" a été {status}.',
+    statusError: 'Impossible de changer le statut.',
+    error: 'Erreur'
+  }
+};
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/layout/card';
 import { Button } from '@/components/ui/interactive/button';
 import { Input } from '@/components/ui/forms/input';
@@ -42,8 +110,29 @@ import {
 import type { StoreBanner, StoreBannerInsert, StoreBannerUpdate } from '@/supabase';
 
 const BannersPage: React.FC = () => {
-  const { t: translate } = useLanguage();
-  const t = (key: string) => translate(key, 'admin_banners');
+  const { t: translate, language } = useLanguage();
+  
+  // Translation helper - French hardcoded, others from JSON
+  const getFrenchText = (key: string): string => {
+    const keys = key.split('.');
+    let value: unknown = fr;
+    for (const k of keys) {
+      if (value && typeof value === 'object') {
+        value = (value as Record<string, unknown>)[k];
+      } else {
+        return key;
+      }
+    }
+    return typeof value === 'string' ? value : key;
+  };
+  
+  const t = (key: string): string => {
+    if (language === 'fr') {
+      return getFrenchText(key);
+    }
+    const translated = translate(key, 'admin_banners');
+    return translated === key ? getFrenchText(key) : translated;
+  };
   const { toast } = useToast();
   const [banners, setBanners] = useState<StoreBanner[]>([]);
   const [loading, setLoading] = useState(true);

@@ -6,6 +6,33 @@ import { toast } from 'sonner';
 import { validateImageFile } from '@/supabase';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+// French translations (default)
+const fr = {
+  imageUpload: {
+    dropHere: 'Déposez les {type} ici',
+    dragDrop: 'Glissez-déposez vos {type}',
+    files: 'fichiers',
+    images: 'images',
+    imagesVideos: 'images/vidéos',
+    clickToBrowse: 'ou <span>cliquez pour parcourir</span>',
+    formatInfoImages: 'JPG, PNG, WebP ou GIF • Max 5 Mo • {count}/{max} images',
+    formatInfoMedia: 'JPG, PNG, WebP, GIF, MP4, WebM • Images max 5 Mo, Vidéos max 50 Mo • {count}/{max}',
+    maxFiles: 'Maximum {max} fichiers',
+    maxFilesDesc: 'Vous pouvez ajouter {remaining} fichier(s) supplémentaire(s).',
+    videosNotAllowed: 'Vidéos non autorisées',
+    videosNotAllowedDesc: 'Seules les images sont acceptées ici.',
+    invalidFile: 'Fichier invalide',
+    filesAdded: '{count} fichier(s) ajouté(s)',
+    videoFormatError: 'Format vidéo non supporté. Utilisez MP4, WebM ou MOV.',
+    videoSizeError: 'Vidéo trop volumineuse. Maximum {size} Mo.',
+    primary: 'Principal',
+    video: 'Vidéo',
+    pending: 'En attente',
+    noMedia: 'Aucun média ajouté',
+    noImages: 'Aucune image ajoutée'
+  }
+};
+
 // Media item can be a blob URL (local) or a remote URL (already uploaded)
 interface MediaItem {
   url: string;
@@ -68,9 +95,30 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   className,
   allowVideo = false,
 }) => {
-  const { t: translate } = useLanguage();
+  const { t: translate, language } = useLanguage();
+  
+  // Translation helper - French hardcoded, others from JSON
+  const getFrenchText = (key: string): string => {
+    const keys = key.split('.');
+    let value: unknown = fr;
+    for (const k of keys) {
+      if (value && typeof value === 'object') {
+        value = (value as Record<string, unknown>)[k];
+      } else {
+        return key;
+      }
+    }
+    return typeof value === 'string' ? value : key;
+  };
+  
   const t = (key: string, params?: Record<string, string>) => {
-    let text = translate(key, 'components');
+    let text: string;
+    if (language === 'fr') {
+      text = getFrenchText(key);
+    } else {
+      const translated = translate(key, 'components');
+      text = translated === key ? getFrenchText(key) : translated;
+    }
     if (params) {
       Object.entries(params).forEach(([k, v]) => {
         text = text.replace(`{${k}}`, v);

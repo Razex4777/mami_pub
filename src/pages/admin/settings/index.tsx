@@ -15,11 +15,194 @@ import type { SettingKey } from '@/supabase';
 import { useLanguage, languages } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 
+// French translations (default)
+const fr = {
+  title: 'Paramètres du site',
+  subtitle: 'Gérer le logo, les informations de contact et les paramètres SEO',
+  refresh: 'Actualiser',
+  refreshShort: 'Sync',
+  save: 'Enregistrer',
+  tabs: {
+    general: 'Général',
+    contact: 'Contact',
+    notifications: 'Notifs',
+    social: 'Social',
+    seo: 'SEO'
+  },
+  general: {
+    logo: {
+      title: 'Logo',
+      description: 'Logo affiché dans la barre de navigation'
+    },
+    favicon: {
+      title: 'Favicon',
+      description: "Icône affichée dans l'onglet du navigateur"
+    },
+    siteInfo: {
+      title: 'Informations du site',
+      description: 'Nom, titre et slogan affichés sur le site',
+      siteName: 'Nom du site',
+      siteNamePlaceholder: 'MAMI PUB',
+      tagline: 'Slogan',
+      taglinePlaceholder: 'Qualité Premium',
+      browserTitle: 'Titre du navigateur',
+      browserTitlePlaceholder: 'MAMI PUB - Impression & Publicité',
+      browserTitleHint: "Ce titre apparaît dans l'onglet du navigateur"
+    },
+    language: {
+      title: 'Langue',
+      description: "Choisir la langue de l'interface"
+    },
+    preview: 'Aperçu :'
+  },
+  contact: {
+    title: 'Informations de contact',
+    description: 'Coordonnées affichées dans la barre de navigation',
+    phone: 'Téléphone',
+    phonePlaceholder: '0557 91 45 44',
+    email: 'Email',
+    emailPlaceholder: 'contact@example.com',
+    address: 'Adresse',
+    addressPlaceholder: 'Ets Mahamid Mami, El Eulma',
+    mapsLink: 'Lien Google Maps',
+    mapsLinkPlaceholder: 'https://maps.google.com/...',
+    businessHours: "Horaires d'ouverture",
+    businessHoursPlaceholder: 'Lun-Sam: 9h-18h'
+  },
+  notifications: {
+    telegram: {
+      title: 'Notifications Telegram',
+      description: 'Recevez des notifications instantanées sur Telegram pour chaque nouvelle commande',
+      enable: 'Activer les notifications',
+      enableDesc: 'Recevoir une notification Telegram pour chaque commande',
+      botToken: 'Token du Bot',
+      botTokenPlaceholder: '123456789:ABCdefGHIjklMNOpqrsTUVwxyz',
+      botTokenHint: 'Obtenez-le via @BotFather sur Telegram',
+      chatId: 'Chat ID',
+      chatIdPlaceholder: '5112845316',
+      chatIdHint: 'Votre ID utilisateur Telegram (via @userinfobot)',
+      testButton: 'Envoyer un message test',
+      howTo: {
+        title: 'Comment configurer ?',
+        step1: 'Ouvrez Telegram et recherchez @BotFather',
+        step2: 'Envoyez /newbot et suivez les instructions',
+        step3: "Copiez le token API fourni",
+        step4: 'Recherchez @userinfobot pour obtenir votre Chat ID',
+        step5: 'Collez les deux valeurs ci-dessus et testez'
+      }
+    },
+    email: {
+      title: 'Notifications Email',
+      description: 'Recevez les commandes par email',
+      enable: 'Activer les notifications email',
+      enableDesc: 'Recevoir un email pour chaque nouvelle commande',
+      recipient: 'Votre email',
+      recipientPlaceholder: 'votre-email@example.com',
+      recipientHint: "L'adresse email où vous recevrez les notifications de commande",
+      testButton: 'Envoyer un email test'
+    }
+  },
+  social: {
+    title: 'Réseaux sociaux',
+    description: 'Liens vers vos profils sociaux',
+    facebook: 'Facebook',
+    facebookPlaceholder: 'https://facebook.com/...',
+    instagram: 'Instagram',
+    instagramPlaceholder: 'https://instagram.com/...',
+    tiktok: 'TikTok',
+    tiktokPlaceholder: 'https://tiktok.com/@...',
+    whatsapp: 'WhatsApp',
+    whatsappPlaceholder: '557 91 45 44',
+    whatsappHint: 'Numéro algérien pour le lien WhatsApp (sans 0)'
+  },
+  seo: {
+    title: 'SEO (Référencement)',
+    description: 'Optimisez votre visibilité sur les moteurs de recherche',
+    siteDescription: 'Description du site',
+    siteDescriptionPlaceholder: 'Description de votre activité...',
+    siteDescriptionHint: 'Cette description apparaît dans les résultats de recherche Google',
+    keywords: 'Mots-clés',
+    keywordsPlaceholder: 'impression, publicité, Béjaïa, Algérie...',
+    keywordsHint: 'Séparez les mots-clés par des virgules',
+    ogImage: {
+      title: 'Image de partage social',
+      description: 'Image affichée lors du partage sur les réseaux sociaux',
+      hint: 'Taille recommandée : 1200x630 pixels'
+    }
+  },
+  security: {
+    title: 'Sécurité',
+    description: 'Modifier votre mot de passe administrateur',
+    currentPassword: 'Mot de passe actuel',
+    currentPasswordPlaceholder: 'Entrez votre mot de passe actuel',
+    newPassword: 'Nouveau mot de passe',
+    newPasswordPlaceholder: 'Entrez le nouveau mot de passe',
+    confirmPassword: 'Confirmer le mot de passe',
+    confirmPasswordPlaceholder: 'Confirmez le nouveau mot de passe',
+    passwordHint: 'Minimum 8 caractères',
+    changePassword: 'Modifier le mot de passe',
+    changing: 'Modification...',
+    allFieldsRequired: 'Tous les champs sont requis',
+    passwordMismatch: 'Les mots de passe ne correspondent pas',
+    passwordTooShort: 'Le mot de passe doit contenir au moins 8 caractères',
+    notLoggedIn: 'Utilisateur non connecté',
+    passwordChanged: 'Mot de passe modifié avec succès',
+    error: 'Erreur',
+    passwordChangeFailed: 'Impossible de modifier le mot de passe',
+    unexpectedError: 'Une erreur est survenue'
+  },
+  toast: {
+    saved: 'Paramètres enregistrés',
+    savedDesc: '{count} paramètre(s) mis à jour',
+    saveError: "Erreur d'enregistrement",
+    saveErrorDesc: 'Veuillez réessayer',
+    telegramIncomplete: 'Configuration incomplète',
+    telegramIncompleteDesc: 'Veuillez remplir le Token du Bot et le Chat ID',
+    telegramSuccess: 'Test réussi !',
+    telegramSuccessDesc: 'Vérifiez votre Telegram pour le message test',
+    telegramFailed: 'Test échoué',
+    telegramFailedDesc: 'Vérifiez vos identifiants',
+    telegramError: 'Erreur de connexion',
+    telegramErrorDesc: 'Impossible de contacter Telegram',
+    emailRequired: 'Email requis',
+    emailRequiredDesc: 'Veuillez remplir votre adresse email',
+    emailSuccess: 'Test réussi !',
+    emailSuccessDesc: 'Vérifiez votre boîte de réception',
+    emailFailed: 'Test échoué',
+    emailFailedDesc: "Erreur lors de l'envoi de l'email",
+    emailError: 'Erreur de connexion',
+    emailErrorDesc: "Impossible d'envoyer l'email"
+  }
+};
+
 const SettingsPage = () => {
   const { settings, isLoading, updateSettingValue, uploadAsset, refreshSettings } = useSiteSettings();
   const { language, setLanguage, currentLanguage, t: translate } = useLanguage();
   const { user } = useAuth();
-  const t = (key: string) => translate(key, 'admin_settings');
+  
+  // Translation helper - French hardcoded, others from JSON
+  const getFrenchText = (key: string): string => {
+    const keys = key.split('.');
+    let value: unknown = fr;
+    for (const k of keys) {
+      if (value && typeof value === 'object') {
+        value = (value as Record<string, unknown>)[k];
+      } else {
+        return key;
+      }
+    }
+    return typeof value === 'string' ? value : key;
+  };
+  
+  const getText = (key: string): string => {
+    if (language === 'fr') {
+      return getFrenchText(key);
+    }
+    const translated = translate(key, 'admin_settings');
+    return translated === key ? getFrenchText(key) : translated;
+  };
+  
+  const t = getText;
   const [isSaving, setIsSaving] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [isTestingEmail, setIsTestingEmail] = useState(false);
@@ -110,22 +293,22 @@ const SettingsPage = () => {
   const handleChangePassword = async () => {
     // Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
-      toast.error(language === 'fr' ? 'Tous les champs sont requis' : t('security.allFieldsRequired'));
+      toast.error(t('security.allFieldsRequired'));
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast.error(language === 'fr' ? 'Les mots de passe ne correspondent pas' : t('security.passwordMismatch'));
+      toast.error(t('security.passwordMismatch'));
       return;
     }
 
     if (newPassword.length < 8) {
-      toast.error(language === 'fr' ? 'Le mot de passe doit contenir au moins 8 caractères' : t('security.passwordTooShort'));
+      toast.error(t('security.passwordTooShort'));
       return;
     }
 
     if (!user?.id) {
-      toast.error(language === 'fr' ? 'Utilisateur non connecté' : t('security.notLoggedIn'));
+      toast.error(t('security.notLoggedIn'));
       return;
     }
 
@@ -148,18 +331,18 @@ const SettingsPage = () => {
       const data = await response.json();
 
       if (data.success) {
-        toast.success(language === 'fr' ? 'Mot de passe modifié avec succès' : t('security.passwordChanged'));
+        toast.success(t('security.passwordChanged'));
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
       } else {
-        toast.error(language === 'fr' ? 'Erreur' : t('security.error'), {
-          description: data.error || (language === 'fr' ? 'Impossible de modifier le mot de passe' : t('security.passwordChangeFailed')),
+        toast.error(t('security.error'), {
+          description: data.error || t('security.passwordChangeFailed'),
         });
       }
     } catch (error) {
-      toast.error(language === 'fr' ? 'Erreur' : t('security.error'), {
-        description: language === 'fr' ? 'Une erreur est survenue' : t('security.unexpectedError'),
+      toast.error(t('security.error'), {
+        description: t('security.unexpectedError'),
       });
     } finally {
       setIsChangingPassword(false);
@@ -419,16 +602,16 @@ const SettingsPage = () => {
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="text-sm sm:text-base flex items-center gap-2">
                 <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                {language === 'fr' ? 'Sécurité' : t('security.title')}
+                {t('security.title')}
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                {language === 'fr' ? 'Modifier votre mot de passe administrateur' : t('security.description')}
+                {t('security.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
               <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="current_password" className="text-xs sm:text-sm">
-                  {language === 'fr' ? 'Mot de passe actuel' : t('security.currentPassword')}
+                  {t('security.currentPassword')}
                 </Label>
                 <div className="relative">
                   <Input
@@ -436,7 +619,7 @@ const SettingsPage = () => {
                     type={showCurrentPassword ? 'text' : 'password'}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder={language === 'fr' ? 'Entrez votre mot de passe actuel' : t('security.currentPasswordPlaceholder')}
+                    placeholder={t('security.currentPasswordPlaceholder')}
                     className="h-9 sm:h-10 text-sm pr-10"
                   />
                   <button
@@ -450,7 +633,7 @@ const SettingsPage = () => {
               </div>
               <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="new_password" className="text-xs sm:text-sm">
-                  {language === 'fr' ? 'Nouveau mot de passe' : t('security.newPassword')}
+                  {t('security.newPassword')}
                 </Label>
                 <div className="relative">
                   <Input
@@ -458,7 +641,7 @@ const SettingsPage = () => {
                     type={showNewPassword ? 'text' : 'password'}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder={language === 'fr' ? 'Entrez le nouveau mot de passe' : t('security.newPasswordPlaceholder')}
+                    placeholder={t('security.newPasswordPlaceholder')}
                     className="h-9 sm:h-10 text-sm pr-10"
                   />
                   <button
@@ -470,19 +653,19 @@ const SettingsPage = () => {
                   </button>
                 </div>
                 <p className="text-[10px] sm:text-xs text-muted-foreground">
-                  {language === 'fr' ? 'Minimum 8 caractères' : t('security.passwordHint')}
+                  {t('security.passwordHint')}
                 </p>
               </div>
               <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="confirm_password" className="text-xs sm:text-sm">
-                  {language === 'fr' ? 'Confirmer le mot de passe' : t('security.confirmPassword')}
+                  {t('security.confirmPassword')}
                 </Label>
                 <Input
                   id="confirm_password"
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder={language === 'fr' ? 'Confirmez le nouveau mot de passe' : t('security.confirmPasswordPlaceholder')}
+                  placeholder={t('security.confirmPasswordPlaceholder')}
                   className="h-9 sm:h-10 text-sm"
                 />
               </div>
@@ -494,12 +677,12 @@ const SettingsPage = () => {
                 {isChangingPassword ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {language === 'fr' ? 'Modification...' : t('security.changing')}
+                    {t('security.changing')}
                   </>
                 ) : (
                   <>
                     <Lock className="mr-2 h-4 w-4" />
-                    {language === 'fr' ? 'Modifier le mot de passe' : t('security.changePassword')}
+                    {t('security.changePassword')}
                   </>
                 )}
               </Button>

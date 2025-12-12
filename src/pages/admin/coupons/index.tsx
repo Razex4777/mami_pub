@@ -1,6 +1,89 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// French translations (default)
+const fr = {
+  title: 'Codes Promo',
+  subtitle: 'Gérer vos codes de réduction',
+  newCode: 'Nouveau Code',
+  searchPlaceholder: 'Rechercher un code...',
+  stats: {
+    total: 'Total',
+    active: 'Actifs',
+    uses: 'Utilisations'
+  },
+  table: {
+    code: 'Code',
+    discount: 'Réduction',
+    minOrder: 'Commande min.',
+    uses: 'Utilisations',
+    expiration: 'Expiration',
+    status: 'Statut',
+    actions: 'Actions',
+    loading: 'Chargement...',
+    noResults: 'Aucun coupon trouvé'
+  },
+  status: {
+    active: 'Actif',
+    inactive: 'Inactif',
+    expired: 'Expiré'
+  },
+  dialog: {
+    createTitle: 'Nouveau Coupon',
+    editTitle: 'Modifier le Coupon',
+    cancel: 'Annuler',
+    create: 'Créer',
+    update: 'Mettre à jour'
+  },
+  form: {
+    code: 'Code',
+    codeRequired: 'Code *',
+    codePlaceholder: 'EX: PROMO20',
+    codeTooltip: 'Le code unique que les clients entreront lors du paiement. Sera automatiquement converti en majuscules.',
+    description: 'Description',
+    descriptionPlaceholder: 'Ex: Promo été 2025',
+    descriptionTooltip: 'Description interne pour vous aider à identifier ce coupon. Non visible par les clients.',
+    type: 'Type',
+    typeRequired: 'Type *',
+    typePercentage: '% Pourcentage',
+    typeFixed: 'DA Fixe',
+    typeTooltip: '%: Réduction en pourcentage / DA: Montant fixe',
+    value: 'Valeur',
+    valueRequired: 'Valeur *',
+    valueTooltip: 'Ex: 20 pour 20%',
+    valueTooltipFixed: 'Ex: 500 pour -500 DA',
+    minOrder: 'Commande min.',
+    minOrderTooltip: 'Montant minimum de commande. 0 = pas de limite.',
+    maxUses: 'Utilisations max.',
+    maxUsesTooltip: "Nombre maximum d'utilisations. Vide = illimité.",
+    expiration: 'Expiration',
+    expirationTooltip: "Date d'expiration du coupon."
+  },
+  deleteDialog: {
+    title: 'Supprimer le coupon ?',
+    description: 'Cette action est irréversible',
+    cancel: 'Annuler',
+    confirm: 'Supprimer'
+  },
+  toast: {
+    error: 'Erreur',
+    loadError: 'Impossible de charger les coupons',
+    validationError: 'Le code et la valeur de réduction sont requis',
+    updated: 'Succès',
+    updatedDesc: 'Coupon mis à jour',
+    created: 'Succès',
+    createdDesc: 'Coupon créé',
+    deleted: 'Succès',
+    deletedDesc: 'Coupon supprimé',
+    deleteError: 'Impossible de supprimer le coupon',
+    statusUpdated: 'Statut mis à jour',
+    activated: 'Coupon activé',
+    deactivated: 'Coupon désactivé',
+    statusError: 'Impossible de changer le statut',
+    genericError: 'Une erreur est survenue'
+  }
+};
 import {
   Plus,
   Pencil,
@@ -60,8 +143,29 @@ import {
 } from '@/supabase';
 
 const CouponsPage: React.FC = () => {
-  const { t: translate } = useLanguage();
-  const t = (key: string) => translate(key, 'admin_coupons');
+  const { t: translate, language } = useLanguage();
+  
+  // Translation helper - French hardcoded, others from JSON
+  const getFrenchText = (key: string): string => {
+    const keys = key.split('.');
+    let value: unknown = fr;
+    for (const k of keys) {
+      if (value && typeof value === 'object') {
+        value = (value as Record<string, unknown>)[k];
+      } else {
+        return key;
+      }
+    }
+    return typeof value === 'string' ? value : key;
+  };
+  
+  const t = (key: string): string => {
+    if (language === 'fr') {
+      return getFrenchText(key);
+    }
+    const translated = translate(key, 'admin_coupons');
+    return translated === key ? getFrenchText(key) : translated;
+  };
   const { toast } = useToast();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [filteredCoupons, setFilteredCoupons] = useState<Coupon[]>([]);
