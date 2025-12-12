@@ -110,6 +110,83 @@ const fr = {
     bulkError: "Une erreur est survenue lors de l'opération.",
     googleSheetsExport: 'Export Google Sheets',
     exportError: 'Erreur lors de l\'export'
+  },
+  table: {
+    title: 'Gestion des commandes',
+    selectAll: 'Tout sélectionner',
+    order: 'Commande',
+    customer: 'Client',
+    phone: 'Téléphone',
+    statusHeader: 'Statut',
+    total: 'Total',
+    date: 'Date',
+    actions: 'Actions',
+    tracking: 'Suivi',
+    items: 'article',
+    itemsPlural: 'articles',
+    viewDetails: 'Voir détails',
+    edit: 'Modifier',
+    delete: 'Supprimer'
+  },
+  deleteDialog: {
+    titleSingle: 'Supprimer la commande',
+    descriptionSingle: 'Supprimer',
+    cancel: 'Annuler'
+  },
+  details: {
+    title: 'Commande',
+    description: 'Détails et informations de livraison',
+    tabs: {
+      details: 'Détails',
+      items: 'Articles',
+      customer: 'Client',
+      tracking: 'Suivi'
+    },
+    info: {
+      title: 'Informations',
+      orderNumber: 'N° Commande:',
+      status: 'Statut:',
+      created: 'Créée:',
+      modified: 'Modifiée:',
+      tracking: 'Suivi:'
+    },
+    summary: {
+      title: 'Récapitulatif',
+      subtotal: 'Sous-total:',
+      tax: 'TVA:',
+      shipping: 'Livraison:',
+      total: 'Total:'
+    },
+    notes: 'Notes',
+    itemsOrdered: 'Articles commandés',
+    product: 'Produit',
+    quantity: 'Quantité',
+    price: 'Prix',
+    customerInfo: {
+      title: 'Informations client',
+      customerId: 'ID Client:',
+      email: 'Adresse email',
+      phone: 'Téléphone',
+      shippingAddress: 'Adresse de livraison'
+    },
+    progress: {
+      title: 'Progression',
+      currentStatus: 'Statut actuel'
+    }
+  },
+  edit: {
+    title: 'Modifier la commande',
+    description: 'Mettre à jour le statut de livraison',
+    noEmail: 'Pas d\'email - Notifications désactivées',
+    noEmailWarning: 'Ce client n\'a pas fourni d\'email. Les mises à jour de statut ne seront pas envoyées par email.',
+    deliveryStatus: 'Statut de livraison',
+    notes: 'Notes',
+    notesOptional: '(optionnel)',
+    notesPlaceholder: 'Ajouter des notes pour le client...',
+    emailNotice: 'Un email sera envoyé au client pour l\'informer du nouveau statut.',
+    cancel: 'Annuler',
+    save: 'Enregistrer',
+    sending: 'Envoi en cours...'
   }
 };
 
