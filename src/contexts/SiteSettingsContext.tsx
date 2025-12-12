@@ -25,7 +25,7 @@ const defaultSettings: Record<SettingKey, string | null> = {
   logo_url: null,
   favicon_url: null,
   site_name: 'MAMI PUB',
-  site_title: 'MAMI PUB - Impression & Publicité | Imprimantes Professionnelles Béjaïa',
+  site_title: 'MAMI PUB - Impression & Publicité | Imprimantes Professionnelles Eulma',
   site_tagline: 'Qualité Premium',
   contact_phone: '0557 91 45 44',
   contact_email: 'anes.mami.n@gmail.com',
@@ -43,8 +43,8 @@ const defaultSettings: Record<SettingKey, string | null> = {
   social_instagram: null,
   social_tiktok: null,
   social_whatsapp: '+213 557 91 45 44',
-  site_description: 'MAMI PUB - Votre partenaire en impression et publicité à Béjaïa.',
-  keywords: 'imprimante, impression, publicité, Béjaïa, Algérie',
+  site_description: 'MAMI PUB - Votre partenaire en impression et publicité à Eulma.',
+  keywords: 'imprimante, impression, publicité, Eulma, Sétif, Algérie',
   og_image: null,
 };
 
@@ -148,6 +148,28 @@ export const SiteSettingsProvider: React.FC<{ children: ReactNode }> = ({ childr
         document.head.appendChild(meta);
       }
       meta.content = settings.site_description;
+    }
+
+    // Update OG title (use site_title)
+    if (settings.site_title) {
+      let ogTitle = document.querySelector("meta[property='og:title']") as HTMLMetaElement;
+      if (!ogTitle) {
+        ogTitle = document.createElement('meta');
+        ogTitle.setAttribute('property', 'og:title');
+        document.head.appendChild(ogTitle);
+      }
+      ogTitle.content = settings.site_title;
+    }
+
+    // Update OG description (use site_description)
+    if (settings.site_description) {
+      let ogDesc = document.querySelector("meta[property='og:description']") as HTMLMetaElement;
+      if (!ogDesc) {
+        ogDesc = document.createElement('meta');
+        ogDesc.setAttribute('property', 'og:description');
+        document.head.appendChild(ogDesc);
+      }
+      ogDesc.content = settings.site_description;
     }
 
     // Update OG image
