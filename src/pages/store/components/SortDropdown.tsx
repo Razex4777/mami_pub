@@ -1,4 +1,5 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/forms/select";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SortDropdownProps {
   sortBy: string;
@@ -6,16 +7,33 @@ interface SortDropdownProps {
 }
 
 const SortDropdown = ({ sortBy, setSortBy }: SortDropdownProps) => {
+  const { t, language } = useLanguage();
+
+  // French text (default)
+  const fr = {
+    label: "Trier par",
+    newest: "Plus récents",
+    oldest: "Plus anciens",
+    mostViewed: "Plus vus"
+  };
+
+  const getText = (key: string): string => {
+    if (language === 'fr') {
+      const value = fr[key as keyof typeof fr];
+      return typeof value === 'string' ? value : key;
+    }
+    return t(`sort.${key}`, 'store');
+  };
+
   return (
     <Select value={sortBy} onValueChange={setSortBy}>
-      <SelectTrigger className="h-9 w-40 bg-card/30 border-white/10 hover:bg-card/50 rounded-lg px-3 text-sm">
-        <SelectValue placeholder="Trier par" />
+      <SelectTrigger className="h-9 w-44 bg-card/30 border-white/10 hover:bg-card/50 rounded-lg px-3 text-sm">
+        <SelectValue placeholder={getText('label')} />
       </SelectTrigger>
       <SelectContent className="bg-card/95 backdrop-blur-xl border-white/10 rounded-xl p-1 z-[100]">
-        <SelectItem value="featured" className="rounded-lg text-xs cursor-pointer">Mis en avant</SelectItem>
-        <SelectItem value="newest" className="rounded-lg text-xs cursor-pointer">Plus récents</SelectItem>
-        <SelectItem value="price-low" className="rounded-lg text-xs cursor-pointer">Prix croissant</SelectItem>
-        <SelectItem value="price-high" className="rounded-lg text-xs cursor-pointer">Prix décroissant</SelectItem>
+        <SelectItem value="newest" className="rounded-lg text-xs cursor-pointer">{getText('newest')}</SelectItem>
+        <SelectItem value="oldest" className="rounded-lg text-xs cursor-pointer">{getText('oldest')}</SelectItem>
+        <SelectItem value="mostViewed" className="rounded-lg text-xs cursor-pointer">{getText('mostViewed')}</SelectItem>
       </SelectContent>
     </Select>
   );

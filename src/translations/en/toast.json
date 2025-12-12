@@ -1,0 +1,82 @@
+{
+  "cart": {
+    "addedToCart": "Added to cart",
+    "removedFromCart": "Removed from cart",
+    "cartCleared": "Cart cleared",
+    "itemsAdded": "items added to cart"
+  },
+  "favorites": {
+    "addedToFavorites": "Added to favorites",
+    "removedFromFavorites": "Removed from favorites"
+  },
+  "share": {
+    "linkCopied": "Link copied to clipboard"
+  },
+  "auth": {
+    "loginSuccess": "Login successful",
+    "loginError": "Login failed",
+    "logoutSuccess": "Logged out successfully",
+    "invalidCredentials": "Invalid credentials"
+  },
+  "order": {
+    "orderPlaced": "Order placed successfully",
+    "orderError": "Error placing order",
+    "orderUpdated": "Order updated",
+    "orderDeleted": "Order deleted",
+    "statusUpdated": "Order status updated",
+    "emailSent": "Confirmation email sent",
+    "emailFailed": "Failed to send email"
+  },
+  "product": {
+    "created": "Product created successfully",
+    "updated": "Product updated successfully",
+    "deleted": "Product deleted successfully",
+    "duplicated": "Product duplicated",
+    "error": "Error saving product"
+  },
+  "category": {
+    "created": "Category created successfully",
+    "updated": "Category updated successfully",
+    "deleted": "Category deleted successfully",
+    "error": "Error saving category"
+  },
+  "banner": {
+    "created": "Banner created successfully",
+    "updated": "Banner updated successfully",
+    "deleted": "Banner deleted successfully",
+    "error": "Error saving banner"
+  },
+  "coupon": {
+    "created": "Coupon created successfully",
+    "updated": "Coupon updated successfully",
+    "deleted": "Coupon deleted successfully",
+    "applied": "Coupon applied",
+    "invalid": "Invalid coupon code",
+    "expired": "Coupon has expired",
+    "error": "Error saving coupon"
+  },
+  "settings": {
+    "saved": "Settings saved successfully",
+    "error": "Error saving settings",
+    "telegramTest": "Telegram test message sent",
+    "telegramError": "Failed to send Telegram test",
+    "emailTest": "Test email sent",
+    "emailError": "Failed to send test email"
+  },
+  "upload": {
+    "success": "File uploaded successfully",
+    "error": "Error uploading file",
+    "invalidFormat": "Invalid file format",
+    "fileTooLarge": "File is too large",
+    "imageCropped": "Image cropped successfully"
+  },
+  "export": {
+    "pdfSuccess": "PDF exported successfully",
+    "pdfError": "Error exporting PDF"
+  },
+  "error": {
+    "generic": "An error occurred",
+    "network": "Network error",
+    "tryAgain": "Please try again"
+  }
+}

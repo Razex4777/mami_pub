@@ -2,13 +2,30 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/interactive/button";
 import AnimatedCounter from "@/components/ui/interactive/AnimatedCounter";
 import { IconBadge, AnimationBubble } from "../components";
-import { heroStats } from "../data";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface HeroSectionProps {
   animations: Record<string, any>;
 }
 
 const HeroSection = ({ animations }: HeroSectionProps) => {
+  const { t, language } = useLanguage();
+
+  // French text (default) - only translate for en/ar
+  const text = {
+    badge: language === 'fr' ? "Fournitures d'impression & publicité" : t('hero.badge'),
+    title: language === 'fr' ? "L'Art de l'Impression" : t('hero.title'),
+    titleHighlight: language === 'fr' ? "Publicitaire" : t('hero.titleHighlight'),
+    description: language === 'fr' ? "MAMI PUB est une entreprise de vente de fournitures d'impression et de publicité, proposant des imprimantes de différents types, tailles et spécialisations, avec leurs accessoires." : t('hero.description'),
+    explore: language === 'fr' ? "Explorer nos produits" : t('hero.cta.explore'),
+    contact: language === 'fr' ? "Nous contacter" : t('hero.cta.contact'),
+    years: language === 'fr' ? "Années d'expertise" : t('stats.years'),
+    clients: language === 'fr' ? "Clients accompagnés" : t('stats.clients'),
+    production: language === 'fr' ? "Production express" : t('stats.production'),
+    smartHub: language === 'fr' ? "Smart Print Hub" : t('hero.smartHub'),
+    monitoring: language === 'fr' ? "Monitoring en direct" : t('hero.monitoring'),
+  };
+  
   return (
     <section className="relative overflow-hidden min-h-[80vh] sm:min-h-screen flex items-center">
       <div className="absolute inset-0">
@@ -24,38 +41,42 @@ const HeroSection = ({ animations }: HeroSectionProps) => {
             <div className="inline-flex items-center gap-2 sm:gap-3 rounded-full border border-white/20 bg-white/10 px-3 sm:px-4 py-1.5 sm:py-2 backdrop-blur-xl">
               <IconBadge size="sm" variant="glass" className="shadow-none" />
               <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-white/80">
-                El Eulma · Studio d'impression
+                {text.badge}
               </span>
             </div>
 
             <div>
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black leading-tight text-white">
-                Créons des expériences visuelles qui marquent.
+                {text.title} <span className="bg-gradient-to-r from-primary to-cyan-400 bg-clip-text text-transparent">{text.titleHighlight}</span>
               </h1>
               <p className="mt-2 sm:mt-4 max-w-lg text-xs sm:text-sm md:text-base text-white/80">
-                MAMI PUB orchestre vos campagnes d'impression avec précision artisanale.
+                {text.description}
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <Link to="/store">
                 <Button size="default" className="h-9 sm:h-10 md:h-12 rounded-full bg-gradient-to-r from-primary via-blue-500 to-cyan-500 px-4 sm:px-6 md:px-8 text-xs sm:text-sm font-semibold shadow-xl shadow-primary/40">
-                  Explorer nos solutions
+                  {text.explore}
                 </Button>
               </Link>
               <a href="https://wa.me/213557914544" target="_blank" rel="noopener noreferrer">
                 <Button size="default" className="h-9 sm:h-10 md:h-12 rounded-full border-2 border-white/60 bg-white/15 backdrop-blur-sm px-4 sm:px-6 md:px-8 text-xs sm:text-sm font-semibold !text-white hover:bg-white/25 shadow-lg">
-                  Lancer votre projet
+                  {text.contact}
                 </Button>
               </a>
             </div>
 
             <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-2 sm:pt-4">
-              {heroStats.map(stat => (
-                <div key={stat.label} className="rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-xl p-2 sm:p-4 border border-white/20 text-center">
-                  <AnimatedCounter value={stat.value} label={stat.label} duration={2200} delay={stat.delay} />
-                </div>
-              ))}
+              <div className="rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-xl p-2 sm:p-4 border border-white/20 text-center">
+                <AnimatedCounter value="15+" label={text.years} duration={2200} delay={0} />
+              </div>
+              <div className="rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-xl p-2 sm:p-4 border border-white/20 text-center">
+                <AnimatedCounter value="1000+" label={text.clients} duration={2200} delay={200} />
+              </div>
+              <div className="rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-xl p-2 sm:p-4 border border-white/20 text-center">
+                <AnimatedCounter value="72h" label={text.production} duration={2200} delay={400} />
+              </div>
             </div>
           </div>
 
@@ -64,9 +85,9 @@ const HeroSection = ({ animations }: HeroSectionProps) => {
               <div className="absolute inset-3 rounded-[1.5rem] border border-white/10" />
               <AnimationBubble animation={animations.orbit} className="h-full w-full" />
               <div className="pointer-events-none absolute bottom-8 left-1/2 flex w-48 -translate-x-1/2 flex-col gap-1 rounded-xl bg-white/90 p-3 text-center shadow-xl">
-                <div className="text-xs font-semibold text-primary">Smart Print Hub</div>
+                <div className="text-xs font-semibold text-primary">{text.smartHub}</div>
                 <div className="text-xs text-muted-foreground">
-                  Monitoring en direct
+                  {text.monitoring}
                 </div>
               </div>
               <IconBadge size="lg" className="absolute -right-3 top-8 rotate-12 shadow-primary/50" />

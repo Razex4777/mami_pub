@@ -1,0 +1,114 @@
+{
+  "title": "Dashboard",
+  "welcome": "Welcome",
+  "subtitle": "Here's an overview of your store.",
+  "stats": {
+    "revenue": "Revenue",
+    "profit": "Profit",
+    "orders": "Orders",
+    "products": "Products",
+    "customers": "Customers",
+    "thisMonth": "This month",
+    "thisWeek": "This week",
+    "today": "Today",
+    "vsLastMonth": "vs last month",
+    "vsLastWeek": "vs last week"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "products": "Products",
+    "orders": "Orders",
+    "activity": "Activity"
+  },
+  "charts": {
+    "salesOverview": "Sales Overview",
+    "revenueOverview": "Revenue Overview",
+    "revenueDescription": "Monthly revenue trends",
+    "categoryDistribution": "Category Distribution",
+    "categoryDescription": "Active products distribution",
+    "revenueByCategory": "Revenue by Category",
+    "orderStatus": "Order Status",
+    "orderStatusDesc": "Current distribution",
+    "ordersByMonth": "Orders by Month",
+    "ordersByMonthDesc": "6-month evolution",
+    "topProducts": "Top Products",
+    "recentOrders": "Recent Orders",
+    "last7Days": "Last 7 days",
+    "last30Days": "Last 30 days",
+    "last90Days": "Last 90 days",
+    "all": "All"
+  },
+  "buttons": {
+    "refresh": "Refresh",
+    "export": "Export",
+    "exporting": "Exporting..."
+  },
+  "errors": {
+    "loadFailed": "Unable to load data. Please refresh the page.",
+    "noData": "No data to export",
+    "exportError": "Error during export"
+  },
+  "success": {
+    "exportSuccess": "PDF report generated successfully"
+  },
+  "quickStats": {
+    "activeProducts": "Active products",
+    "inactiveProducts": "Inactive products",
+    "totalOrders": "Total orders",
+    "totalCustomers": "Total customers"
+  },
+  "productsTab": {
+    "productStats": "Product Statistics",
+    "catalogState": "Your catalog status",
+    "activeProducts": "Active products",
+    "inactiveProducts": "Inactive products",
+    "categories": "Categories",
+    "mostViewed": "Most Viewed Products",
+    "mostViewedDesc": "Based on visitor views",
+    "noData": "No data available",
+    "topSelling": "Best Sellers",
+    "topSellingDesc": "Products generating the most revenue",
+    "sales": "sales"
+  },
+  "ordersTab": {
+    "orderStatus": "Order Status",
+    "currentDistribution": "Current distribution",
+    "ordersByMonth": "Orders by Month",
+    "evolution6Months": "6-month evolution",
+    "orderStatusCards": "Orders by status"
+  },
+  "activityTab": {
+    "recentActivity": "Recent Activity",
+    "latestEvents": "Latest events",
+    "quickActions": "Quick Actions",
+    "manageProducts": "Manage products",
+    "viewOrders": "View orders",
+    "manageCoupons": "Manage coupons",
+    "manageBanners": "Manage banners"
+  },
+  "orders": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled",
+    "returned": "Returned"
+  },
+  "table": {
+    "orderNumber": "Order #",
+    "customer": "Customer",
+    "date": "Date",
+    "status": "Status",
+    "total": "Total",
+    "actions": "Actions",
+    "viewAll": "View all",
+    "noOrders": "No orders yet"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "addProduct": "Add Product",
+    "viewOrders": "View Orders",
+    "manageCategories": "Manage Categories",
+    "settings": "Settings"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "title": "الفئات",
+  "subtitle": "إدارة فئات المنتجات",
+  "addCategory": "إضافة فئة",
+  "createCategory": "إنشاء فئة",
+  "editCategory": "تعديل الفئة",
+  "newCategory": "فئة جديدة",
+  "category": "فئة",
+  "categories": "فئات",
+  "active": "نشطة",
+  "inactive": "غير نشطة",
+  "noCategories": "لا توجد فئات",
+  "noCategoriesDesc": "ابدأ بإنشاء فئة المنتجات الأولى.",
+  "form": {
+    "name": "الاسم",
+    "slug": "المعرف",
+    "slugHint": "معرف فريد يستخدم في الروابط",
+    "description": "الوصف",
+    "descriptionPlaceholder": "وصف الفئة...",
+    "displayOrder": "ترتيب العرض",
+    "isActive": "فئة نشطة",
+    "namePlaceholder": "مثال: أحبار DTF",
+    "slugPlaceholder": "dtf-inks"
+  },
+  "dialog": {
+    "editDesc": "تعديل معلومات الفئة.",
+    "createDesc": "إنشاء فئة منتجات جديدة."
+  },
+  "actions": {
+    "cancel": "إلغاء",
+    "update": "تحديث",
+    "create": "إنشاء",
+    "delete": "حذف"
+  },
+  "deleteDialog": {
+    "title": "حذف الفئة؟",
+    "description": "لا يمكن التراجع عن هذا الإجراء. لن يتم حذف المنتجات المرتبطة ولكنها ستفقد فئتها."
+  },
+  "toast": {
+    "error": "خطأ",
+    "loadError": "تعذر تحميل الفئات.",
+    "validationError": "خطأ في التحقق",
+    "nameSlugRequired": "الاسم والمعرف مطلوبان.",
+    "categoryUpdated": "تم تحديث الفئة",
+    "categoryCreated": "تم إنشاء الفئة",
+    "categoryDeleted": "تم حذف الفئة",
+    "duplicateError": "توجد فئة بهذا الاسم أو المعرف بالفعل.",
+    "saveError": "حدث خطأ أثناء الحفظ.",
+    "deleteError": "تعذر حذف الفئة. قد تكون مستخدمة من قبل المنتجات.",
+    "statusError": "تعذر تغيير الحالة.",
+    "activated": "تم تفعيل الفئة",
+    "deactivated": "تم إلغاء تفعيل الفئة"
+  }
+}

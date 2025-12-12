@@ -1,0 +1,150 @@
+{
+  "title": "الطلبات",
+  "subtitle": "إدارة طلبات العملاء",
+  "refresh": "تحديث",
+  "export": "تصدير",
+  "stats": {
+    "totalOrders": "إجمالي الطلبات",
+    "processing": "قيد المعالجة",
+    "shipped": "تم الشحن",
+    "revenue": "الإيرادات"
+  },
+  "status": {
+    "all": "الكل",
+    "pending": "قيد الانتظار",
+    "confirmed": "مؤكد",
+    "processing": "قيد المعالجة",
+    "shipped": "تم الشحن",
+    "delivered": "تم التسليم",
+    "cancelled": "ملغي"
+  },
+  "table": {
+    "title": "إدارة الطلبات",
+    "orderCount": "{count} من {total} طلب",
+    "selectAll": "تحديد الكل",
+    "order": "الطلب",
+    "customer": "العميل",
+    "phone": "الهاتف",
+    "statusHeader": "الحالة",
+    "total": "المجموع",
+    "date": "التاريخ",
+    "actions": "الإجراءات",
+    "tracking": "التتبع",
+    "items": "منتج",
+    "itemsPlural": "منتجات",
+    "viewDetails": "عرض التفاصيل",
+    "edit": "تعديل",
+    "delete": "حذف"
+  },
+  "filters": {
+    "search": "بحث...",
+    "statusPlaceholder": "الحالة",
+    "selected": "محدد",
+    "bulkActions": "إجراءات جماعية",
+    "exportAction": "تصدير",
+    "deleteAction": "حذف"
+  },
+  "deleteDialog": {
+    "title": "حذف {count} طلب؟",
+    "titleSingle": "حذف الطلب",
+    "description": "لا يمكن التراجع عن هذا الإجراء. سيتم حذف الطلبات المحددة نهائياً.",
+    "descriptionSingle": "حذف \"{orderNumber}\"؟",
+    "descriptionFull": "هل أنت متأكد من حذف الطلب \"{orderNumber}\"؟",
+    "cancel": "إلغاء",
+    "delete": "حذف"
+  },
+  "details": {
+    "title": "الطلب {orderNumber}",
+    "description": "التفاصيل ومعلومات الشحن",
+    "tabs": {
+      "details": "التفاصيل",
+      "items": "المنتجات",
+      "customer": "العميل",
+      "tracking": "التتبع"
+    },
+    "info": {
+      "title": "المعلومات",
+      "orderNumber": "رقم الطلب:",
+      "status": "الحالة:",
+      "created": "تاريخ الإنشاء:",
+      "modified": "تاريخ التعديل:",
+      "tracking": "رقم التتبع:"
+    },
+    "summary": {
+      "title": "الملخص",
+      "subtotal": "المجموع الفرعي:",
+      "tax": "الضريبة:",
+      "shipping": "الشحن:",
+      "total": "المجموع:"
+    },
+    "notes": "ملاحظات",
+    "itemsOrdered": "المنتجات المطلوبة",
+    "product": "المنتج",
+    "quantity": "الكمية",
+    "price": "السعر",
+    "customerInfo": {
+      "title": "معلومات العميل",
+      "customerId": "رقم العميل:",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "shippingAddress": "عنوان الشحن"
+    },
+    "progress": {
+      "title": "التقدم",
+      "currentStatus": "الحالة الحالية"
+    }
+  },
+  "edit": {
+    "title": "تعديل الطلب {orderNumber}",
+    "description": "تحديث حالة التسليم",
+    "noEmail": "لا يوجد بريد - الإشعارات معطلة",
+    "noEmailWarning": "لم يقدم هذا العميل بريداً إلكترونياً. لن يتم إرسال تحديثات الحالة عبر البريد.",
+    "deliveryStatus": "حالة التسليم",
+    "notes": "ملاحظات",
+    "notesOptional": "(اختياري)",
+    "notesPlaceholder": "أضف ملاحظات للعميل...",
+    "emailNotice": "سيتم إرسال بريد إلكتروني للعميل لإعلامه بالحالة الجديدة.",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "sending": "جاري الإرسال..."
+  },
+  "toast": {
+    "error": "خطأ",
+    "loadError": "تعذر تحميل الطلبات.",
+    "orderUpdated": "تم تحديث الطلب",
+    "statusChanged": "تم تغيير الحالة إلى \"{status}\".",
+    "statusUpdateError": "تعذر تحديث الحالة.",
+    "orderDeleted": "تم حذف الطلب",
+    "orderDeletedDesc": "تم حذف الطلب {orderNumber}.",
+    "deleteError": "تعذر حذف الطلب.",
+    "noSelection": "لا يوجد تحديد",
+    "selectOrders": "يرجى تحديد الطلبات.",
+    "ordersConfirmed": "تم تأكيد الطلبات",
+    "ordersConfirmedDesc": "تم تأكيد {count} طلب.",
+    "inProcessing": "قيد المعالجة",
+    "inProcessingDesc": "{count} طلب قيد المعالجة.",
+    "ordersShipped": "تم شحن الطلبات",
+    "ordersShippedDesc": "تم شحن {count} طلب.",
+    "ordersArchived": "تم أرشفة الطلبات",
+    "ordersArchivedDesc": "تم أرشفة {count} طلب.",
+    "exportComplete": "اكتمل التصدير",
+    "exportCompleteDesc": "تم تصدير {count} طلب.",
+    "ordersDeleted": "تم حذف الطلبات",
+    "ordersDeletedDesc": "تم حذف {count} طلب.",
+    "partialOperation": "عملية جزئية",
+    "partialDesc": "نجح {success}، فشل {failed}.",
+    "partialDelete": "حذف جزئي",
+    "bulkError": "حدث خطأ أثناء العملية.",
+    "googleSheetsExport": "تصدير Google Sheets",
+    "googleSheetsDesc": "تم نسخ {count} طلب. الصق باستخدام Ctrl+V في الورقة.",
+    "exportError": "خطأ في التصدير",
+    "emailSent": "تم إرسال البريد",
+    "emailSentDesc": "تم إرسال الإشعار إلى {email}",
+    "emailError": "خطأ في الإرسال",
+    "emailErrorDesc": "تعذر إرسال البريد الإلكتروني",
+    "configMissing": "إعدادات مفقودة",
+    "configMissingDesc": "تعذر إرسال البريد الإلكتروني",
+    "timeout": "انتهت المهلة",
+    "timeoutDesc": "استغرق إرسال البريد وقتاً طويلاً"
+  }
+}

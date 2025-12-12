@@ -1,5 +1,23 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '@/supabase';
+import { supabase } from '@/supabase';
+
+// Server-side authentication response types
+interface AuthResponse {
+  success: boolean;
+  error?: string;
+  user?: {
+    id: string;
+    username: string;
+    name: string | null;
+    email: string | null;
+    avatar: string | null;
+  };
+  session?: {
+    token: string;
+    expiresAt: string;
+  };
+}
 
 interface AuthContextType {
   user: User | null;
@@ -10,6 +28,10 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Supabase Edge Function URL for admin login
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const AUTH_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/admin-login`;
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -28,30 +50,74 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored authentication
+    // Check for stored authentication and session validity
     const storedUser = localStorage.getItem('admin_user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    const storedSession = localStorage.getItem('admin_session');
+    
+    if (storedUser && storedSession) {
+      try {
+        const session = JSON.parse(storedSession);
+        const expiresAt = new Date(session.expiresAt);
+        
+        // Check if session is still valid
+        if (expiresAt > new Date()) {
+          setUser(JSON.parse(storedUser));
+        } else {
+          // Session expired, clear storage
+          localStorage.removeItem('admin_user');
+          localStorage.removeItem('admin_session');
+        }
+      } catch {
+        // Invalid session data, clear storage
+        localStorage.removeItem('admin_user');
+        localStorage.removeItem('admin_session');
+      }
     }
     setIsLoading(false);
   }, []);
 
   const login = async (username: string, password: string): Promise<boolean> => {
-    // Easter egg authentication - only "admin" / "admin" works
-    if (username === 'admin' && password === 'admin') {
+    try {
+      // Input validation
+      if (!username || !password) {
+        console.error('Login error: Username and password are required');
+        return false;
+      }
+
+      // Call server-side Edge Function for secure authentication
+      // Password verification happens on the server - no hash exposure to client
+      const response = await fetch(AUTH_FUNCTION_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data: AuthResponse = await response.json();
+
+      if (!data.success || !data.user || !data.session) {
+        console.error('Login error:', data.error || 'Authentication failed');
+        return false;
+      }
+
+      // Create user object from server response (no password_hash exposed)
       const adminUser: User = {
-        id: '1',
-        name: 'Admin User',
-        email: 'admin@mamipub.com',
+        id: data.user.id,
+        name: data.user.name || username,
+        email: data.user.email || '',
         role: 'admin',
-        avatar: '/images/admin-avatar.png',
+        avatar: data.user.avatar || '/images/admin-avatar.png',
         lastLogin: new Date().toISOString(),
         isActive: true,
       };
-      
+
+      // Store user and session securely
       setUser(adminUser);
       localStorage.setItem('admin_user', JSON.stringify(adminUser));
-      
+      localStorage.setItem('admin_session', JSON.stringify(data.session));
+
       // Log activity
       const activity = {
         id: Date.now().toString(),
@@ -62,15 +128,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         userId: adminUser.id,
         userName: adminUser.name,
       };
-      
+
       const storedActivities = localStorage.getItem('admin_activities');
       const activities = storedActivities ? JSON.parse(storedActivities) : [];
       activities.unshift(activity);
-      localStorage.setItem('admin_activities', JSON.stringify(activities.slice(0, 100))); // Keep last 100 activities
-      
+      localStorage.setItem('admin_activities', JSON.stringify(activities.slice(0, 100)));
+
       return true;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
@@ -94,6 +162,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     setUser(null);
     localStorage.removeItem('admin_user');
+    localStorage.removeItem('admin_session');
   };
 
   const value: AuthContextType = {

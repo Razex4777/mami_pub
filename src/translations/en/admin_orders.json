@@ -1,0 +1,150 @@
+{
+  "title": "Orders",
+  "subtitle": "Manage customer orders",
+  "refresh": "Refresh",
+  "export": "Export",
+  "stats": {
+    "totalOrders": "Total Orders",
+    "processing": "Processing",
+    "shipped": "Shipped",
+    "revenue": "Revenue"
+  },
+  "status": {
+    "all": "All",
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "processing": "Processing",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled"
+  },
+  "table": {
+    "title": "Order Management",
+    "orderCount": "{count} of {total} orders",
+    "selectAll": "Select all",
+    "order": "Order",
+    "customer": "Customer",
+    "phone": "Phone",
+    "statusHeader": "Status",
+    "total": "Total",
+    "date": "Date",
+    "actions": "Actions",
+    "tracking": "Tracking",
+    "items": "item",
+    "itemsPlural": "items",
+    "viewDetails": "View details",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "filters": {
+    "search": "Search...",
+    "statusPlaceholder": "Status",
+    "selected": "selected",
+    "bulkActions": "Bulk actions",
+    "exportAction": "Export",
+    "deleteAction": "Delete"
+  },
+  "deleteDialog": {
+    "title": "Delete {count} order(s)?",
+    "titleSingle": "Delete order",
+    "description": "This action cannot be undone. The selected orders will be permanently deleted.",
+    "descriptionSingle": "Delete \"{orderNumber}\"?",
+    "descriptionFull": "Are you sure you want to delete order \"{orderNumber}\"?",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "details": {
+    "title": "Order {orderNumber}",
+    "description": "Details and shipping information",
+    "tabs": {
+      "details": "Details",
+      "items": "Items",
+      "customer": "Customer",
+      "tracking": "Tracking"
+    },
+    "info": {
+      "title": "Information",
+      "orderNumber": "Order #:",
+      "status": "Status:",
+      "created": "Created:",
+      "modified": "Modified:",
+      "tracking": "Tracking:"
+    },
+    "summary": {
+      "title": "Summary",
+      "subtotal": "Subtotal:",
+      "tax": "Tax:",
+      "shipping": "Shipping:",
+      "total": "Total:"
+    },
+    "notes": "Notes",
+    "itemsOrdered": "Ordered Items",
+    "product": "Product",
+    "quantity": "Quantity",
+    "price": "Price",
+    "customerInfo": {
+      "title": "Customer Information",
+      "customerId": "Customer ID:",
+      "email": "Email address",
+      "phone": "Phone",
+      "shippingAddress": "Shipping Address"
+    },
+    "progress": {
+      "title": "Progress",
+      "currentStatus": "Current status"
+    }
+  },
+  "edit": {
+    "title": "Edit Order {orderNumber}",
+    "description": "Update delivery status",
+    "noEmail": "No email - notifications disabled",
+    "noEmailWarning": "This customer did not provide an email. Status updates will not be sent by email.",
+    "deliveryStatus": "Delivery Status",
+    "notes": "Notes",
+    "notesOptional": "(optional)",
+    "notesPlaceholder": "Add notes for the customer...",
+    "emailNotice": "An email will be sent to the customer to inform them of the new status.",
+    "cancel": "Cancel",
+    "save": "Save",
+    "sending": "Sending..."
+  },
+  "toast": {
+    "error": "Error",
+    "loadError": "Unable to load orders.",
+    "orderUpdated": "Order updated",
+    "statusChanged": "Status changed to \"{status}\".",
+    "statusUpdateError": "Unable to update status.",
+    "orderDeleted": "Order deleted",
+    "orderDeletedDesc": "Order {orderNumber} deleted.",
+    "deleteError": "Unable to delete order.",
+    "noSelection": "No selection",
+    "selectOrders": "Please select orders.",
+    "ordersConfirmed": "Orders confirmed",
+    "ordersConfirmedDesc": "{count} orders confirmed.",
+    "inProcessing": "In processing",
+    "inProcessingDesc": "{count} orders in processing.",
+    "ordersShipped": "Orders shipped",
+    "ordersShippedDesc": "{count} orders shipped.",
+    "ordersArchived": "Orders archived",
+    "ordersArchivedDesc": "{count} orders archived.",
+    "exportComplete": "Export complete",
+    "exportCompleteDesc": "{count} orders exported.",
+    "ordersDeleted": "Orders deleted",
+    "ordersDeletedDesc": "{count} orders deleted.",
+    "partialOperation": "Partial operation",
+    "partialDesc": "{success} succeeded, {failed} failed.",
+    "partialDelete": "Partial deletion",
+    "bulkError": "An error occurred during the operation.",
+    "googleSheetsExport": "Google Sheets Export",
+    "googleSheetsDesc": "{count} order(s) copied. Paste with Ctrl+V in the sheet.",
+    "exportError": "Export error",
+    "emailSent": "Email sent",
+    "emailSentDesc": "Notification sent to {email}",
+    "emailError": "Send error",
+    "emailErrorDesc": "The email could not be sent",
+    "configMissing": "Missing configuration",
+    "configMissingDesc": "Unable to send email",
+    "timeout": "Timeout",
+    "timeoutDesc": "Sending the email took too long"
+  }
+}

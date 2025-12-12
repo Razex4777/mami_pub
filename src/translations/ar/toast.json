@@ -1,0 +1,82 @@
+{
+  "cart": {
+    "addedToCart": "تمت الإضافة إلى السلة",
+    "removedFromCart": "تمت الإزالة من السلة",
+    "cartCleared": "تم إفراغ السلة",
+    "itemsAdded": "عناصر أضيفت إلى السلة"
+  },
+  "favorites": {
+    "addedToFavorites": "تمت الإضافة إلى المفضلة",
+    "removedFromFavorites": "تمت الإزالة من المفضلة"
+  },
+  "share": {
+    "linkCopied": "تم نسخ الرابط"
+  },
+  "auth": {
+    "loginSuccess": "تم تسجيل الدخول بنجاح",
+    "loginError": "فشل تسجيل الدخول",
+    "logoutSuccess": "تم تسجيل الخروج بنجاح",
+    "invalidCredentials": "بيانات الاعتماد غير صحيحة"
+  },
+  "order": {
+    "orderPlaced": "تم تقديم الطلب بنجاح",
+    "orderError": "خطأ في تقديم الطلب",
+    "orderUpdated": "تم تحديث الطلب",
+    "orderDeleted": "تم حذف الطلب",
+    "statusUpdated": "تم تحديث حالة الطلب",
+    "emailSent": "تم إرسال بريد التأكيد",
+    "emailFailed": "فشل إرسال البريد"
+  },
+  "product": {
+    "created": "تم إنشاء المنتج بنجاح",
+    "updated": "تم تحديث المنتج بنجاح",
+    "deleted": "تم حذف المنتج بنجاح",
+    "duplicated": "تم نسخ المنتج",
+    "error": "خطأ في حفظ المنتج"
+  },
+  "category": {
+    "created": "تم إنشاء الفئة بنجاح",
+    "updated": "تم تحديث الفئة بنجاح",
+    "deleted": "تم حذف الفئة بنجاح",
+    "error": "خطأ في حفظ الفئة"
+  },
+  "banner": {
+    "created": "تم إنشاء البانر بنجاح",
+    "updated": "تم تحديث البانر بنجاح",
+    "deleted": "تم حذف البانر بنجاح",
+    "error": "خطأ في حفظ البانر"
+  },
+  "coupon": {
+    "created": "تم إنشاء الكوبون بنجاح",
+    "updated": "تم تحديث الكوبون بنجاح",
+    "deleted": "تم حذف الكوبون بنجاح",
+    "applied": "تم تطبيق الكوبون",
+    "invalid": "كود الكوبون غير صالح",
+    "expired": "انتهت صلاحية الكوبون",
+    "error": "خطأ في حفظ الكوبون"
+  },
+  "settings": {
+    "saved": "تم حفظ الإعدادات بنجاح",
+    "error": "خطأ في حفظ الإعدادات",
+    "telegramTest": "تم إرسال رسالة تجريبية عبر تيليجرام",
+    "telegramError": "فشل إرسال رسالة تيليجرام",
+    "emailTest": "تم إرسال بريد تجريبي",
+    "emailError": "فشل إرسال البريد التجريبي"
+  },
+  "upload": {
+    "success": "تم رفع الملف بنجاح",
+    "error": "خطأ في رفع الملف",
+    "invalidFormat": "صيغة الملف غير صالحة",
+    "fileTooLarge": "حجم الملف كبير جداً",
+    "imageCropped": "تم قص الصورة بنجاح"
+  },
+  "export": {
+    "pdfSuccess": "تم تصدير PDF بنجاح",
+    "pdfError": "خطأ في تصدير PDF"
+  },
+  "error": {
+    "generic": "حدث خطأ",
+    "network": "خطأ في الشبكة",
+    "tryAgain": "يرجى المحاولة مرة أخرى"
+  }
+}

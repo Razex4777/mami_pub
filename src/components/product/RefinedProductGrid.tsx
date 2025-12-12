@@ -5,22 +5,7 @@ import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/interactive/button';
 import RefinedProductCard from './RefinedProductCard';
 import QuickViewModal from './QuickViewModal';
-
-interface Product {
-  id: string; // UUID from Supabase
-  name: string;
-  category: string;
-  price: number;
-  image: string;
-  specs: string;
-  rating?: number;
-  reviews?: number;
-  inStock?: boolean;
-  featured?: boolean;
-  tags?: string[];
-  deliveryTime?: string;
-  discount?: number;
-}
+import type { Product } from '@/pages/store/types';
 
 interface RefinedProductGridProps {
   products: Product[];
@@ -112,7 +97,7 @@ const RefinedProductGrid: React.FC<RefinedProductGridProps> = ({
         </motion.div>
 
         {/* Loading Skeleton Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="bg-card rounded-2xl overflow-hidden border border-border/50 aspect-[4/5]">
               <div className="aspect-square bg-gradient-to-r from-muted/30 via-muted/50 to-muted/30 animate-pulse" />
@@ -189,7 +174,7 @@ const RefinedProductGrid: React.FC<RefinedProductGridProps> = ({
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
       >
         <AnimatePresence mode="popLayout">
           {products.map((product, index) => (

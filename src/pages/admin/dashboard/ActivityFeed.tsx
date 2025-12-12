@@ -11,6 +11,8 @@ import { Activity as ActivityType } from '@/supabase';
 interface ActivityFeedProps {
   activities: ActivityType[];
   formatTimeAgo: (timestamp: string) => string;
+  title?: string;
+  description?: string;
 }
 
 const getActivityIcon = (type: string) => {
@@ -51,15 +53,20 @@ const getActivityIcon = (type: string) => {
   }
 };
 
-const ActivityFeed: React.FC<ActivityFeedProps> = ({ activities, formatTimeAgo }) => {
+const ActivityFeed: React.FC<ActivityFeedProps> = ({ 
+  activities, 
+  formatTimeAgo,
+  title = 'Recent Activity',
+  description = 'Latest events'
+}) => {
   return (
     <Card className="hover:shadow-md transition-shadow duration-300">
       <CardHeader className="p-3 sm:p-4 md:p-6">
         <div className="flex items-center gap-2">
           <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-          <CardTitle className="text-sm sm:text-base md:text-lg">Recent Activity</CardTitle>
+          <CardTitle className="text-sm sm:text-base md:text-lg">{title}</CardTitle>
         </div>
-        <CardDescription className="text-xs sm:text-sm">Latest events</CardDescription>
+        <CardDescription className="text-xs sm:text-sm">{description}</CardDescription>
       </CardHeader>
       
       <CardContent className="p-3 sm:p-4 md:p-6 pt-0">

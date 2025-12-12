@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/layout/card';
 import { Button } from '@/components/ui/interactive/button';
 import { Input } from '@/components/ui/forms/input';
 import { Label } from '@/components/ui/forms/label';
 import { Switch } from '@/components/ui/forms/switch';
 import { useToast } from '@/components/ui/feedback/use-toast';
+import BannerImageUpload from '@/components/ui/forms/BannerImageUpload';
 import {
   Dialog,
   DialogContent,
@@ -27,11 +29,8 @@ import {
   Plus,
   Pencil,
   Trash2,
-  GripVertical,
   Image as ImageIcon,
   ExternalLink,
-  Eye,
-  EyeOff,
   Loader2,
 } from 'lucide-react';
 import {
@@ -43,6 +42,8 @@ import {
 import type { StoreBanner, StoreBannerInsert, StoreBannerUpdate } from '@/supabase';
 
 const BannersPage: React.FC = () => {
+  const { t: translate } = useLanguage();
+  const t = (key: string) => translate(key, 'admin_banners');
   const { toast } = useToast();
   const [banners, setBanners] = useState<StoreBanner[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,8 +69,8 @@ const BannersPage: React.FC = () => {
       setBanners(data);
     } catch (error) {
       toast({
-        title: 'Erreur',
-        description: 'Impossible de charger les bannières.',
+        title: t('toast.error'),
+        description: t('toast.loadError'),
         variant: 'destructive',
       });
     } finally {
@@ -109,8 +110,8 @@ const BannersPage: React.FC = () => {
   const handleSave = async () => {
     if (!formData.title || !formData.image_url || !formData.alt_text) {
       toast({
-        title: 'Erreur de validation',
-        description: 'Veuillez remplir tous les champs obligatoires.',
+        title: t('toast.validationError'),
+        description: t('toast.validationMessage'),
         variant: 'destructive',
       });
       return;
@@ -130,14 +131,14 @@ const BannersPage: React.FC = () => {
         };
         await updateBanner(editingBanner.id, updates);
         toast({
-          title: 'Bannière mise à jour',
-          description: `"${formData.title}" a été mise à jour avec succès.`,
+          title: t('toast.updated'),
+          description: t('toast.updatedDesc').replace('{title}', formData.title),
         });
       } else {
         await createBanner(formData);
         toast({
-          title: 'Bannière créée',
-          description: `"${formData.title}" a été créée avec succès.`,
+          title: t('toast.created'),
+          description: t('toast.createdDesc').replace('{title}', formData.title),
         });
       }
       
@@ -145,8 +146,8 @@ const BannersPage: React.FC = () => {
       fetchBanners();
     } catch (error) {
       toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue lors de la sauvegarde.',
+        title: t('toast.error'),
+        description: t('toast.saveError'),
         variant: 'destructive',
       });
     } finally {
@@ -160,33 +161,43 @@ const BannersPage: React.FC = () => {
     try {
       await deleteBanner(bannerToDelete.id);
       toast({
-        title: 'Bannière supprimée',
-        description: `"${bannerToDelete.title}" a été supprimée.`,
+        title: t('toast.deleted'),
+        description: t('toast.deletedDesc').replace('{title}', bannerToDelete.title),
       });
       setDeleteDialogOpen(false);
       setBannerToDelete(null);
       fetchBanners();
     } catch (error) {
       toast({
-        title: 'Erreur',
-        description: 'Impossible de supprimer la bannière.',
+        title: t('toast.error'),
+        description: t('toast.deleteError'),
         variant: 'destructive',
       });
     }
   };
 
   const handleToggleActive = async (banner: StoreBanner) => {
+    const newStatus = !banner.is_active;
+    
+    // Optimistic update - update UI immediately
+    setBanners(prev => 
+      prev.map(b => b.id === banner.id ? { ...b, is_active: newStatus } : b)
+    );
+
     try {
-      await updateBanner(banner.id, { is_active: !banner.is_active });
+      await updateBanner(banner.id, { is_active: newStatus });
       toast({
-        title: banner.is_active ? 'Bannière désactivée' : 'Bannière activée',
-        description: `"${banner.title}" a été ${banner.is_active ? 'désactivée' : 'activée'}.`,
+        title: newStatus ? t('toast.activated') : t('toast.deactivated'),
+        description: t('toast.toggledDesc').replace('{title}', banner.title).replace('{status}', newStatus ? t('status.active').toLowerCase() : t('status.inactive').toLowerCase()),
       });
-      fetchBanners();
     } catch (error) {
+      // Revert on error
+      setBanners(prev => 
+        prev.map(b => b.id === banner.id ? { ...b, is_active: !newStatus } : b)
+      );
       toast({
-        title: 'Erreur',
-        description: 'Impossible de modifier le statut.',
+        title: t('toast.error'),
+        description: t('toast.statusError'),
         variant: 'destructive',
       });
     }
@@ -202,8 +213,8 @@ const BannersPage: React.FC = () => {
       <div className="space-y-4 sm:space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Bannières</h1>
-            <p className="text-xs sm:text-sm text-muted-foreground">Gérer les bannières promotionnelles du store</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">{t('title')}</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t('subtitle')}</p>
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -226,14 +237,14 @@ const BannersPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Bannières</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-xs sm:text-sm text-muted-foreground">
-            Gérer les bannières promotionnelles du store ({banners.length} bannière{banners.length !== 1 ? 's' : ''})
+            {t('subtitle')} ({banners.length} {banners.length !== 1 ? t('subtitleCountPlural') : t('subtitleCount')})
           </p>
         </div>
         <Button size="sm" onClick={() => handleOpenForm()} className="h-8 sm:h-9 text-xs sm:text-sm">
           <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-          Ajouter une bannière
+          {t('addBanner')}
         </Button>
       </div>
 
@@ -241,18 +252,18 @@ const BannersPage: React.FC = () => {
       {banners.length === 0 ? (
         <Card className="p-8 text-center">
           <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Aucune bannière</h3>
+          <h3 className="text-lg font-semibold mb-2">{t('empty.title')}</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Commencez par créer votre première bannière promotionnelle.
+            {t('empty.description')}
           </p>
           <Button onClick={() => handleOpenForm()}>
             <Plus className="h-4 w-4 mr-2" />
-            Créer une bannière
+            {t('createBanner')}
           </Button>
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {banners.map((banner) => (
+          {banners.map((banner, index) => (
             <Card key={banner.id} className={`overflow-hidden transition-all duration-200 hover:shadow-md ${!banner.is_active ? 'opacity-60' : ''}`}>
               {/* Banner Image */}
               <div className="relative aspect-[21/9] bg-muted">
@@ -270,11 +281,11 @@ const BannersPage: React.FC = () => {
                     ? 'bg-green-500/90 text-white' 
                     : 'bg-gray-500/90 text-white'
                 }`}>
-                  {banner.is_active ? 'Active' : 'Inactive'}
+                  {banner.is_active ? t('status.active') : t('status.inactive')}
                 </div>
                 {/* Order Badge */}
                 <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-black/50 text-white text-xs font-medium">
-                  #{banner.display_order + 1}
+                  #{index + 1}
                 </div>
               </div>
 
@@ -292,27 +303,25 @@ const BannersPage: React.FC = () => {
                     href={banner.link_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-blue-500 hover:underline flex items-center gap-1 mb-3"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 text-xs font-medium transition-colors mb-3"
                   >
                     <ExternalLink className="h-3 w-3" />
-                    <span className="truncate">{banner.link_url}</span>
+                    {t('card.viewLink')}
                   </a>
                 )}
 
                 {/* Actions */}
                 <div className="flex items-center justify-between pt-2 border-t">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleToggleActive(banner)}
-                    className="h-8 px-2"
-                  >
-                    {banner.is_active ? (
-                      <><EyeOff className="h-4 w-4 mr-1" /> Désactiver</>
-                    ) : (
-                      <><Eye className="h-4 w-4 mr-1" /> Activer</>
-                    )}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={banner.is_active}
+                      onCheckedChange={() => handleToggleActive(banner)}
+                      className="scale-90"
+                    />
+                    <span className="text-[10px] text-muted-foreground">
+                      {banner.is_active ? t('status.active') : t('status.inactive')}
+                    </span>
+                  </div>
                   <div className="flex items-center gap-1">
                     <Button
                       variant="ghost"
@@ -340,84 +349,75 @@ const BannersPage: React.FC = () => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="w-[calc(100%-1rem)] sm:w-full sm:max-w-[500px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle>
-              {editingBanner ? 'Modifier la bannière' : 'Nouvelle bannière'}
+            <DialogTitle className="text-base sm:text-lg">
+              {editingBanner ? t('dialog.editTitle') : t('dialog.createTitle')}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs sm:text-sm">
               {editingBanner 
-                ? 'Modifiez les informations de la bannière.' 
-                : 'Créez une nouvelle bannière promotionnelle pour le store.'}
+                ? t('dialog.editDescription') 
+                : t('dialog.createDescription')}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Titre *</Label>
+          <div className="space-y-3 sm:space-y-4 py-2 sm:py-4">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="title" className="text-xs sm:text-sm">{t('form.titleRequired')}</Label>
               <Input
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Ex: Promo -30%"
+                placeholder={t('form.titlePlaceholder')}
+                className="h-9 sm:h-10 text-sm"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="image_url">URL de l'image *</Label>
-              <Input
-                id="image_url"
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label className="text-xs sm:text-sm">{t('form.imageRequired')}</Label>
+              <BannerImageUpload
                 value={formData.image_url}
-                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                placeholder="https://... ou /images/banner.png"
+                onChange={(url) => setFormData({ ...formData, image_url: url })}
+                disabled={saving}
               />
-              {formData.image_url && (
-                <div className="mt-2 aspect-[21/9] bg-muted rounded-lg overflow-hidden">
-                  <img
-                    src={formData.image_url}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                </div>
-              )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="alt_text">Texte alternatif *</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="alt_text" className="text-xs sm:text-sm">{t('form.altTextRequired')}</Label>
               <Input
                 id="alt_text"
                 value={formData.alt_text}
                 onChange={(e) => setFormData({ ...formData, alt_text: e.target.value })}
-                placeholder="Description de l'image pour l'accessibilité"
+                placeholder={t('form.altTextPlaceholder')}
+                className="h-9 sm:h-10 text-sm"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="link_url">Lien (optionnel)</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="link_url" className="text-xs sm:text-sm">{t('form.linkUrl')}</Label>
               <Input
                 id="link_url"
                 value={formData.link_url || ''}
                 onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
-                placeholder="https://... ou /store?category=promo"
+                placeholder={t('form.linkUrlPlaceholder')}
+                className="h-9 sm:h-10 text-sm"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="display_order">Ordre d'affichage</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="display_order" className="text-xs sm:text-sm">{t('form.displayOrder')}</Label>
               <Input
                 id="display_order"
                 type="number"
                 min="0"
                 value={formData.display_order}
                 onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) || 0 })}
+                className="h-9 sm:h-10 text-sm"
               />
             </div>
 
             <div className="flex items-center justify-between">
-              <Label htmlFor="is_active">Bannière active</Label>
+              <Label htmlFor="is_active" className="text-xs sm:text-sm">{t('form.isActive')}</Label>
               <Switch
                 id="is_active"
                 checked={formData.is_active}
@@ -426,13 +426,13 @@ const BannersPage: React.FC = () => {
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsFormOpen(false)} disabled={saving}>
-              Annuler
+          <DialogFooter className="gap-2 flex-col-reverse sm:flex-row">
+            <Button variant="outline" onClick={() => setIsFormOpen(false)} disabled={saving} className="h-9 sm:h-10 text-sm">
+              {t('dialog.cancel')}
             </Button>
-            <Button onClick={handleSave} disabled={saving}>
+            <Button onClick={handleSave} disabled={saving} className="h-9 sm:h-10 text-sm">
               {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              {editingBanner ? 'Mettre à jour' : 'Créer'}
+              {editingBanner ? t('dialog.update') : t('dialog.create')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -442,15 +442,15 @@ const BannersPage: React.FC = () => {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer la bannière ?</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Êtes-vous sûr de vouloir supprimer "{bannerToDelete?.title}" ? Cette action est irréversible.
+              {t('deleteDialog.description').replace('{title}', bannerToDelete?.title || '')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t('deleteDialog.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Supprimer
+              {t('deleteDialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/layout/card';
 import { Button } from '@/components/ui/interactive/button';
 import { useToast } from '@/components/ui/feedback/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Plus,
   Download,
@@ -14,8 +15,12 @@ import {
   deleteProduct,
   bulkUpdateProductsStatus,
   bulkDeleteProducts,
+  getAllCategories,
+  uploadProductImage,
+  logActivity,
   type Product as SupabaseProduct,
   type ProductInsert,
+  type Category,
 } from '@/supabase';
 import ProductForm from './ProductForm';
 import ProductTable from './ProductTable';
@@ -28,76 +33,139 @@ const toLocalProduct = (p: SupabaseProduct): AdminProduct => ({
   id: p.id,
   name: p.name,
   description: p.description || '',
-  category: p.category,
+  category: p.category || 'Tous',
   price: p.price,
   cost: p.cost,
-  stock: p.stock,
-  minStock: p.min_stock,
   status: p.status,
-  sku: p.sku,
+  sku: p.sku || '',
   images: p.images,
   createdAt: p.created_at,
   updatedAt: p.updated_at,
-  supplier: p.supplier || undefined,
   tags: p.tags,
+  specs: p.specs || [],
+  condition: p.condition || 'new',
+  viewer_count: p.viewer_count || 0,
 });
 
 // Helper to convert AdminProduct to Supabase insert type
 const toSupabaseProduct = (p: Partial<AdminProduct>): ProductInsert => ({
   name: p.name || '',
   description: p.description || null,
-  category: p.category || '',
+  category: p.category || 'Tous',
   price: p.price || 0,
   cost: p.cost || 0,
-  stock: p.stock || 0,
-  min_stock: p.minStock || 0,
   status: p.status || 'active',
-  sku: p.sku || '',
+  sku: p.sku || null,
   images: p.images || [],
-  supplier: p.supplier || null,
   tags: p.tags || [],
-  rating: 0,
-  reviews_count: 0,
-  featured: false,
-  discount: 0,
-  delivery_time: null,
-  specs: null,
+  specs: p.specs || null,
+  condition: p.condition || 'new',
+  viewer_count: p.viewer_count || 0,
 });
 
-const categories = ['All', 'Films', 'Equipment', 'Vinyl', 'Ink', 'Tools', 'Accessories'];
 const statuses = ['all', 'active', 'inactive', 'discontinued'];
+
+// French translations (default)
+const fr = {
+  title: 'Produits',
+  subtitle: 'Gérer votre inventaire de produits',
+  addProduct: 'Ajouter Produit',
+  export: 'Exporter',
+  stats: {
+    totalProducts: 'Total Produits',
+    activeProducts: 'Produits Actifs',
+    inactiveProducts: 'Inactifs',
+    totalValue: 'Valeur totale'
+  },
+  filters: {
+    search: 'Rechercher...',
+    all: 'All',
+    allStatuses: 'Tous les statuts'
+  },
+  table: {
+    product: 'Produit',
+    ref: 'Réf',
+    category: 'Catégorie',
+    price: 'Prix',
+    views: 'Vues',
+    status: 'Statut',
+    actions: 'Actions',
+    catalogProducts: 'Catalogue produits',
+    ofProducts: 'sur',
+    products: 'produits',
+    active: 'Actif',
+    inactive: 'Inactif'
+  },
+  toast: {
+    error: 'Erreur',
+    loadError: 'Impossible de charger les produits.'
+  }
+};
 
 const ProductsPage: React.FC = () => {
   const { toast } = useToast();
+  const { t, language } = useLanguage();
+  
+  // Translation helper
+  const getText = (key: string): string => {
+    if (language === 'fr') {
+      const keys = key.split('.');
+      let value: unknown = fr;
+      for (const k of keys) {
+        if (value && typeof value === 'object') {
+          value = (value as Record<string, unknown>)[k];
+        } else {
+          return key;
+        }
+      }
+      return typeof value === 'string' ? value : key;
+    }
+    return t(key, 'admin_products');
+  };
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<AdminProduct[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryNames, setCategoryNames] = useState<string[]>(['All']);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
   const [formData, setFormData] = useState<Partial<AdminProduct>>({
     name: '',
     description: '',
     category: '',
-    price: 0,
-    cost: 0,
-    stock: 0,
-    minStock: 0,
+    price: undefined,
+    cost: undefined,
     status: 'active' as const,
     sku: '',
-    supplier: '',
+    images: [],
     tags: [],
+    specs: [],
+    condition: 'new',
+    viewer_count: 0,
   });
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
   // Load Lottie animations from public folder
   const { animationData: packageAnimation } = useLottieAnimation('/animations/package.json');
   const { animationData: warningAnimation } = useLottieAnimation('/animations/warning.json');
   const { animationData: emptyBoxAnimation } = useLottieAnimation('/animations/empty-box.json');
   const { animationData: revenueAnimation } = useLottieAnimation('/animations/revenue.json');
+
+  const fetchCategories = async () => {
+    try {
+      const data = await getAllCategories();
+      setCategories(data);
+      setCategoryNames(['All', ...data.map(c => c.name)]);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -118,6 +186,7 @@ const ProductsPage: React.FC = () => {
   };
 
   useEffect(() => {
+    fetchCategories();
     fetchProducts();
   }, []);
 
@@ -129,7 +198,6 @@ const ProductsPage: React.FC = () => {
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.supplier?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
@@ -168,71 +236,143 @@ const ProductsPage: React.FC = () => {
       name: '',
       description: '',
       category: '',
-      price: 0,
-      cost: 0,
-      stock: 0,
-      minStock: 0,
+      price: undefined,
+      cost: undefined,
       status: 'active',
       sku: '',
-      supplier: '',
+      images: [],
       tags: [],
+      specs: [],
+      condition: 'new',
+      viewer_count: 0,
     });
     setEditingProduct(null);
+    setPendingFiles([]);
     setIsFormOpen(true);
   };
 
   const handleEditProduct = (product: AdminProduct) => {
     setEditingProduct(product);
     setFormData(product);
+    setPendingFiles([]);
     setIsFormOpen(true);
   };
 
   const handleSaveProduct = async () => {
-    if (!formData.name || !formData.category || !formData.sku) {
+    if (!formData.name) {
       toast({
         title: 'Erreur de validation',
-        description: 'Veuillez remplir tous les champs obligatoires.',
+        description: 'Veuillez remplir le nom du produit.',
         variant: 'destructive',
       });
       return;
     }
+    
+    // Ensure condition has a default value
+    const productFormData = {
+      ...formData,
+      condition: formData.condition || 'new',
+      category: formData.category || 'Tous',
+    };
+
+    setIsSaving(true);
+    
+    // Show progress toast
+    const toastId = toast({
+      title: '⏳ Sauvegarde en cours...',
+      description: 'Préparation des données...',
+      duration: 60000, // Keep it open
+    });
 
     try {
+      // Upload pending files first
+      let finalImages = formData.images?.filter(url => !url.startsWith('blob:')) || [];
+      
+      if (pendingFiles.length > 0) {
+        toast({
+          title: '📤 Téléchargement des médias...',
+          description: `Upload de ${pendingFiles.length} fichier(s)...`,
+          duration: 60000,
+        });
+        
+        for (let i = 0; i < pendingFiles.length; i++) {
+          const file = pendingFiles[i];
+          try {
+            toast({
+              title: '📤 Téléchargement en cours...',
+              description: `Fichier ${i + 1}/${pendingFiles.length}: ${file.name}`,
+              duration: 60000,
+            });
+            const url = await uploadProductImage(file);
+            finalImages.push(url);
+          } catch (uploadError) {
+            console.error('Upload error:', uploadError);
+            toast({
+              title: 'Erreur d\'upload',
+              description: `Impossible d'uploader ${file.name}`,
+              variant: 'destructive',
+            });
+          }
+        }
+      }
+
+      toast({
+        title: '💾 Enregistrement...',
+        description: 'Sauvegarde du produit dans la base de données...',
+        duration: 60000,
+      });
+
+      const productData = {
+        ...toSupabaseProduct(productFormData),
+        images: finalImages,
+      };
+
       if (editingProduct) {
-        await updateProduct(editingProduct.id, {
-          name: formData.name,
-          description: formData.description || null,
-          category: formData.category,
-          price: formData.price || 0,
-          cost: formData.cost || 0,
-          stock: formData.stock || 0,
-          min_stock: formData.minStock || 0,
-          status: formData.status || 'active',
-          sku: formData.sku,
-          supplier: formData.supplier || null,
-          tags: formData.tags || [],
+        await updateProduct(editingProduct.id, productData);
+        await logActivity({
+          type: 'product',
+          action: 'update',
+          entity_id: editingProduct.id,
+          entity_name: productFormData.name,
+          details: { changes: productData },
+          performed_by: null,
+          performed_by_name: 'Admin'
         });
         toast({
-          title: 'Produit mis à jour',
-          description: `${formData.name} a été mis à jour avec succès.`,
+          title: '✅ Produit mis à jour',
+          description: `${productFormData.name} a été mis à jour avec succès.`,
         });
       } else {
-        await createProduct(toSupabaseProduct(formData));
+        const newProduct = await createProduct(productData);
+        await logActivity({
+          type: 'product',
+          action: 'create',
+          entity_id: newProduct.id,
+          entity_name: productFormData.name,
+          details: { product: productData },
+          performed_by: null,
+          performed_by_name: 'Admin'
+        });
         toast({
-          title: 'Produit ajouté',
-          description: `${formData.name} a été ajouté avec succès.`,
+          title: '✅ Produit ajouté',
+          description: `${productFormData.name} a été ajouté avec succès.`,
         });
       }
       
       setIsFormOpen(false);
       setEditingProduct(null);
+      setPendingFiles([]);
       fetchProducts();
     } catch (error) {
+      console.error('Save product error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue lors de la sauvegarde.';
       toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue lors de la sauvegarde.',
+        title: '❌ Erreur',
+        description: errorMessage,
         variant: 'destructive',
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -241,6 +381,15 @@ const ProductsPage: React.FC = () => {
     if (product) {
       try {
         await deleteProduct(productId);
+        await logActivity({
+          type: 'product',
+          action: 'delete',
+          entity_id: productId,
+          entity_name: product.name,
+          details: null,
+          performed_by: null,
+          performed_by_name: 'Admin'
+        });
         setSelectedProducts(new Set([...selectedProducts].filter(id => id !== productId)));
         toast({
           title: 'Produit supprimé',
@@ -254,6 +403,42 @@ const ProductsPage: React.FC = () => {
           variant: 'destructive',
         });
       }
+    }
+  };
+
+  const handleToggleStatus = async (product: AdminProduct) => {
+    const newStatus = product.status === 'active' ? 'inactive' : 'active';
+    
+    // Optimistic update - update UI immediately
+    setProducts(prev => prev.map(p => 
+      p.id === product.id ? { ...p, status: newStatus } : p
+    ));
+    
+    try {
+      await updateProduct(product.id, { status: newStatus });
+      await logActivity({
+        type: 'product',
+        action: 'status_change',
+        entity_id: product.id,
+        entity_name: product.name,
+        details: { from: product.status, to: newStatus },
+        performed_by: null,
+        performed_by_name: 'Admin'
+      });
+      toast({
+        title: newStatus === 'active' ? '✅ Produit activé' : '⏸️ Produit désactivé',
+        description: `${product.name} est maintenant ${newStatus === 'active' ? 'visible' : 'masqué'} dans la boutique.`,
+      });
+    } catch (error) {
+      // Revert on error
+      setProducts(prev => prev.map(p => 
+        p.id === product.id ? { ...p, status: product.status } : p
+      ));
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de modifier le statut.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -273,6 +458,15 @@ const ProductsPage: React.FC = () => {
       switch (action) {
         case 'activate':
           await bulkUpdateProductsStatus(ids, 'active');
+          await logActivity({
+            type: 'product',
+            action: 'bulk_activate',
+            entity_id: null,
+            entity_name: `${ids.length} products`,
+            details: { ids },
+            performed_by: null,
+            performed_by_name: 'Admin'
+          });
           toast({
             title: 'Produits activés',
             description: `${selectedProducts.size} produits ont été activés.`,
@@ -280,6 +474,15 @@ const ProductsPage: React.FC = () => {
           break;
         case 'deactivate':
           await bulkUpdateProductsStatus(ids, 'inactive');
+          await logActivity({
+            type: 'product',
+            action: 'bulk_deactivate',
+            entity_id: null,
+            entity_name: `${ids.length} products`,
+            details: { ids },
+            performed_by: null,
+            performed_by_name: 'Admin'
+          });
           toast({
             title: 'Produits désactivés',
             description: `${selectedProducts.size} produits ont été désactivés.`,
@@ -287,6 +490,15 @@ const ProductsPage: React.FC = () => {
           break;
         case 'delete':
           await bulkDeleteProducts(ids);
+          await logActivity({
+            type: 'product',
+            action: 'bulk_delete',
+            entity_id: null,
+            entity_name: `${ids.length} products`,
+            details: { ids },
+            performed_by: null,
+            performed_by_name: 'Admin'
+          });
           toast({
             title: 'Produits supprimés',
             description: `${selectedProducts.size} produits ont été supprimés.`,
@@ -304,14 +516,13 @@ const ProductsPage: React.FC = () => {
           const csvData = filteredProducts
             .filter(p => selectedProducts.has(p.id))
             .map(p => ({
-              Name: p.name,
+              Nom: p.name,
               SKU: p.sku,
-              Category: p.category,
-              Price: p.price,
-              Cost: p.cost,
-              Stock: p.stock,
-              Status: p.status,
-              Supplier: p.supplier || '',
+              Catégorie: p.category,
+              Prix: p.price,
+              Coût: p.cost,
+              Statut: p.status,
+              État: p.condition === 'new' ? 'Neuf' : 'Occasion',
             }));
           
           // Guard for empty array
@@ -359,14 +570,12 @@ const ProductsPage: React.FC = () => {
 
   const totalProducts = products.length;
   const activeProducts = products.filter(p => p.status === 'active').length;
-  const lowStockProducts = products.filter(p => p.stock <= p.minStock && p.stock > 0).length;
-  const outOfStockProducts = products.filter(p => p.stock === 0).length;
-  const totalValue = products.reduce((sum, p) => sum + (p.price * p.stock), 0);
+  const totalValue = products.reduce((sum, p) => sum + p.price, 0);
 
   if (loading) {
     return (
       <div className="space-y-4 sm:space-y-6">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Produits</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">{getText('title')}</h1>
         <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
             <Card key={i} className="animate-pulse">
@@ -387,24 +596,24 @@ const ProductsPage: React.FC = () => {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Produits</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground">Gérer votre inventaire de produits</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">{getText('title')}</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">{getText('subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => handleBulkAction('export')} disabled={selectedProducts.size === 0} className="h-8 sm:h-9 text-xs sm:text-sm">
             <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-            <span className="hidden sm:inline">Exporter</span> ({selectedProducts.size})
+            <span className="hidden sm:inline">{getText('export')}</span> ({selectedProducts.size})
           </Button>
           <Button size="sm" onClick={handleAddProduct} className="h-8 sm:h-9 text-xs sm:text-sm">
             <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-            <span className="hidden sm:inline">Ajouter</span> Produit
+            {getText('addProduct')}
           </Button>
         </div>
       </div>
 
-      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-3">
         <StatsCard
-          title="Total Produits"
+          title={getText('stats.totalProducts')}
           value={totalProducts}
           change={undefined}
           lottieAnimation={packageAnimation || undefined}
@@ -414,32 +623,22 @@ const ProductsPage: React.FC = () => {
         />
         
         <StatsCard
-          title="Stock faible"
-          value={lowStockProducts}
+          title={getText('stats.activeProducts')}
+          value={activeProducts}
           change={undefined}
           lottieAnimation={warningAnimation || undefined}
           svgIcon="/icons/low-stock.svg"
-          gradient="from-orange-500 to-amber-600"
+          gradient="from-green-500 to-emerald-600"
           iconColor="text-white"
         />
         
         <StatsCard
-          title="Rupture"
-          value={outOfStockProducts}
-          change={undefined}
-          lottieAnimation={emptyBoxAnimation || undefined}
-          svgIcon="/icons/out-of-stock.svg"
-          gradient="from-red-500 to-rose-600"
-          iconColor="text-white"
-        />
-        
-        <StatsCard
-          title="Valeur totale"
+          title={getText('stats.totalValue')}
           value={`${totalValue.toLocaleString()} DA`}
           change={undefined}
           lottieAnimation={revenueAnimation || undefined}
           svgIcon="/icons/revenue.svg"
-          gradient="from-green-500 to-emerald-600"
+          gradient="from-purple-500 to-indigo-600"
           iconColor="text-white"
         />
       </div>
@@ -451,12 +650,23 @@ const ProductsPage: React.FC = () => {
         onCategoryChange={setSelectedCategory}
         selectedStatus={selectedStatus}
         onStatusChange={setSelectedStatus}
-        categories={categories}
+        categories={categoryNames}
         statuses={statuses}
         selectedCount={selectedProducts.size}
         onBulkAction={handleBulkAction}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        translations={{
+          search: getText('filters.search'),
+          category: language === 'fr' ? 'Catégorie' : t('table.category', 'admin_products'),
+          status: language === 'fr' ? 'Statut' : t('table.status', 'admin_products'),
+          selected: language === 'fr' ? 'sél.' : t('bulk.selected', 'admin_products'),
+          bulkActions: language === 'fr' ? 'Actions groupées' : 'Bulk Actions',
+          activate: language === 'fr' ? 'Activer' : t('actions.activate', 'admin_products'),
+          deactivate: language === 'fr' ? 'Désactiver' : t('actions.deactivate', 'admin_products'),
+          delete: language === 'fr' ? 'Supprimer' : t('actions.delete', 'admin_products'),
+          export: getText('export'),
+        }}
       />
 
       <ProductTable
@@ -467,6 +677,28 @@ const ProductsPage: React.FC = () => {
         onSelectAll={handleSelectAll}
         onEdit={handleEditProduct}
         onDelete={handleDeleteProduct}
+        onToggleStatus={handleToggleStatus}
+        translations={{
+          catalogTitle: getText('table.catalogProducts'),
+          of: getText('table.ofProducts'),
+          products: getText('table.products'),
+          selectAll: language === 'fr' ? 'Tout sélectionner' : t('table.selectAll', 'admin_products'),
+          edit: language === 'fr' ? 'Modifier' : t('actions.edit', 'admin_products'),
+          delete: language === 'fr' ? 'Supprimer' : t('actions.delete', 'admin_products'),
+          deleteTitle: language === 'fr' ? 'Supprimer le produit' : t('deleteConfirm.title', 'admin_products'),
+          deleteConfirm: language === 'fr' ? 'Cette action est irréversible.' : t('deleteConfirm.message', 'admin_products'),
+          cancel: language === 'fr' ? 'Annuler' : t('actions.cancel', 'admin_products'),
+          active: getText('table.active'),
+          inactive: getText('table.inactive'),
+          discontinued: language === 'fr' ? 'Arrêté' : t('filters.discontinued', 'admin_products'),
+          product: getText('table.product'),
+          ref: getText('table.ref'),
+          category: getText('table.category'),
+          price: getText('table.price'),
+          views: getText('table.views'),
+          status: getText('table.status'),
+          actions: getText('table.actions'),
+        }}
       />
 
       <ProductForm
@@ -476,7 +708,11 @@ const ProductsPage: React.FC = () => {
         formData={formData}
         setFormData={setFormData}
         onSave={handleSaveProduct}
-        categories={categories}
+        categories={categoryNames.filter(c => c !== 'All')}
+        pendingFiles={pendingFiles}
+        setPendingFiles={setPendingFiles}
+        isSaving={isSaving}
+        setIsSaving={setIsSaving}
       />
     </div>
   );

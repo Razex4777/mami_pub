@@ -1,0 +1,137 @@
+{
+  "title": "إعدادات الموقع",
+  "subtitle": "إدارة الشعار ومعلومات الاتصال وإعدادات SEO",
+  "refresh": "تحديث",
+  "refreshShort": "مزامنة",
+  "save": "حفظ",
+  "tabs": {
+    "general": "عام",
+    "contact": "الاتصال",
+    "notifications": "الإشعارات",
+    "social": "التواصل",
+    "seo": "تحسين البحث"
+  },
+  "general": {
+    "logo": {
+      "title": "الشعار",
+      "description": "الشعار المعروض في شريط التنقل"
+    },
+    "favicon": {
+      "title": "أيقونة الموقع",
+      "description": "الأيقونة المعروضة في علامة تبويب المتصفح"
+    },
+    "siteInfo": {
+      "title": "معلومات الموقع",
+      "description": "الاسم والعنوان والشعار المعروض على الموقع",
+      "siteName": "اسم الموقع",
+      "siteNamePlaceholder": "MAMI PUB",
+      "tagline": "الشعار",
+      "taglinePlaceholder": "جودة ممتازة",
+      "browserTitle": "عنوان المتصفح",
+      "browserTitlePlaceholder": "MAMI PUB - طباعة وإعلان",
+      "browserTitleHint": "يظهر هذا العنوان في علامة تبويب المتصفح"
+    },
+    "language": {
+      "title": "اللغة",
+      "description": "اختر لغة الواجهة"
+    },
+    "preview": "معاينة:"
+  },
+  "contact": {
+    "title": "معلومات الاتصال",
+    "description": "تفاصيل الاتصال المعروضة في شريط التنقل",
+    "phone": "الهاتف",
+    "phonePlaceholder": "0557 91 45 44",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "contact@example.com",
+    "address": "العنوان",
+    "addressPlaceholder": "مؤسسة محميد مامي، العلمة",
+    "mapsLink": "رابط خرائط جوجل",
+    "mapsLinkPlaceholder": "https://maps.google.com/...",
+    "businessHours": "ساعات العمل",
+    "businessHoursPlaceholder": "الإثنين-السبت: 9ص-6م"
+  },
+  "notifications": {
+    "telegram": {
+      "title": "إشعارات تيليجرام",
+      "description": "استلم إشعارات فورية على تيليجرام لكل طلب جديد",
+      "enable": "تفعيل الإشعارات",
+      "enableDesc": "استلام إشعار تيليجرام لكل طلب",
+      "botToken": "رمز البوت",
+      "botTokenPlaceholder": "123456789:ABCdefGHIjklMNOpqrsTUVwxyz",
+      "botTokenHint": "احصل عليه عبر @BotFather على تيليجرام",
+      "chatId": "معرف المحادثة",
+      "chatIdPlaceholder": "5112845316",
+      "chatIdHint": "معرف مستخدم تيليجرام الخاص بك (عبر @userinfobot)",
+      "testButton": "إرسال رسالة اختبار",
+      "howTo": {
+        "title": "كيفية الإعداد؟",
+        "step1": "افتح تيليجرام وابحث عن @BotFather",
+        "step2": "أرسل /newbot واتبع التعليمات",
+        "step3": "انسخ رمز API المقدم",
+        "step4": "ابحث عن @userinfobot للحصول على معرف المحادثة",
+        "step5": "الصق القيمتين أعلاه واختبر"
+      }
+    },
+    "email": {
+      "title": "إشعارات البريد الإلكتروني",
+      "description": "استلم الطلبات عبر البريد الإلكتروني",
+      "enable": "تفعيل إشعارات البريد الإلكتروني",
+      "enableDesc": "استلام بريد إلكتروني لكل طلب جديد",
+      "recipient": "بريدك الإلكتروني",
+      "recipientPlaceholder": "your-email@example.com",
+      "recipientHint": "عنوان البريد الإلكتروني الذي ستستلم فيه إشعارات الطلبات",
+      "testButton": "إرسال بريد اختبار"
+    }
+  },
+  "social": {
+    "title": "شبكات التواصل الاجتماعي",
+    "description": "روابط ملفاتك الشخصية على وسائل التواصل",
+    "facebook": "فيسبوك",
+    "facebookPlaceholder": "https://facebook.com/...",
+    "instagram": "إنستغرام",
+    "instagramPlaceholder": "https://instagram.com/...",
+    "tiktok": "تيك توك",
+    "tiktokPlaceholder": "https://tiktok.com/@...",
+    "whatsapp": "واتساب",
+    "whatsappPlaceholder": "557 91 45 44",
+    "whatsappHint": "رقم جزائري لرابط واتساب (بدون 0)"
+  },
+  "seo": {
+    "title": "تحسين محركات البحث (SEO)",
+    "description": "حسّن ظهورك على محركات البحث",
+    "siteDescription": "وصف الموقع",
+    "siteDescriptionPlaceholder": "وصف نشاطك التجاري...",
+    "siteDescriptionHint": "يظهر هذا الوصف في نتائج بحث جوجل",
+    "keywords": "الكلمات المفتاحية",
+    "keywordsPlaceholder": "طباعة، إعلان، بجاية، الجزائر...",
+    "keywordsHint": "افصل الكلمات المفتاحية بفواصل",
+    "ogImage": {
+      "title": "صورة المشاركة الاجتماعية",
+      "description": "الصورة المعروضة عند المشاركة على شبكات التواصل",
+      "hint": "الحجم الموصى به: 1200×630 بكسل"
+    }
+  },
+  "toast": {
+    "saved": "تم حفظ الإعدادات",
+    "savedDesc": "تم تحديث {count} إعداد(ات)",
+    "saveError": "خطأ في الحفظ",
+    "saveErrorDesc": "يرجى المحاولة مرة أخرى",
+    "telegramIncomplete": "إعداد غير مكتمل",
+    "telegramIncompleteDesc": "يرجى ملء رمز البوت ومعرف المحادثة",
+    "telegramSuccess": "نجح الاختبار!",
+    "telegramSuccessDesc": "تحقق من تيليجرام للرسالة الاختبارية",
+    "telegramFailed": "فشل الاختبار",
+    "telegramFailedDesc": "تحقق من بيانات الاعتماد",
+    "telegramError": "خطأ في الاتصال",
+    "telegramErrorDesc": "تعذر الاتصال بتيليجرام",
+    "emailRequired": "البريد الإلكتروني مطلوب",
+    "emailRequiredDesc": "يرجى ملء عنوان بريدك الإلكتروني",
+    "emailSuccess": "نجح الاختبار!",
+    "emailSuccessDesc": "تحقق من صندوق الوارد",
+    "emailFailed": "فشل الاختبار",
+    "emailFailedDesc": "خطأ في إرسال البريد الإلكتروني",
+    "emailError": "خطأ في الاتصال",
+    "emailErrorDesc": "تعذر إرسال البريد الإلكتروني"
+  }
+}

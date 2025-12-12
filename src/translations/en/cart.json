@@ -1,0 +1,28 @@
+{
+  "empty": {
+    "title": "Your cart is empty",
+    "description": "Discover our latest collections and start filling your cart.",
+    "exploreBtn": "Explore the store"
+  },
+  "header": {
+    "title": "Cart",
+    "itemsSelected": "items selected",
+    "continueShopping": "Continue shopping"
+  },
+  "item": {
+    "total": "Total",
+    "remove": "Remove"
+  },
+  "summary": {
+    "title": "Summary",
+    "subtotal": "Subtotal",
+    "totalToPay": "Total to pay",
+    "taxIncluded": "Taxes included",
+    "orderBtn": "Order",
+    "paymentOnDelivery": "Payment on delivery"
+  },
+  "mobile": {
+    "totalToPay": "Total to pay",
+    "orderBtn": "Order"
+  }
+}

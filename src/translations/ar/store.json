@@ -1,0 +1,44 @@
+{
+  "filters": {
+    "title": "الفلاتر",
+    "categories": "الفئات",
+    "allCategories": "جميع الفئات",
+    "priceRange": "نطاق السعر",
+    "condition": "الحالة",
+    "all": "الكل",
+    "new": "جديد",
+    "used": "مستعمل",
+    "favorites": "المفضلة فقط",
+    "reset": "إعادة تعيين الفلاتر"
+  },
+  "search": {
+    "placeholder": "البحث عن منتجات...",
+    "noResults": "لم يتم العثور على منتجات",
+    "noResultsDesc": "حاول تعديل البحث أو الفلاتر"
+  },
+  "results": {
+    "products": "منتجات",
+    "product": "منتج",
+    "showing": "عرض",
+    "of": "من"
+  },
+  "sort": {
+    "label": "ترتيب حسب",
+    "newest": "الأحدث",
+    "oldest": "الأقدم",
+    "mostViewed": "الأكثر مشاهدة",
+    "priceLow": "السعر: من الأقل للأعلى",
+    "priceHigh": "السعر: من الأعلى للأقل"
+  },
+  "product": {
+    "addToCart": "أضف للسلة",
+    "quickView": "عرض سريع",
+    "new": "جديد",
+    "used": "مستعمل"
+  },
+  "empty": {
+    "title": "لم يتم العثور على منتجات",
+    "description": "حاول تعديل الفلاتر أو كلمات البحث",
+    "resetBtn": "إعادة تعيين الفلاتر"
+  }
+}

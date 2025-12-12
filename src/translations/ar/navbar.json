@@ -1,0 +1,36 @@
+{
+  "contact": {
+    "phone": {
+      "label": "اتصل بنا",
+      "description": "مستشار مخصص، ردود فورية"
+    },
+    "email": {
+      "label": "راسلنا",
+      "description": "عروض أسعار، ملفات تقنية، متابعة"
+    },
+    "location": {
+      "label": "زرنا",
+      "description": "صالة عرض وورشة بموعد"
+    }
+  },
+  "admin": {
+    "unlocked": "تم فتح الوصول للإدارة!",
+    "unlockedDesc": "أدخل بيانات الإدارة للوصول إلى لوحة التحكم",
+    "title": "وصول الإدارة",
+    "subtitle": "أدخل بيانات الإدارة الخاصة بك",
+    "username": "اسم المستخدم",
+    "usernamePlaceholder": "أدخل اسم المستخدم",
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "أدخل كلمة المرور",
+    "demo": "تجريبي",
+    "signingIn": "جاري تسجيل الدخول...",
+    "signIn": "تسجيل الدخول",
+    "welcome": "مرحباً!",
+    "welcomeDesc": "تم الاتصال بلوحة التحكم بنجاح",
+    "loginFailed": "فشل تسجيل الدخول",
+    "loginFailedDesc": "بيانات غير صالحة. استخدم admin/admin",
+    "error": "خطأ",
+    "errorDesc": "فشل تسجيل الدخول. يرجى المحاولة مرة أخرى."
+  },
+  "logoTooltip": "انقر 5 مرات للوصول للإدارة"
+}

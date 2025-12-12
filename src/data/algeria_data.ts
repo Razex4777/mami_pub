@@ -58,8 +58,3 @@ export const wilayas = [
   { id: 57, name: "El M'Ghair", code: "57" },
   { id: 58, name: "El Meniaa", code: "58" }
 ];
-
-export const deliveryOptions = [
-  { id: 'home', name: 'Livraison à domicile (Yalidine)', price: 700, icon: 'Truck' },
-  { id: 'desk', name: 'Stop Desk (Bureau Yalidine)', price: 400, icon: 'Building' }
-];

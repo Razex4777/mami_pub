@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Plus, Minus, ShoppingBag, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/interactive/button';
 import { useCart } from '@/contexts/CartContext';
@@ -6,9 +7,9 @@ import { toast } from 'sonner';
 
 const FloatingCart: React.FC = () => {
   const { state, removeItem, updateQuantity, closeCart, clearCart } = useCart();
-  const [isAnimating, setIsAnimating] = useState(false);
+  const navigate = useNavigate();
 
-  const handleQuantityChange = (id: number, newQuantity: number) => {
+  const handleQuantityChange = (id: string, newQuantity: number) => {
     if (newQuantity === 0) {
       removeItem(id);
       toast.success('Produit supprimé du panier');
@@ -18,8 +19,8 @@ const FloatingCart: React.FC = () => {
   };
 
   const handleCheckout = () => {
-    toast.success('Redirection vers le paiement...');
-    // Here you would typically navigate to checkout
+    closeCart();
+    navigate('/checkout');
   };
 
   if (!state.isOpen) return null;

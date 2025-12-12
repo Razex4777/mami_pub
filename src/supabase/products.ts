@@ -8,7 +8,6 @@ export async function getActiveProducts(): Promise<Product[]> {
     .from('products')
     .select('*')
     .eq('status', 'active')
-    .order('featured', { ascending: false })
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -113,23 +112,63 @@ export async function getProductsByCategory(category: string): Promise<Product[]
     .select('*')
     .eq('category', category)
     .eq('status', 'active')
-    .order('featured', { ascending: false });
+    .order('created_at', { ascending: false });
 
   if (error) throw error;
   return (data as Product[]) ?? [];
 }
 
-// Get featured products
-export async function getFeaturedProducts(limit = 6): Promise<Product[]> {
+// Get most viewed products
+export async function getMostViewedProducts(limit = 6): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('*')
     .eq('status', 'active')
-    .eq('featured', true)
+    .order('viewer_count', { ascending: false })
     .limit(limit);
 
   if (error) throw error;
   return (data as Product[]) ?? [];
+}
+
+// Increment viewer count for a product (atomic operation)
+export async function incrementViewerCount(id: string): Promise<void> {
+  // Use atomic increment via RPC to prevent race conditions
+  const { error } = await supabase.rpc('increment_viewer_count', { product_id: id } as never);
+  
+  if (error) {
+    // Fallback to manual increment if RPC doesn't exist
+    // WARNING: This fallback is NOT atomic and may lose increments under concurrent access
+    if (error.code === 'PGRST202' || error.message.includes('function')) {
+      console.warn('RPC increment_viewer_count not found, using non-atomic fallback (race condition possible)');
+      const { data: product, error: fetchError } = await supabase
+        .from('products')
+        .select('viewer_count')
+        .eq('id', id)
+        .single();
+      
+      if (fetchError) {
+        throw new Error(`Failed to fetch product for viewer count increment: ${fetchError.message}`);
+      }
+      
+      if (!product) {
+        throw new Error(`Product not found for viewer count increment: ${id}`);
+      }
+      
+      const currentCount = (product as { viewer_count: number }).viewer_count || 0;
+      const { error: updateError } = await supabase
+        .from('products')
+        .update({ viewer_count: currentCount + 1 } as never)
+        .eq('id', id);
+      
+      if (updateError) {
+        throw new Error(`Failed to update viewer count: ${updateError.message}`);
+      }
+    } else {
+      // Non-RPC errors should be thrown so callers can react
+      throw new Error(`Failed to increment viewer count via RPC: ${error.message}`);
+    }
+  }
 }
 
 // Search products
@@ -139,7 +178,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
     .select('*')
     .eq('status', 'active')
     .or(`name.ilike.%${query}%,description.ilike.%${query}%,sku.ilike.%${query}%`)
-    .order('featured', { ascending: false });
+    .order('created_at', { ascending: false });
 
   if (error) throw error;
   return (data as Product[]) ?? [];
@@ -149,46 +188,31 @@ export async function searchProducts(query: string): Promise<Product[]> {
 export async function getProductStats(): Promise<{
   total: number;
   active: number;
-  lowStock: number;
-  outOfStock: number;
   totalValue: number;
 }> {
   // Run parallel queries for better performance
-  const [totalResult, activeResult, outOfStockResult, valueResult, lowStockData] = await Promise.all([
+  const [totalResult, activeResult, valueResult] = await Promise.all([
     // Total count
     supabase.from('products').select('*', { count: 'exact', head: true }),
     // Active count
     supabase.from('products').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-    // Out of stock count
-    supabase.from('products').select('*', { count: 'exact', head: true }).eq('stock', 0),
-    // Total value - need to fetch price and stock for calculation
-    supabase.from('products').select('price, stock'),
-    // Low stock - need to compare stock with min_stock
-    supabase.from('products').select('stock, min_stock').gt('stock', 0),
+    // Total value - need to fetch price for calculation
+    supabase.from('products').select('price'),
   ]);
 
   if (totalResult.error) throw totalResult.error;
   if (activeResult.error) throw activeResult.error;
-  if (outOfStockResult.error) throw outOfStockResult.error;
   if (valueResult.error) throw valueResult.error;
-  if (lowStockData.error) throw lowStockData.error;
 
   // Calculate total value from minimal data
   const totalValue = (valueResult.data ?? []).reduce(
-    (sum: number, p: { price: number; stock: number }) => sum + (p.price * p.stock), 
+    (sum: number, p: { price: number }) => sum + p.price, 
     0
   );
-
-  // Calculate low stock count (stock <= min_stock AND stock > 0)
-  const lowStock = (lowStockData.data ?? []).filter(
-    (p: { stock: number; min_stock: number }) => p.stock <= p.min_stock
-  ).length;
 
   return {
     total: totalResult.count ?? 0,
     active: activeResult.count ?? 0,
-    lowStock,
-    outOfStock: outOfStockResult.count ?? 0,
     totalValue,
   };
 }

@@ -37,7 +37,30 @@ interface ProductFiltersProps {
   onBulkAction: (action: string) => void;
   viewMode: 'grid' | 'list';
   onViewModeChange: (mode: 'grid' | 'list') => void;
+  translations?: {
+    search: string;
+    category: string;
+    status: string;
+    selected: string;
+    bulkActions: string;
+    activate: string;
+    deactivate: string;
+    delete: string;
+    export: string;
+  };
 }
+
+const defaultTranslations = {
+  search: 'Rechercher...',
+  category: 'Catégorie',
+  status: 'Statut',
+  selected: 'sél.',
+  bulkActions: 'Actions groupées',
+  activate: 'Activer',
+  deactivate: 'Désactiver',
+  delete: 'Supprimer',
+  export: 'Exporter',
+};
 
 const ProductFilters: React.FC<ProductFiltersProps> = ({
   searchQuery,
@@ -52,7 +75,10 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
   onBulkAction,
   viewMode,
   onViewModeChange,
+  translations: propTranslations,
 }) => {
+  const t = { ...defaultTranslations, ...propTranslations };
+  
   return (
     <Card>
       <CardContent className="p-3 sm:p-4 md:p-6">
@@ -61,7 +87,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Rechercher..."
+              placeholder={t.search}
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               className="pl-10 h-9 sm:h-10 text-sm"
@@ -72,7 +98,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <Select value={selectedCategory} onValueChange={onCategoryChange}>
               <SelectTrigger className="w-[100px] sm:w-32 h-8 sm:h-9 text-xs sm:text-sm">
-                <SelectValue placeholder="Catégorie" />
+                <SelectValue placeholder={t.category} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((category) => (
@@ -85,7 +111,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
 
             <Select value={selectedStatus} onValueChange={onStatusChange}>
               <SelectTrigger className="w-[90px] sm:w-28 h-8 sm:h-9 text-xs sm:text-sm">
-                <SelectValue placeholder="Statut" />
+                <SelectValue placeholder={t.status} />
               </SelectTrigger>
               <SelectContent>
                 {statuses.map((status) => (
@@ -102,7 +128,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
             {selectedCount > 0 && (
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="text-[10px] sm:text-xs text-muted-foreground">
-                  {selectedCount} sél.
+                  {selectedCount} {t.selected}
                 </span>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -111,19 +137,19 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuLabel className="text-xs">Actions groupées</DropdownMenuLabel>
+                    <DropdownMenuLabel className="text-xs">{t.bulkActions}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => onBulkAction('activate')} className="text-xs sm:text-sm">
-                      Activer
+                      {t.activate}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onBulkAction('deactivate')} className="text-xs sm:text-sm">
-                      Désactiver
+                      {t.deactivate}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onBulkAction('delete')} className="text-red-600 text-xs sm:text-sm">
-                      Supprimer
+                      {t.delete}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onBulkAction('export')} className="text-xs sm:text-sm">
-                      Exporter
+                      {t.export}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

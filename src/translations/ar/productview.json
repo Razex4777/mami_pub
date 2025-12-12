@@ -1,0 +1,48 @@
+{
+  "loading": "جاري تحميل المنتج...",
+  "notFound": "المنتج غير موجود",
+  "backToStore": "العودة للمتجر",
+  "missingId": "معرف المنتج مفقود",
+  "loadError": "خطأ في تحميل المنتج",
+  "loadErrorDesc": "تعذر تحميل تفاصيل المنتج.",
+  "breadcrumb": {
+    "home": "الرئيسية",
+    "store": "المتجر"
+  },
+  "condition": {
+    "new": "جديد",
+    "used": "مستعمل"
+  },
+  "views": "مشاهدة",
+  "price": {
+    "paymentOnDelivery": "الدفع عند الاستلام",
+    "shippingCalc": "يتم حساب الشحن عند الدفع"
+  },
+  "actions": {
+    "addToCart": "أضف للسلة",
+    "buyNow": "اشتري الآن",
+    "add": "أضف"
+  },
+  "trust": {
+    "delivery": "توصيل 48 ساعة",
+    "guarantee": "ضمان 100%",
+    "returns": "إرجاع سهل"
+  },
+  "tabs": {
+    "description": "الوصف",
+    "specs": "المواصفات"
+  },
+  "noDescription": "لا يوجد وصف متاح.",
+  "noSpecs": "لا توجد مواصفات متاحة.",
+  "tags": "الوسوم",
+  "related": {
+    "title": "قد يعجبك أيضاً",
+    "viewAll": "عرض الكل"
+  },
+  "mobile": {
+    "total": "المجموع"
+  },
+  "toast": {
+    "addedToCart": "تمت الإضافة للسلة"
+  }
+}

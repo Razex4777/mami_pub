@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { NotificationProvider } from '@/contexts/NotificationContext';
 import AdminSidebar from './AdminSidebar';
 import AdminTopbar from './AdminTopbar';
 import AdminMobileTabBar from './AdminMobileTabBar';
@@ -41,7 +42,8 @@ const AdminLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <NotificationProvider>
+      <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Sidebar - Desktop only */}
       <div className="hidden md:block">
         <AdminSidebar
@@ -73,7 +75,8 @@ const AdminLayout: React.FC = () => {
 
       {/* Mobile Tab Bar */}
       <AdminMobileTabBar />
-    </div>
+      </div>
+    </NotificationProvider>
   );
 };
 

@@ -1,0 +1,36 @@
+{
+  "contact": {
+    "phone": {
+      "label": "Call us",
+      "description": "Dedicated advisor, immediate responses"
+    },
+    "email": {
+      "label": "Write to us",
+      "description": "Quotes, technical files, follow-up"
+    },
+    "location": {
+      "label": "Visit us",
+      "description": "Showroom & workshop by appointment"
+    }
+  },
+  "admin": {
+    "unlocked": "Admin Access Unlocked!",
+    "unlockedDesc": "Enter admin credentials to access the dashboard",
+    "title": "Admin Access",
+    "subtitle": "Enter your admin credentials",
+    "username": "Username",
+    "usernamePlaceholder": "Enter username",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "demo": "Demo",
+    "signingIn": "Signing in...",
+    "signIn": "Sign in",
+    "welcome": "Welcome!",
+    "welcomeDesc": "Successfully connected to admin dashboard",
+    "loginFailed": "Login failed",
+    "loginFailedDesc": "Invalid credentials. Please try again.",
+    "error": "Error",
+    "errorDesc": "Login failed. Please try again."
+  },
+  "logoTooltip": "Click 5 times for admin access"
+}

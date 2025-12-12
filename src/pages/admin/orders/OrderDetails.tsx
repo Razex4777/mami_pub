@@ -31,41 +31,96 @@ import {
 } from 'lucide-react';
 import { Order } from '@/supabase';
 
+interface OrderDetailsTranslations {
+  title: string;
+  description: string;
+  tabs: {
+    details: string;
+    items: string;
+    customer: string;
+    tracking: string;
+  };
+  info: {
+    title: string;
+    orderNumber: string;
+    status: string;
+    created: string;
+    modified: string;
+    tracking: string;
+  };
+  summary: {
+    title: string;
+    subtotal: string;
+    tax: string;
+    shipping: string;
+    total: string;
+  };
+  notes: string;
+  itemsOrdered: string;
+  product: string;
+  quantity: string;
+  price: string;
+  customerInfo: {
+    title: string;
+    customerId: string;
+    email: string;
+    phone: string;
+    shippingAddress: string;
+  };
+  progress: {
+    title: string;
+    currentStatus: string;
+  };
+  statusPending: string;
+  statusConfirmed: string;
+  statusProcessing: string;
+  statusShipped: string;
+  statusDelivered: string;
+  statusCancelled: string;
+}
+
 interface OrderDetailsProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   order: Order | null;
+  translations?: OrderDetailsTranslations;
 }
 
-const getStatusBadge = (status: string) => {
-  switch (status) {
-    case 'pending':
-      return <Badge variant="secondary" className="flex items-center gap-1"><Clock className="h-3 w-3" /> En attente</Badge>;
-    case 'confirmed':
-      return <Badge className="bg-blue-100 text-blue-800 flex items-center gap-1"><CheckCircle className="h-3 w-3" /> Confirmée</Badge>;
-    case 'processing':
-      return <Badge className="bg-purple-100 text-purple-800 flex items-center gap-1"><Package className="h-3 w-3" /> En cours</Badge>;
-    case 'shipped':
-      return <Badge className="bg-indigo-100 text-indigo-800 flex items-center gap-1"><Truck className="h-3 w-3" /> Expédiée</Badge>;
-    case 'delivered':
-      return <Badge className="bg-green-100 text-green-800 flex items-center gap-1"><CheckCircle className="h-3 w-3" /> Livrée</Badge>;
-    case 'cancelled':
-      return <Badge variant="destructive" className="flex items-center gap-1"><XCircle className="h-3 w-3" /> Annulée</Badge>;
-    default:
-      return <Badge variant="outline">{status}</Badge>;
-  }
+const defaultTranslations: OrderDetailsTranslations = {
+  title: 'Commande',
+  description: 'Détails et informations de livraison',
+  tabs: { details: 'Détails', items: 'Articles', customer: 'Client', tracking: 'Suivi' },
+  info: { title: 'Informations', orderNumber: 'N° Commande:', status: 'Statut:', created: 'Créée:', modified: 'Modifiée:', tracking: 'Suivi:' },
+  summary: { title: 'Récapitulatif', subtotal: 'Sous-total:', tax: 'TVA:', shipping: 'Livraison:', total: 'Total:' },
+  notes: 'Notes',
+  itemsOrdered: 'Articles commandés',
+  product: 'Produit',
+  quantity: 'Quantité',
+  price: 'Prix',
+  customerInfo: { title: 'Informations client', customerId: 'ID Client:', email: 'Adresse email', phone: 'Téléphone', shippingAddress: 'Adresse de livraison' },
+  progress: { title: 'Progression', currentStatus: 'Statut actuel' },
+  statusPending: 'En attente',
+  statusConfirmed: 'Confirmée',
+  statusProcessing: 'En cours',
+  statusShipped: 'Expédiée',
+  statusDelivered: 'Livrée',
+  statusCancelled: 'Annulée',
 };
 
-const getPaymentStatusBadge = (status: string) => {
+const createGetStatusBadge = (t: OrderDetailsTranslations) => (status: string) => {
   switch (status) {
     case 'pending':
-      return <Badge variant="secondary">En attente</Badge>;
-    case 'paid':
-      return <Badge className="bg-green-100 text-green-800">Payé</Badge>;
-    case 'failed':
-      return <Badge variant="destructive">Échoué</Badge>;
-    case 'refunded':
-      return <Badge variant="outline">Remboursé</Badge>;
+      return <Badge variant="secondary" className="flex items-center gap-1"><Clock className="h-3 w-3" /> {t.statusPending}</Badge>;
+    case 'confirmed':
+      return <Badge className="bg-blue-100 text-blue-800 flex items-center gap-1"><CheckCircle className="h-3 w-3" /> {t.statusConfirmed}</Badge>;
+    case 'processing':
+      return <Badge className="bg-purple-100 text-purple-800 flex items-center gap-1"><Package className="h-3 w-3" /> {t.statusProcessing}</Badge>;
+    case 'shipped':
+      return <Badge className="bg-indigo-100 text-indigo-800 flex items-center gap-1"><Truck className="h-3 w-3" /> {t.statusShipped}</Badge>;
+    case 'delivered':
+      return <Badge className="bg-green-100 text-green-800 flex items-center gap-1"><CheckCircle className="h-3 w-3" /> {t.statusDelivered}</Badge>;
+    case 'cancelled':
+      return <Badge variant="destructive" className="flex items-center gap-1"><XCircle className="h-3 w-3" /> {t.statusCancelled}</Badge>;
     default:
       return <Badge variant="outline">{status}</Badge>;
   }
@@ -119,67 +174,73 @@ const formatDate = (dateString: string) => {
   });
 };
 
-const orderStatuses = [
-  { value: 'all', label: 'Toutes' },
-  { value: 'pending', label: 'En attente' },
-  { value: 'confirmed', label: 'Confirmée' },
-  { value: 'processing', label: 'En cours' },
-  { value: 'shipped', label: 'Expédiée' },
-  { value: 'delivered', label: 'Livrée' },
-  { value: 'cancelled', label: 'Annulée' },
-];
-
-const OrderDetails: React.FC<OrderDetailsProps> = ({ open, onOpenChange, order }) => {
+const OrderDetails: React.FC<OrderDetailsProps> = ({ open, onOpenChange, order, translations }) => {
+  const t: OrderDetailsTranslations = {
+    ...defaultTranslations,
+    ...translations,
+    tabs: { ...defaultTranslations.tabs, ...translations?.tabs },
+    info: { ...defaultTranslations.info, ...translations?.info },
+    summary: { ...defaultTranslations.summary, ...translations?.summary },
+    customerInfo: { ...defaultTranslations.customerInfo, ...translations?.customerInfo },
+    progress: { ...defaultTranslations.progress, ...translations?.progress },
+  };
+  const getStatusBadge = createGetStatusBadge(t);
+  
   if (!order) return null;
+
+  const orderStatuses = [
+    { value: 'pending', label: t.statusPending },
+    { value: 'confirmed', label: t.statusConfirmed },
+    { value: 'processing', label: t.statusProcessing },
+    { value: 'shipped', label: t.statusShipped },
+    { value: 'delivered', label: t.statusDelivered },
+    { value: 'cancelled', label: t.statusCancelled },
+  ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Commande {order.orderNumber}</DialogTitle>
+          <DialogTitle>{t.title} {order.orderNumber}</DialogTitle>
           <DialogDescription>
-            Détails et informations de livraison
+            {t.description}
           </DialogDescription>
         </DialogHeader>
         
         <Tabs defaultValue="details" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="details">Détails</TabsTrigger>
-            <TabsTrigger value="items">Articles</TabsTrigger>
-            <TabsTrigger value="customer">Client</TabsTrigger>
-            <TabsTrigger value="tracking">Suivi</TabsTrigger>
+            <TabsTrigger value="details">{t.tabs.details}</TabsTrigger>
+            <TabsTrigger value="items">{t.tabs.items}</TabsTrigger>
+            <TabsTrigger value="customer">{t.tabs.customer}</TabsTrigger>
+            <TabsTrigger value="tracking">{t.tabs.tracking}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="details" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Informations</CardTitle>
+                  <CardTitle className="text-lg">{t.info.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">N° Commande:</span>
+                    <span className="text-muted-foreground">{t.info.orderNumber}</span>
                     <span className="font-medium">{order.orderNumber}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Statut:</span>
+                    <span className="text-muted-foreground">{t.info.status}</span>
                     {getStatusBadge(order.status)}
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Paiement:</span>
-                    {getPaymentStatusBadge(order.paymentStatus)}
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Créée:</span>
+                    <span className="text-muted-foreground">{t.info.created}</span>
                     <span>{formatDate(order.createdAt)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Modifiée:</span>
+                    <span className="text-muted-foreground">{t.info.modified}</span>
                     <span>{formatDate(order.updatedAt)}</span>
                   </div>
                   {order.trackingNumber && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Suivi:</span>
+                      <span className="text-muted-foreground">{t.info.tracking}</span>
                       <span className="font-mono">{order.trackingNumber}</span>
                     </div>
                   )}
@@ -188,24 +249,24 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ open, onOpenChange, order }
               
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Récapitulatif</CardTitle>
+                  <CardTitle className="text-lg">{t.summary.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Sous-total:</span>
+                    <span className="text-muted-foreground">{t.summary.subtotal}</span>
                     <span>{formatCurrency(order.subtotal)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">TVA:</span>
+                    <span className="text-muted-foreground">{t.summary.tax}</span>
                     <span>{formatCurrency(order.tax)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Livraison:</span>
+                    <span className="text-muted-foreground">{t.summary.shipping}</span>
                     <span>{formatCurrency(order.shipping)}</span>
                   </div>
                   <div className="border-t pt-3">
                     <div className="flex justify-between font-medium">
-                      <span>Total:</span>
+                      <span>{t.summary.total}</span>
                       <span className="text-lg">{formatCurrency(order.total)}</span>
                     </div>
                   </div>
@@ -216,7 +277,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ open, onOpenChange, order }
             {order.notes && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Notes</CardTitle>
+                  <CardTitle className="text-lg">{t.notes}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">{order.notes}</p>
@@ -228,16 +289,16 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ open, onOpenChange, order }
           <TabsContent value="items" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Articles commandés</CardTitle>
+                <CardTitle className="text-lg">{t.itemsOrdered}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Produit</TableHead>
-                      <TableHead>Quantité</TableHead>
-                      <TableHead>Prix</TableHead>
-                      <TableHead>Total</TableHead>
+                      <TableHead>{t.product}</TableHead>
+                      <TableHead>{t.quantity}</TableHead>
+                      <TableHead>{t.price}</TableHead>
+                      <TableHead>{t.summary.total}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -258,14 +319,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ open, onOpenChange, order }
           <TabsContent value="customer" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Informations client</CardTitle>
+                <CardTitle className="text-lg">{t.customerInfo.title}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-3">
                   <User className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="font-medium">{order.customer.name}</p>
-                    <p className="text-sm text-muted-foreground">ID Client: {order.customer.id}</p>
+                    <p className="text-sm text-muted-foreground">{t.customerInfo.customerId} {order.customer.id}</p>
                   </div>
                 </div>
                 
@@ -273,7 +334,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ open, onOpenChange, order }
                   <Mail className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="font-medium">{order.customer.email}</p>
-                    <p className="text-sm text-muted-foreground">Adresse email</p>
+                    <p className="text-sm text-muted-foreground">{t.customerInfo.email}</p>
                   </div>
                 </div>
                 
@@ -281,14 +342,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ open, onOpenChange, order }
                   <Phone className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="font-medium">{order.customer.phone}</p>
-                    <p className="text-sm text-muted-foreground">Téléphone</p>
+                    <p className="text-sm text-muted-foreground">{t.customerInfo.phone}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-muted-foreground mt-1" />
                   <div>
-                    <p className="font-medium">Adresse de livraison</p>
+                    <p className="font-medium">{t.customerInfo.shippingAddress}</p>
                     <div className="text-sm text-muted-foreground space-y-1">
                       <p>{order.shippingAddress.street}</p>
                       <p>
@@ -305,15 +366,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ open, onOpenChange, order }
           <TabsContent value="tracking" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Progression</CardTitle>
+                <CardTitle className="text-lg">{t.progress.title}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <Progress value={getOrderProgress(order.status)} className="h-2" />
                   
                   <div className="space-y-3">
-                    {orderStatuses.filter(s => s.value !== 'all').map((status) => {
-                      const isCompleted = getOrderProgress(order.status) > getOrderProgress(status.value as Order['status']);
+                    {orderStatuses.map((status) => {
+                      const isCompleted = getOrderProgress(order.status) > getOrderProgress(status.value);
                       const isCurrent = order.status === status.value;
                       
                       return (
@@ -321,14 +382,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ open, onOpenChange, order }
                           isCompleted ? 'bg-green-50 dark:bg-green-950' :
                           isCurrent ? 'bg-blue-50 dark:bg-blue-950' : 'bg-muted'
                         }`}>
-                          {getStatusIcon(status.value as Order['status'])}
+                          {getStatusIcon(status.value)}
                           <div className="flex-1">
                             <p className={`font-medium ${isCompleted ? 'text-green-700 dark:text-green-300' : 
                               isCurrent ? 'text-blue-700 dark:text-blue-300' : 'text-muted-foreground'}`}>
                               {status.label}
                             </p>
                             {isCurrent && (
-                              <p className="text-sm text-blue-600 dark:text-blue-400">Statut actuel</p>
+                              <p className="text-sm text-blue-600 dark:text-blue-400">{t.progress.currentStatus}</p>
                             )}
                           </div>
                           {isCompleted && (

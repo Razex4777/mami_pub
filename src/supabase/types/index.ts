@@ -17,6 +17,31 @@ export interface StoreBanner {
 export type StoreBannerInsert = Omit<StoreBanner, 'id' | 'created_at' | 'updated_at'>;
 export type StoreBannerUpdate = Partial<StoreBannerInsert>;
 
+// Categories
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  image_url: string | null;
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type CategoryInsert = Omit<Category, 'id' | 'created_at' | 'updated_at'>;
+export type CategoryUpdate = Partial<CategoryInsert>;
+
+// Product Specification Block
+export interface ProductSpec {
+  name: string;
+  description: string;
+}
+
+// Product Condition Type
+export type ProductCondition = 'new' | 'used';
+
 // Products (Supabase schema - snake_case)
 export interface Product {
   id: string;
@@ -25,25 +50,34 @@ export interface Product {
   category: string;
   price: number;
   cost: number;
-  stock: number;
-  min_stock: number;
   status: 'active' | 'inactive' | 'discontinued';
-  sku: string;
-  images: string[];
-  supplier: string | null;
+  sku: string | null;
+  images: string[];  // Can include both images and videos
   tags: string[];
-  rating: number;
-  reviews_count: number;
-  featured: boolean;
-  discount: number;
-  delivery_time: string | null;
-  specs: string | null;
+  specs: ProductSpec[] | null;
+  condition: ProductCondition;
+  viewer_count: number;
   created_at: string;
   updated_at: string;
 }
 
 export type ProductInsert = Omit<Product, 'id' | 'created_at' | 'updated_at'>;
 export type ProductUpdate = Partial<ProductInsert>;
+
+// Admin Activities
+export interface AdminActivity {
+  id: string;
+  type: 'product' | 'order' | 'coupon' | 'banner' | 'settings' | 'system';
+  action: string;
+  entity_id: string | null;
+  entity_name: string | null;
+  details: any | null;
+  performed_by: string | null;
+  performed_by_name: string | null;
+  created_at: string;
+}
+
+export type AdminActivityInsert = Omit<AdminActivity, 'id' | 'created_at'>;
 
 // Database schema type for Supabase client
 export interface Database {
@@ -54,10 +88,20 @@ export interface Database {
         Insert: StoreBannerInsert;
         Update: StoreBannerUpdate;
       };
+      categories: {
+        Row: Category;
+        Insert: CategoryInsert;
+        Update: CategoryUpdate;
+      };
       products: {
         Row: Product;
         Insert: ProductInsert;
         Update: ProductUpdate;
+      };
+      admin_activities: {
+        Row: AdminActivity;
+        Insert: AdminActivityInsert;
+        Update: never;
       };
     };
   };
@@ -75,15 +119,15 @@ export interface AdminProduct {
   category: string;
   price: number;
   cost: number;
-  stock: number;
-  minStock: number;
   status: 'active' | 'inactive' | 'discontinued';
   sku: string;
-  images: string[];
+  images: string[];  // Can include both images and videos
   createdAt: string;
   updatedAt: string;
-  supplier?: string;
   tags: string[];
+  specs: ProductSpec[];
+  condition: ProductCondition;
+  viewer_count: number;
 }
 
 export interface User {
@@ -138,6 +182,7 @@ export interface Address {
 
 export interface Analytics {
   totalRevenue: number;
+  totalProfit?: number;
   totalOrders: number;
   totalCustomers: number;
   totalProducts: number;
@@ -148,7 +193,24 @@ export interface Analytics {
   revenueByMonth: RevenueByMonth[];
   ordersByStatus: OrdersByStatus[];
   topProducts: TopProduct[];
+  categoryDistribution: CategoryDistribution[];
+  productHealth: ProductHealth;
   recentActivities: Activity[];
+}
+
+export interface CategoryDistribution {
+  name: string;
+  count: number;
+  percentage: number;
+  revenue: number;
+}
+
+export interface ProductHealth {
+  total: number;
+  active: number;
+  inactive: number;
+  lowStock: number;
+  outOfStock: number;
 }
 
 export interface RevenueByMonth {

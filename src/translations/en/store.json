@@ -1,0 +1,44 @@
+{
+  "filters": {
+    "title": "Filters",
+    "categories": "Categories",
+    "allCategories": "All Categories",
+    "priceRange": "Price Range",
+    "condition": "Condition",
+    "all": "All",
+    "new": "New",
+    "used": "Used",
+    "favorites": "Favorites Only",
+    "reset": "Reset Filters"
+  },
+  "search": {
+    "placeholder": "Search products...",
+    "noResults": "No products found",
+    "noResultsDesc": "Try adjusting your search or filters"
+  },
+  "results": {
+    "products": "products",
+    "product": "product",
+    "showing": "Showing",
+    "of": "of"
+  },
+  "sort": {
+    "label": "Sort by",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "mostViewed": "Most Viewed",
+    "priceLow": "Price: Low to High",
+    "priceHigh": "Price: High to Low"
+  },
+  "product": {
+    "addToCart": "Add to Cart",
+    "quickView": "Quick View",
+    "new": "New",
+    "used": "Used"
+  },
+  "empty": {
+    "title": "No products found",
+    "description": "Try adjusting your filters or search terms",
+    "resetBtn": "Reset Filters"
+  }
+}

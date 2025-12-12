@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
+
+const CART_STORAGE_KEY = 'mami_pub_cart';
 
 export interface CartItem {
   id: string; // UUID from Supabase
@@ -23,13 +25,53 @@ type CartAction =
   | { type: 'CLEAR_CART' }
   | { type: 'TOGGLE_CART' }
   | { type: 'OPEN_CART' }
-  | { type: 'CLOSE_CART' };
+  | { type: 'CLOSE_CART' }
+  | { type: 'LOAD_CART'; payload: CartItem[] };
+
+// Load cart from localStorage
+const loadCartFromStorage = (): CartItem[] => {
+  try {
+    const stored = localStorage.getItem(CART_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Validate that it's an array and has the expected structure matching CartItem interface
+      if (Array.isArray(parsed) && parsed.every(item => 
+        item && typeof item.id === 'string' && 
+        typeof item.name === 'string' && 
+        typeof item.price === 'number' && 
+        typeof item.quantity === 'number' &&
+        typeof item.image === 'string' && item.image.length > 0 &&
+        typeof item.category === 'string' && item.category.length > 0 &&
+        item.quantity > 0
+      )) {
+        return parsed;
+      }
+    }
+  } catch (error) {
+    console.error('Error loading cart from storage:', error);
+  }
+  return [];
+};
+
+// Save cart to localStorage
+const saveCartToStorage = (items: CartItem[]) => {
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  } catch (error) {
+    console.error('Error saving cart to storage:', error);
+  }
+};
+
+// Calculate totals from items
+const calculateTotals = (items: CartItem[]) => ({
+  total: items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+  itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
+});
 
 const initialState: CartState = {
-  items: [],
+  items: loadCartFromStorage(),
   isOpen: false,
-  total: 0,
-  itemCount: 0,
+  ...calculateTotals(loadCartFromStorage()),
 };
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
@@ -137,6 +179,11 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
+
+  // Persist cart to localStorage whenever items change
+  useEffect(() => {
+    saveCartToStorage(state.items);
+  }, [state.items]);
 
   const addItem = (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
     dispatch({ type: 'ADD_ITEM', payload: item });

@@ -1,0 +1,682 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { Settings, Globe, Phone, Share2, Search, Save, Loader2, RefreshCw, Bell, Send, Languages, Check } from 'lucide-react';
+import { Button } from '@/components/ui/interactive/button';
+import { Input } from '@/components/ui/forms/input';
+import { Label } from '@/components/ui/forms/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/navigation/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/layout/card';
+import { Switch } from '@/components/ui/forms/switch';
+import { useSiteSettings } from '@/contexts/SiteSettingsContext';
+import { toast } from 'sonner';
+import ImageUpload from '@/components/ui/forms/ImageUpload';
+import { testTelegramConnection } from '@/lib/telegram';
+import { testEmailConnection } from '@/lib/email';
+import type { SettingKey } from '@/supabase';
+import { useLanguage, languages } from '@/contexts/LanguageContext';
+
+const SettingsPage = () => {
+  const { settings, isLoading, updateSettingValue, uploadAsset, refreshSettings } = useSiteSettings();
+  const { language, setLanguage, currentLanguage, t: translate } = useLanguage();
+  const t = (key: string) => translate(key, 'admin_settings');
+  const [isSaving, setIsSaving] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+  const [isTestingEmail, setIsTestingEmail] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<Record<string, File[]>>({});
+  
+  // Local form state
+  const [formData, setFormData] = useState<Record<SettingKey, string | null>>({} as any);
+
+  // Initialize form data from settings
+  useEffect(() => {
+    setFormData(settings);
+  }, [settings]);
+
+  // Test Telegram connection
+  const handleTestTelegram = async () => {
+    const botToken = formData.telegram_bot_token;
+    const chatId = formData.telegram_chat_id;
+    
+    if (!botToken || !chatId) {
+      toast.error(t('toast.telegramIncomplete'), {
+        description: t('toast.telegramIncompleteDesc'),
+      });
+      return;
+    }
+    
+    setIsTesting(true);
+    try {
+      const result = await testTelegramConnection({ botToken, chatId });
+      if (result.success) {
+        toast.success(t('toast.telegramSuccess'), {
+          description: t('toast.telegramSuccessDesc'),
+        });
+      } else {
+        toast.error(t('toast.telegramFailed'), {
+          description: result.error || t('toast.telegramFailedDesc'),
+        });
+      }
+    } catch (error) {
+      toast.error(t('toast.telegramError'), {
+        description: t('toast.telegramErrorDesc'),
+      });
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
+  // Test Email connection
+  const handleTestEmail = async () => {
+    const recipientEmail = formData.email_recipient;
+    
+    if (!recipientEmail) {
+      toast.error(t('toast.emailRequired'), {
+        description: t('toast.emailRequiredDesc'),
+      });
+      return;
+    }
+    
+    setIsTestingEmail(true);
+    try {
+      const result = await testEmailConnection(recipientEmail);
+      if (result.success) {
+        toast.success(t('toast.emailSuccess'), {
+          description: t('toast.emailSuccessDesc'),
+        });
+      } else {
+        toast.error(t('toast.emailFailed'), {
+          description: result.error || t('toast.emailFailedDesc'),
+        });
+      }
+    } catch (error) {
+      toast.error(t('toast.emailError'), {
+        description: t('toast.emailErrorDesc'),
+      });
+    } finally {
+      setIsTestingEmail(false);
+    }
+  };
+
+  const handleInputChange = useCallback((key: SettingKey, value: string) => {
+    setFormData(prev => ({ ...prev, [key]: value || null }));
+  }, []);
+
+  const handleImageChange = useCallback((key: SettingKey, urls: string[]) => {
+    setFormData(prev => ({ ...prev, [key]: urls[0] || null }));
+  }, []);
+
+  const handleFilesChange = useCallback((key: string, files: File[]) => {
+    setPendingFiles(prev => ({ ...prev, [key]: files }));
+  }, []);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      // Upload pending images first and track URLs separately
+      const uploadedUrls: Record<string, string> = {};
+      
+      for (const [key, files] of Object.entries(pendingFiles)) {
+        if (files.length > 0) {
+          const assetType = key === 'logo_url' ? 'logo' : key === 'favicon_url' ? 'favicon' : 'og_image';
+          const url = await uploadAsset(files[0], assetType);
+          uploadedUrls[key] = url;
+        }
+      }
+      
+      // Merge uploaded URLs with current form data
+      const finalData = { ...formData, ...uploadedUrls };
+      
+      // Save all changed settings
+      const changedKeys = Object.keys(finalData).filter(
+        key => finalData[key as SettingKey] !== settings[key as SettingKey]
+      );
+      
+      for (const key of changedKeys) {
+        await updateSettingValue(key as SettingKey, finalData[key as SettingKey]);
+      }
+      
+      setPendingFiles({});
+      toast.success(t('toast.saved'), {
+        description: t('toast.savedDesc').replace('{count}', String(changedKeys.length)),
+      });
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      toast.error(t('toast.saveError'), {
+        description: t('toast.saveErrorDesc'),
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 pb-20 md:pb-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+            <Settings className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+            {t('title')}
+          </h1>
+          <p className="text-muted-foreground text-xs sm:text-sm mt-1">
+            {t('subtitle')}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={refreshSettings} disabled={isSaving} className="text-xs sm:text-sm">
+            <RefreshCw className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+            <span className="hidden sm:inline">{t('refresh')}</span>
+            <span className="sm:hidden">{t('refreshShort')}</span>
+          </Button>
+          <Button onClick={handleSave} disabled={isSaving} size="sm" className="text-xs sm:text-sm">
+            {isSaving ? (
+              <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 animate-spin" />
+            ) : (
+              <Save className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+            )}
+            {t('save')}
+          </Button>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <Tabs defaultValue="general" className="space-y-4 sm:space-y-6">
+        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid h-auto">
+          <TabsTrigger value="general" className="gap-1.5 sm:gap-2 text-xs sm:text-sm py-2">
+            <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">{t('tabs.general')}</span>
+          </TabsTrigger>
+          <TabsTrigger value="contact" className="gap-1.5 sm:gap-2 text-xs sm:text-sm py-2">
+            <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">{t('tabs.contact')}</span>
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className="gap-1.5 sm:gap-2 text-xs sm:text-sm py-2">
+            <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">{t('tabs.notifications')}</span>
+          </TabsTrigger>
+          <TabsTrigger value="social" className="gap-1.5 sm:gap-2 text-xs sm:text-sm py-2">
+            <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">{t('tabs.social')}</span>
+          </TabsTrigger>
+          <TabsTrigger value="seo" className="gap-1.5 sm:gap-2 text-xs sm:text-sm py-2">
+            <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">{t('tabs.seo')}</span>
+          </TabsTrigger>
+        </TabsList>
+
+        {/* General Tab */}
+        <TabsContent value="general" className="space-y-4 sm:space-y-6">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
+            {/* Logo */}
+            <Card>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-sm sm:text-base">{t('general.logo.title')}</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">{t('general.logo.description')}</CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6 pt-0">
+                <ImageUpload
+                  value={formData.logo_url ? [formData.logo_url] : []}
+                  onChange={(urls) => handleImageChange('logo_url', urls)}
+                  onFilesChange={(files) => handleFilesChange('logo_url', files)}
+                  maxImages={1}
+                />
+                {formData.logo_url && (
+                  <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-muted/50 rounded-lg">
+                    <p className="text-[10px] sm:text-xs text-muted-foreground mb-2">{t('general.preview')}</p>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <img 
+                        src={formData.logo_url} 
+                        alt="Logo preview" 
+                        className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl object-cover"
+                      />
+                      <span className="font-bold text-sm sm:text-base">{formData.site_name || 'MAMI PUB'}</span>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Favicon */}
+            <Card>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-sm sm:text-base">{t('general.favicon.title')}</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">{t('general.favicon.description')}</CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6 pt-0">
+                <ImageUpload
+                  value={formData.favicon_url ? [formData.favicon_url] : []}
+                  onChange={(urls) => handleImageChange('favicon_url', urls)}
+                  onFilesChange={(files) => handleFilesChange('favicon_url', files)}
+                  maxImages={1}
+                />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Site Info */}
+          <Card>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-sm sm:text-base">{t('general.siteInfo.title')}</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">{t('general.siteInfo.description')}</CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
+              <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="site_name" className="text-xs sm:text-sm">{t('general.siteInfo.siteName')}</Label>
+                  <Input
+                    id="site_name"
+                    value={formData.site_name || ''}
+                    onChange={(e) => handleInputChange('site_name', e.target.value)}
+                    placeholder={t('general.siteInfo.siteNamePlaceholder')}
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="site_tagline" className="text-xs sm:text-sm">{t('general.siteInfo.tagline')}</Label>
+                  <Input
+                    id="site_tagline"
+                    value={formData.site_tagline || ''}
+                    onChange={(e) => handleInputChange('site_tagline', e.target.value)}
+                    placeholder={t('general.siteInfo.taglinePlaceholder')}
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+              </div>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="site_title" className="text-xs sm:text-sm">{t('general.siteInfo.browserTitle')}</Label>
+                <Input
+                  id="site_title"
+                  value={formData.site_title || ''}
+                  onChange={(e) => handleInputChange('site_title', e.target.value)}
+                  placeholder={t('general.siteInfo.browserTitlePlaceholder')}
+                  className="h-9 sm:h-10 text-sm"
+                />
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
+                  {t('general.siteInfo.browserTitleHint')}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Language Selector */}
+          <Card>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                <Languages className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                {t('general.language.title')}
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                {t('general.language.description')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => setLanguage(lang.code)}
+                    className={`relative flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl border-2 transition-all ${
+                      language === lang.code
+                        ? 'border-primary bg-primary/10'
+                        : 'border-white/10 hover:border-white/20 hover:bg-white/5'
+                    }`}
+                  >
+                    <span className="text-2xl sm:text-3xl">{lang.flag}</span>
+                    <div className="text-center">
+                      <div className="font-medium text-xs sm:text-sm">{lang.nativeName}</div>
+                      <div className="text-[10px] sm:text-xs text-muted-foreground">{lang.name}</div>
+                    </div>
+                    {language === lang.code && (
+                      <div className="absolute top-2 right-2 w-4 h-4 sm:w-5 sm:h-5 bg-primary rounded-full flex items-center justify-center">
+                        <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-white" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Contact Tab */}
+        <TabsContent value="contact" className="space-y-4 sm:space-y-6">
+          <Card>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-sm sm:text-base">{t('contact.title')}</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">{t('contact.description')}</CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
+              <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="contact_phone" className="text-xs sm:text-sm">{t('contact.phone')}</Label>
+                  <Input
+                    id="contact_phone"
+                    value={formData.contact_phone || ''}
+                    onChange={(e) => handleInputChange('contact_phone', e.target.value)}
+                    placeholder={t('contact.phonePlaceholder')}
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="contact_email" className="text-xs sm:text-sm">{t('contact.email')}</Label>
+                  <Input
+                    id="contact_email"
+                    type="email"
+                    value={formData.contact_email || ''}
+                    onChange={(e) => handleInputChange('contact_email', e.target.value)}
+                    placeholder={t('contact.emailPlaceholder')}
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+              </div>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="contact_address" className="text-xs sm:text-sm">{t('contact.address')}</Label>
+                <Input
+                  id="contact_address"
+                  value={formData.contact_address || ''}
+                  onChange={(e) => handleInputChange('contact_address', e.target.value)}
+                  placeholder={t('contact.addressPlaceholder')}
+                  className="h-9 sm:h-10 text-sm"
+                />
+              </div>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="business_hours" className="text-xs sm:text-sm">{t('contact.businessHours')}</Label>
+                <Input
+                  id="business_hours"
+                  value={formData.business_hours || ''}
+                  onChange={(e) => handleInputChange('business_hours', e.target.value)}
+                  placeholder={t('contact.businessHoursPlaceholder')}
+                  className="h-9 sm:h-10 text-sm"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Notifications Tab */}
+        <TabsContent value="notifications" className="space-y-4 sm:space-y-6">
+          <Card>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
+                {t('notifications.telegram.title')}
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                {t('notifications.telegram.description')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0 space-y-4 sm:space-y-6">
+              {/* Enable/Disable Toggle */}
+              <div className="flex items-center justify-between p-3 sm:p-4 bg-muted/50 rounded-lg gap-3">
+                <div>
+                  <p className="font-medium text-sm sm:text-base">{t('notifications.telegram.enable')}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {t('notifications.telegram.enableDesc')}
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.telegram_enabled === 'true'}
+                  onCheckedChange={(checked) => 
+                    handleInputChange('telegram_enabled', checked ? 'true' : 'false')
+                  }
+                />
+              </div>
+
+              {/* Settings Form */}
+              <div className="space-y-3 sm:space-y-4">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="telegram_bot_token" className="text-xs sm:text-sm">{t('notifications.telegram.botToken')}</Label>
+                  <Input
+                    id="telegram_bot_token"
+                    type="password"
+                    value={formData.telegram_bot_token || ''}
+                    onChange={(e) => handleInputChange('telegram_bot_token', e.target.value)}
+                    placeholder={t('notifications.telegram.botTokenPlaceholder')}
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
+                    {t('notifications.telegram.botTokenHint')}
+                  </p>
+                </div>
+
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="telegram_chat_id" className="text-xs sm:text-sm">{t('notifications.telegram.chatId')}</Label>
+                  <Input
+                    id="telegram_chat_id"
+                    value={formData.telegram_chat_id || ''}
+                    onChange={(e) => handleInputChange('telegram_chat_id', e.target.value)}
+                    placeholder={t('notifications.telegram.chatIdPlaceholder')}
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
+                    {t('notifications.telegram.chatIdHint')}
+                  </p>
+                </div>
+
+                <Button
+                  variant="outline"
+                  onClick={handleTestTelegram}
+                  disabled={isTesting || !formData.telegram_bot_token || !formData.telegram_chat_id}
+                  className="w-full h-9 sm:h-10 text-xs sm:text-sm"
+                >
+                  {isTesting ? (
+                    <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2" />
+                  )}
+                  {t('notifications.telegram.testButton')}
+                </Button>
+
+                <div className="p-3 sm:p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                  <h4 className="font-medium text-blue-600 mb-2 text-xs sm:text-sm">{t('notifications.telegram.howTo.title')}</h4>
+                  <ol className="text-[10px] sm:text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+                    <li>{t('notifications.telegram.howTo.step1')}</li>
+                    <li>{t('notifications.telegram.howTo.step2')}</li>
+                    <li>{t('notifications.telegram.howTo.step3')}</li>
+                    <li>{t('notifications.telegram.howTo.step4')}</li>
+                    <li>{t('notifications.telegram.howTo.step5')}</li>
+                  </ol>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Email Notifications */}
+          <Card>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                <Send className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />
+                {t('notifications.email.title')}
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                {t('notifications.email.description')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0 space-y-4 sm:space-y-6">
+              {/* Enable/Disable Toggle */}
+              <div className="flex items-center justify-between p-3 sm:p-4 bg-muted/50 rounded-lg gap-3">
+                <div>
+                  <p className="font-medium text-sm sm:text-base">{t('notifications.email.enable')}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {t('notifications.email.enableDesc')}
+                  </p>
+                </div>
+                <Switch
+                  checked={formData.email_enabled === 'true'}
+                  onCheckedChange={(checked) => 
+                    handleInputChange('email_enabled', checked ? 'true' : 'false')
+                  }
+                />
+              </div>
+
+              {/* Email Settings */}
+              <div className="space-y-3 sm:space-y-4">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="email_recipient" className="text-xs sm:text-sm">{t('notifications.email.recipient')}</Label>
+                  <Input
+                    id="email_recipient"
+                    type="email"
+                    value={formData.email_recipient || ''}
+                    onChange={(e) => handleInputChange('email_recipient', e.target.value)}
+                    placeholder={t('notifications.email.recipientPlaceholder')}
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
+                    {t('notifications.email.recipientHint')}
+                  </p>
+                </div>
+
+                <Button
+                  variant="outline"
+                  onClick={handleTestEmail}
+                  disabled={isTestingEmail || !formData.email_recipient}
+                  className="w-full h-9 sm:h-10 text-xs sm:text-sm"
+                >
+                  {isTestingEmail ? (
+                    <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4 mr-2" />
+                  )}
+                  {t('notifications.email.testButton')}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Social Tab */}
+        <TabsContent value="social" className="space-y-4 sm:space-y-6">
+          <Card>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-sm sm:text-base">{t('social.title')}</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">{t('social.description')}</CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
+              <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="social_facebook" className="text-xs sm:text-sm">{t('social.facebook')}</Label>
+                  <Input
+                    id="social_facebook"
+                    type="url"
+                    value={formData.social_facebook || ''}
+                    onChange={(e) => handleInputChange('social_facebook', e.target.value)}
+                    placeholder={t('social.facebookPlaceholder')}
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="social_instagram" className="text-xs sm:text-sm">{t('social.instagram')}</Label>
+                  <Input
+                    id="social_instagram"
+                    type="url"
+                    value={formData.social_instagram || ''}
+                    onChange={(e) => handleInputChange('social_instagram', e.target.value)}
+                    placeholder={t('social.instagramPlaceholder')}
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="social_tiktok" className="text-xs sm:text-sm">{t('social.tiktok')}</Label>
+                  <Input
+                    id="social_tiktok"
+                    type="url"
+                    value={formData.social_tiktok || ''}
+                    onChange={(e) => handleInputChange('social_tiktok', e.target.value)}
+                    placeholder={t('social.tiktokPlaceholder')}
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+                <div className="space-y-1.5 sm:space-y-2">
+                  <Label htmlFor="social_whatsapp" className="text-xs sm:text-sm">{t('social.whatsapp')}</Label>
+                  <div className="flex">
+                    <div className="flex items-center px-2 sm:px-3 bg-muted border border-r-0 rounded-l-md text-xs sm:text-sm text-muted-foreground">
+                      +213
+                    </div>
+                    <Input
+                      id="social_whatsapp"
+                      value={formData.social_whatsapp?.replace(/^\+213\s?/, '') || ''}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^\d\s]/g, '');
+                        handleInputChange('social_whatsapp', value ? `+213 ${value}` : '');
+                      }}
+                      placeholder={t('social.whatsappPlaceholder')}
+                      className="rounded-l-none h-9 sm:h-10 text-sm"
+                    />
+                  </div>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
+                    {t('social.whatsappHint')}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* SEO Tab */}
+        <TabsContent value="seo" className="space-y-4 sm:space-y-6">
+          <Card>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-sm sm:text-base">{t('seo.title')}</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">{t('seo.description')}</CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="site_description" className="text-xs sm:text-sm">{t('seo.siteDescription')}</Label>
+                <textarea
+                  id="site_description"
+                  value={formData.site_description || ''}
+                  onChange={(e) => handleInputChange('site_description', e.target.value)}
+                  placeholder={t('seo.siteDescriptionPlaceholder')}
+                  className="w-full min-h-[80px] sm:min-h-[100px] px-3 py-2 text-sm rounded-md border border-input bg-background"
+                />
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
+                  {t('seo.siteDescriptionHint')}
+                </p>
+              </div>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="keywords" className="text-xs sm:text-sm">{t('seo.keywords')}</Label>
+                <Input
+                  id="keywords"
+                  value={formData.keywords || ''}
+                  onChange={(e) => handleInputChange('keywords', e.target.value)}
+                  placeholder={t('seo.keywordsPlaceholder')}
+                  className="h-9 sm:h-10 text-sm"
+                />
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
+                  {t('seo.keywordsHint')}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-sm sm:text-base">{t('seo.ogImage.title')}</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">{t('seo.ogImage.description')}</CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <ImageUpload
+                value={formData.og_image ? [formData.og_image] : []}
+                onChange={(urls) => handleImageChange('og_image', urls)}
+                onFilesChange={(files) => handleFilesChange('og_image', files)}
+                maxImages={1}
+              />
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-2">
+                {t('seo.ogImage.hint')}
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default SettingsPage;

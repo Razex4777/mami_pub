@@ -1,0 +1,66 @@
+{
+  "title": "البانرات",
+  "subtitle": "إدارة بانرات المتجر الترويجية",
+  "subtitleCount": "بانر",
+  "subtitleCountPlural": "بانرات",
+  "addBanner": "إضافة بانر",
+  "createBanner": "إنشاء بانر",
+  "empty": {
+    "title": "لا توجد بانرات",
+    "description": "ابدأ بإنشاء أول بانر ترويجي."
+  },
+  "status": {
+    "active": "نشط",
+    "inactive": "غير نشط"
+  },
+  "card": {
+    "viewLink": "عرض الرابط"
+  },
+  "dialog": {
+    "createTitle": "بانر جديد",
+    "editTitle": "تعديل البانر",
+    "createDescription": "إنشاء بانر ترويجي جديد للمتجر.",
+    "editDescription": "تعديل معلومات البانر.",
+    "cancel": "إلغاء",
+    "create": "إنشاء",
+    "update": "تحديث"
+  },
+  "form": {
+    "title": "العنوان",
+    "titleRequired": "العنوان *",
+    "titlePlaceholder": "مثال: خصم -30%",
+    "image": "صورة البانر",
+    "imageRequired": "صورة البانر *",
+    "altText": "النص البديل",
+    "altTextRequired": "النص البديل *",
+    "altTextPlaceholder": "وصف الصورة للوصول",
+    "linkUrl": "الرابط (اختياري)",
+    "linkUrlPlaceholder": "https://... أو /store?category=promo",
+    "displayOrder": "ترتيب العرض",
+    "isActive": "البانر نشط"
+  },
+  "deleteDialog": {
+    "title": "حذف البانر؟",
+    "description": "هل أنت متأكد من حذف \"{title}\"؟ هذا الإجراء لا يمكن التراجع عنه.",
+    "cancel": "إلغاء",
+    "confirm": "حذف"
+  },
+  "toast": {
+    "loadError": "تعذر تحميل البانرات.",
+    "validationError": "خطأ في التحقق",
+    "validationMessage": "يرجى ملء جميع الحقول المطلوبة.",
+    "updated": "تم تحديث البانر",
+    "updatedDesc": "تم تحديث \"{title}\" بنجاح.",
+    "created": "تم إنشاء البانر",
+    "createdDesc": "تم إنشاء \"{title}\" بنجاح.",
+    "saveError": "حدث خطأ أثناء الحفظ.",
+    "deleted": "تم حذف البانر",
+    "deletedDesc": "تم حذف \"{title}\".",
+    "deleteError": "تعذر حذف البانر.",
+    "activated": "تم تفعيل البانر",
+    "deactivated": "تم إلغاء تفعيل البانر",
+    "toggledDesc": "تم {status} \"{title}\".",
+    "statusError": "تعذر تغيير الحالة.",
+    "error": "خطأ"
+  }
+}

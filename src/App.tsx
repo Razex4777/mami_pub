@@ -14,11 +14,17 @@ import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
+import { FavoritesProvider } from "./contexts/FavoritesContext";
+import { SiteSettingsProvider } from "./contexts/SiteSettingsContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import AdminLayout from "./components/admin/AdminLayout";
 import Dashboard from "./pages/admin/dashboard";
 import ProductsPage from "./pages/admin/products";
+import CategoriesPage from "./pages/admin/categories";
 import OrdersPage from "./pages/admin/orders";
 import BannersPage from "./pages/admin/banners";
+import CouponsPage from "./pages/admin/coupons";
+import SettingsPage from "./pages/admin/settings/index";
 
 const queryClient = new QueryClient();
 
@@ -26,36 +32,44 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <TooltipProvider>
-        <AuthProvider>
-          <CartProvider>
-            <Toaster />
-            <Sonner />
-          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Layout />}>
-                <Route index element={<Home />} />
-                <Route path="store" element={<Store />} />
-                <Route path="product/:id" element={<ProductDetail />} />
-                <Route path="cart" element={<Cart />} />
-                <Route path="checkout" element={<Checkout />} />
-              </Route>
-              
-              {/* Admin Routes */}
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<Dashboard />} />
-                <Route path="products" element={<ProductsPage />} />
-                <Route path="orders" element={<OrdersPage />} />
-                <Route path="banners" element={<BannersPage />} />
-                <Route path="notifications" element={<div className="p-6"><h1 className="text-2xl font-bold">Notifications</h1><p className="text-muted-foreground">Notification center coming soon...</p></div>} />
-              </Route>
-              
-              {/* 404 Route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-          </CartProvider>
-        </AuthProvider>
+        <SiteSettingsProvider>
+          <LanguageProvider>
+          <AuthProvider>
+            <CartProvider>
+              <FavoritesProvider>
+                <Toaster />
+                <Sonner />
+              <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/" element={<Layout />}>
+                    <Route index element={<Home />} />
+                    <Route path="store" element={<Store />} />
+                    <Route path="product/:id" element={<ProductDetail />} />
+                    <Route path="cart" element={<Cart />} />
+                    <Route path="checkout" element={<Checkout />} />
+                  </Route>
+                  
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<Dashboard />} />
+                    <Route path="products" element={<ProductsPage />} />
+                    <Route path="categories" element={<CategoriesPage />} />
+                    <Route path="orders" element={<OrdersPage />} />
+                    <Route path="banners" element={<BannersPage />} />
+                    <Route path="coupons" element={<CouponsPage />} />
+                    <Route path="settings" element={<SettingsPage />} />
+                                      </Route>
+                  
+                  {/* 404 Route */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+              </FavoritesProvider>
+            </CartProvider>
+          </AuthProvider>
+          </LanguageProvider>
+        </SiteSettingsProvider>
       </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>

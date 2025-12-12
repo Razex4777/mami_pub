@@ -1,0 +1,114 @@
+{
+  "title": "لوحة التحكم",
+  "welcome": "مرحباً",
+  "subtitle": "إليك نظرة عامة على متجرك.",
+  "stats": {
+    "revenue": "الإيرادات",
+    "profit": "الأرباح",
+    "orders": "الطلبات",
+    "products": "المنتجات",
+    "customers": "العملاء",
+    "thisMonth": "هذا الشهر",
+    "thisWeek": "هذا الأسبوع",
+    "today": "اليوم",
+    "vsLastMonth": "مقارنة بالشهر الماضي",
+    "vsLastWeek": "مقارنة بالأسبوع الماضي"
+  },
+  "tabs": {
+    "overview": "نظرة عامة",
+    "products": "المنتجات",
+    "orders": "الطلبات",
+    "activity": "النشاط"
+  },
+  "charts": {
+    "salesOverview": "نظرة عامة على المبيعات",
+    "revenueOverview": "نظرة عامة على الإيرادات",
+    "revenueDescription": "اتجاهات الإيرادات الشهرية",
+    "categoryDistribution": "توزيع الفئات",
+    "categoryDescription": "توزيع المنتجات النشطة",
+    "revenueByCategory": "الإيرادات حسب الفئة",
+    "orderStatus": "حالة الطلبات",
+    "orderStatusDesc": "التوزيع الحالي",
+    "ordersByMonth": "الطلبات حسب الشهر",
+    "ordersByMonthDesc": "تطور 6 أشهر",
+    "topProducts": "أفضل المنتجات",
+    "recentOrders": "الطلبات الأخيرة",
+    "last7Days": "آخر 7 أيام",
+    "last30Days": "آخر 30 يوم",
+    "last90Days": "آخر 90 يوم",
+    "all": "الكل"
+  },
+  "buttons": {
+    "refresh": "تحديث",
+    "export": "تصدير",
+    "exporting": "جارٍ التصدير..."
+  },
+  "errors": {
+    "loadFailed": "تعذر تحميل البيانات. يرجى تحديث الصفحة.",
+    "noData": "لا توجد بيانات للتصدير",
+    "exportError": "خطأ أثناء التصدير"
+  },
+  "success": {
+    "exportSuccess": "تم إنشاء تقرير PDF بنجاح"
+  },
+  "quickStats": {
+    "activeProducts": "المنتجات النشطة",
+    "inactiveProducts": "المنتجات غير النشطة",
+    "totalOrders": "إجمالي الطلبات",
+    "totalCustomers": "إجمالي العملاء"
+  },
+  "productsTab": {
+    "productStats": "إحصائيات المنتجات",
+    "catalogState": "حالة الكتالوج",
+    "activeProducts": "المنتجات النشطة",
+    "inactiveProducts": "المنتجات غير النشطة",
+    "categories": "الفئات",
+    "mostViewed": "المنتجات الأكثر مشاهدة",
+    "mostViewedDesc": "بناءً على مشاهدات الزوار",
+    "noData": "لا توجد بيانات متاحة",
+    "topSelling": "الأكثر مبيعاً",
+    "topSellingDesc": "المنتجات التي تحقق أعلى إيرادات",
+    "sales": "مبيعات"
+  },
+  "ordersTab": {
+    "orderStatus": "حالة الطلبات",
+    "currentDistribution": "التوزيع الحالي",
+    "ordersByMonth": "الطلبات حسب الشهر",
+    "evolution6Months": "تطور 6 أشهر",
+    "orderStatusCards": "الطلبات حسب الحالة"
+  },
+  "activityTab": {
+    "recentActivity": "النشاط الأخير",
+    "latestEvents": "آخر الأحداث",
+    "quickActions": "إجراءات سريعة",
+    "manageProducts": "إدارة المنتجات",
+    "viewOrders": "عرض الطلبات",
+    "manageCoupons": "إدارة الكوبونات",
+    "manageBanners": "إدارة البانرات"
+  },
+  "orders": {
+    "pending": "قيد الانتظار",
+    "confirmed": "مؤكد",
+    "shipped": "تم الشحن",
+    "delivered": "تم التوصيل",
+    "cancelled": "ملغي",
+    "returned": "مرتجع"
+  },
+  "table": {
+    "orderNumber": "رقم الطلب",
+    "customer": "العميل",
+    "date": "التاريخ",
+    "status": "الحالة",
+    "total": "المجموع",
+    "actions": "الإجراءات",
+    "viewAll": "عرض الكل",
+    "noOrders": "لا توجد طلبات بعد"
+  },
+  "quickActions": {
+    "title": "إجراءات سريعة",
+    "addProduct": "إضافة منتج",
+    "viewOrders": "عرض الطلبات",
+    "manageCategories": "إدارة الفئات",
+    "settings": "الإعدادات"
+  }
+}

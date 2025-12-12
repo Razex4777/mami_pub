@@ -1,0 +1,108 @@
+{
+  "hero": {
+    "badge": "Printing & Advertising Supplies",
+    "title": "The Art of",
+    "titleHighlight": "Advertising Print",
+    "description": "MAMI PUB sells printing and advertising supplies, offering printers of different types, sizes, and specializations, along with their accessories.",
+    "cta": {
+      "explore": "Explore our products",
+      "contact": "Contact us"
+    },
+    "smartHub": "Smart Print Hub",
+    "monitoring": "Live Monitoring"
+  },
+  "stats": {
+    "years": "Years of expertise",
+    "clients": "Clients served",
+    "production": "Express production"
+  },
+  "pillars": {
+    "badge": "MAMI PUB Approach & Workshop",
+    "title": "One team, three synchronized areas of expertise.",    "description": "From strategy to production, we connect creativity and digital workflows to propel your brand with impeccable consistency.",
+    "items": {
+      "creative": {
+        "badge": "Custom Design",
+        "title": "Creative Studio",
+        "description": "Visual identities, space branding and immersive concepts designed with you.",
+        "emphasis": "Collaborative approach"
+      },
+      "tech": {
+        "badge": "High Fidelity Printing",
+        "title": "Technology",
+        "description": "Continuously calibrated machine park for exact colors and lasting durability.",
+        "emphasis": "Tolerance <1%"
+      },
+      "support": {
+        "badge": "Premium Support",
+        "title": "Support",
+        "description": "Training, maintenance and dedicated hotline to keep your operations smooth.",
+        "emphasis": "24/7 Service"
+      }
+    },
+    "showcase": {
+      "title": "Bold productions, calibrated for your deadlines.",
+      "description": "Our digital workflows, robotic cutting and artisanal finishes guarantee impeccable consistency.",
+      "catalogBtn": "Materials Catalog",
+      "whatsappBtn": "Chat on WhatsApp"
+    },
+    "services": {
+      "dtf": {
+        "title": "DTF & UV Production",
+        "description": "Textile, panels, signage or packaging: we push every material to the maximum.",
+        "detail": "Certified film, ink and finish"
+      },
+      "advertising": {
+        "title": "Advertising Solutions",
+        "description": "From lettering to monumental structures, we sculpt your presence in the city.",
+        "detail": "Concept, manufacturing, installation"
+      },
+      "logistics": {
+        "title": "Logistics & Parts",
+        "description": "Immediately available stocks and express after-sales service to never interrupt your production.",
+        "detail": "Delivery within 24h"
+      }
+    }
+  },
+  "timeline": {
+    "badge": "Timeline",
+    "title": "15 years of continuous innovation.",
+    "description": "Each milestone has brought us closer to one goal: offering Algeria's creators a premium infrastructure.",
+    "milestones": {
+      "2009": {
+        "title": "First DTF press in El Eulma",
+        "description": "Deployment of the first premium transfers and foundation of MAMI PUB in the region."
+      },
+      "2014": {
+        "title": "High Capacity Workshop",
+        "description": "Machine park extension, double team and first national contracts."
+      },
+      "2019": {
+        "title": "360° Studio",
+        "description": "Integration of design, prototyping and 3D for turnkey projects."
+      },
+      "2024": {
+        "title": "Smart Print Hub",
+        "description": "Remote monitoring, predictive maintenance and logistics flow optimization."
+      }
+    }
+  },
+  "contact": {
+    "badge": "Contact",
+    "title": "Let's talk about your next activation.",
+    "description": "We co-create devices that leave a lasting impression.",
+    "phone": {
+      "label": "Call us",
+      "description": "Dedicated advisor, immediate responses"
+    },
+    "email": {
+      "label": "Write to us",
+      "description": "Quotes, technical files, follow-up"
+    },
+    "location": {
+      "label": "Visit us",
+      "description": "Showroom & workshop by appointment"
+    },
+    "catalogBtn": "View our catalogs",
+    "whatsappBtn": "Chat on WhatsApp"
+  }
+}

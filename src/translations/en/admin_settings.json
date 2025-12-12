@@ -1,0 +1,137 @@
+{
+  "title": "Site Settings",
+  "subtitle": "Manage logo, contact info and SEO settings",
+  "refresh": "Refresh",
+  "refreshShort": "Sync",
+  "save": "Save",
+  "tabs": {
+    "general": "General",
+    "contact": "Contact",
+    "notifications": "Notifs",
+    "social": "Social",
+    "seo": "SEO"
+  },
+  "general": {
+    "logo": {
+      "title": "Logo",
+      "description": "Logo displayed in the navigation bar"
+    },
+    "favicon": {
+      "title": "Favicon",
+      "description": "Icon displayed in the browser tab"
+    },
+    "siteInfo": {
+      "title": "Site Information",
+      "description": "Name, title and tagline displayed on the site",
+      "siteName": "Site name",
+      "siteNamePlaceholder": "MAMI PUB",
+      "tagline": "Tagline",
+      "taglinePlaceholder": "Premium Quality",
+      "browserTitle": "Browser title",
+      "browserTitlePlaceholder": "MAMI PUB - Printing & Advertising",
+      "browserTitleHint": "This title appears in the browser tab"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Choose the interface language"
+    },
+    "preview": "Preview:"
+  },
+  "contact": {
+    "title": "Contact Information",
+    "description": "Contact details displayed in the navigation bar",
+    "phone": "Phone",
+    "phonePlaceholder": "0557 91 45 44",
+    "email": "Email",
+    "emailPlaceholder": "contact@example.com",
+    "address": "Address",
+    "addressPlaceholder": "Ets Mahamid Mami, El Eulma",
+    "mapsLink": "Google Maps Link",
+    "mapsLinkPlaceholder": "https://maps.google.com/...",
+    "businessHours": "Business Hours",
+    "businessHoursPlaceholder": "Mon-Sat: 9am-6pm"
+  },
+  "notifications": {
+    "telegram": {
+      "title": "Telegram Notifications",
+      "description": "Receive instant notifications on Telegram for each new order",
+      "enable": "Enable notifications",
+      "enableDesc": "Receive a Telegram notification for each order",
+      "botToken": "Bot Token",
+      "botTokenPlaceholder": "123456789:ABCdefGHIjklMNOpqrsTUVwxyz",
+      "botTokenHint": "Get it via @BotFather on Telegram",
+      "chatId": "Chat ID",
+      "chatIdPlaceholder": "5112845316",
+      "chatIdHint": "Your Telegram user ID (via @userinfobot)",
+      "testButton": "Send a test message",
+      "howTo": {
+        "title": "How to configure?",
+        "step1": "Open Telegram and search for @BotFather",
+        "step2": "Send /newbot and follow the instructions",
+        "step3": "Copy the provided API token",
+        "step4": "Search @userinfobot to get your Chat ID",
+        "step5": "Paste both values above and test"
+      }
+    },
+    "email": {
+      "title": "Email Notifications",
+      "description": "Receive orders by email",
+      "enable": "Enable email notifications",
+      "enableDesc": "Receive an email for each new order",
+      "recipient": "Your email",
+      "recipientPlaceholder": "your-email@example.com",
+      "recipientHint": "The email address where you will receive order notifications",
+      "testButton": "Send a test email"
+    }
+  },
+  "social": {
+    "title": "Social Networks",
+    "description": "Links to your social profiles",
+    "facebook": "Facebook",
+    "facebookPlaceholder": "https://facebook.com/...",
+    "instagram": "Instagram",
+    "instagramPlaceholder": "https://instagram.com/...",
+    "tiktok": "TikTok",
+    "tiktokPlaceholder": "https://tiktok.com/@...",
+    "whatsapp": "WhatsApp",
+    "whatsappPlaceholder": "557 91 45 44",
+    "whatsappHint": "Algerian number for WhatsApp link (without 0)"
+  },
+  "seo": {
+    "title": "SEO (Search Engine Optimization)",
+    "description": "Optimize your visibility on search engines",
+    "siteDescription": "Site description",
+    "siteDescriptionPlaceholder": "Description of your business...",
+    "siteDescriptionHint": "This description appears in Google search results",
+    "keywords": "Keywords",
+    "keywordsPlaceholder": "printing, advertising, Bejaia, Algeria...",
+    "keywordsHint": "Separate keywords with commas",
+    "ogImage": {
+      "title": "Social Sharing Image",
+      "description": "Image displayed when sharing on social networks",
+      "hint": "Recommended size: 1200x630 pixels"
+    }
+  },
+  "toast": {
+    "saved": "Settings saved",
+    "savedDesc": "{count} setting(s) updated",
+    "saveError": "Error saving",
+    "saveErrorDesc": "Please try again",
+    "telegramIncomplete": "Incomplete configuration",
+    "telegramIncompleteDesc": "Please fill in the Bot Token and Chat ID",
+    "telegramSuccess": "Test successful!",
+    "telegramSuccessDesc": "Check your Telegram for the test message",
+    "telegramFailed": "Test failed",
+    "telegramFailedDesc": "Check your credentials",
+    "telegramError": "Connection error",
+    "telegramErrorDesc": "Unable to contact Telegram",
+    "emailRequired": "Email required",
+    "emailRequiredDesc": "Please fill in your email address",
+    "emailSuccess": "Test successful!",
+    "emailSuccessDesc": "Check your inbox",
+    "emailFailed": "Test failed",
+    "emailFailedDesc": "Error sending email",
+    "emailError": "Connection error",
+    "emailErrorDesc": "Unable to send email"
+  }
+}

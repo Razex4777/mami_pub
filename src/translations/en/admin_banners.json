@@ -1,0 +1,66 @@
+{
+  "title": "Banners",
+  "subtitle": "Manage store promotional banners",
+  "subtitleCount": "banner",
+  "subtitleCountPlural": "banners",
+  "addBanner": "Add a banner",
+  "createBanner": "Create a banner",
+  "empty": {
+    "title": "No banners",
+    "description": "Start by creating your first promotional banner."
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "card": {
+    "viewLink": "View link"
+  },
+  "dialog": {
+    "createTitle": "New banner",
+    "editTitle": "Edit banner",
+    "createDescription": "Create a new promotional banner for the store.",
+    "editDescription": "Edit the banner information.",
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update"
+  },
+  "form": {
+    "title": "Title",
+    "titleRequired": "Title *",
+    "titlePlaceholder": "Ex: Promo -30%",
+    "image": "Banner image",
+    "imageRequired": "Banner image *",
+    "altText": "Alt text",
+    "altTextRequired": "Alt text *",
+    "altTextPlaceholder": "Image description for accessibility",
+    "linkUrl": "Link (optional)",
+    "linkUrlPlaceholder": "https://... or /store?category=promo",
+    "displayOrder": "Display order",
+    "isActive": "Banner active"
+  },
+  "deleteDialog": {
+    "title": "Delete banner?",
+    "description": "Are you sure you want to delete \"{title}\"? This action is irreversible.",
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  },
+  "toast": {
+    "loadError": "Unable to load banners.",
+    "validationError": "Validation error",
+    "validationMessage": "Please fill in all required fields.",
+    "updated": "Banner updated",
+    "updatedDesc": "\"{title}\" has been updated successfully.",
+    "created": "Banner created",
+    "createdDesc": "\"{title}\" has been created successfully.",
+    "saveError": "An error occurred while saving.",
+    "deleted": "Banner deleted",
+    "deletedDesc": "\"{title}\" has been deleted.",
+    "deleteError": "Unable to delete banner.",
+    "activated": "Banner activated",
+    "deactivated": "Banner deactivated",
+    "toggledDesc": "\"{title}\" has been {status}.",
+    "statusError": "Unable to change status.",
+    "error": "Error"
+  }
+}

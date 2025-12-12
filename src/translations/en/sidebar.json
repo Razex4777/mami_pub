@@ -1,0 +1,12 @@
+{
+  "nav": {
+    "home": "Home",
+    "store": "Store"
+  },
+  "help": {
+    "title": "NEED HELP?",
+    "description": "Contact us for any question",
+    "button": "WhatsApp",
+    "tooltip": "Contact us on WhatsApp"
+  }
+}

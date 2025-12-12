@@ -1,0 +1,31 @@
+{
+  "search": {
+    "placeholder": "بحث...",
+    "searching": "جاري البحث...",
+    "noResults": "لا توجد نتائج لـ",
+    "sections": "الأقسام",
+    "orders": "الطلبات",
+    "products": "المنتجات",
+    "categories": "الفئات",
+    "coupons": "أكواد الخصم",
+    "navigation": "↑↓ للتنقل • Enter للتحديد • Esc للإغلاق",
+    "navigationMobile": "اضغط للتحديد"
+  },
+  "sections": {
+    "dashboard": "لوحة التحكم",
+    "products": "المنتجات",
+    "categories": "الفئات",
+    "orders": "الطلبات",
+    "banners": "البانرات",
+    "coupons": "أكواد الخصم",
+    "settings": "الإعدادات",
+    "settingsGeneral": "الإعدادات - عام",
+    "settingsContact": "الإعدادات - الاتصال",
+    "settingsSocial": "الإعدادات - وسائل التواصل",
+    "settingsSeo": "الإعدادات - SEO",
+    "settingsNotifications": "الإعدادات - الإشعارات"
+  },
+  "status": {
+    "online": "متصل"
+  }
+}

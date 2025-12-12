@@ -3,6 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/layout
 import { TrendingUp, TrendingDown, LucideIcon } from 'lucide-react';
 import LottieAnimation from '@/components/ui/animations/LottieAnimation';
 
+// Centralized labels
+const LABELS = {
+  FROM_LAST_MONTH: 'le mois dernier',
+  TITLES: {
+    revenue: 'Aperçu des revenus',
+    orders: 'Aperçu des commandes',
+  } as Record<string, string>,
+};
+
 interface StatsCardProps {
   title: string;
   value: string | number;
@@ -12,6 +21,7 @@ interface StatsCardProps {
   svgIcon?: string;
   gradient: string;
   iconColor: string;
+  vsLastMonthLabel?: string;
 }
 
 const StatsCard: React.FC<StatsCardProps> = ({
@@ -23,7 +33,12 @@ const StatsCard: React.FC<StatsCardProps> = ({
   svgIcon,
   gradient,
   iconColor,
+  vsLastMonthLabel,
 }) => {
+  // Get translated title or use original
+  const displayTitle = LABELS.TITLES[title] || title;
+  const lastMonthText = vsLastMonthLabel || LABELS.FROM_LAST_MONTH;
+  
   return (
     <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
       {/* Animated gradient background */}
@@ -36,7 +51,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
       
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-3 sm:p-4 md:p-6 relative z-10">
         <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-muted-foreground">
-          {title}
+          {displayTitle}
         </CardTitle>
         
         {/* Animated icon container - no background */}
@@ -82,7 +97,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
                   <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                   <span className="font-medium">{Math.abs(change)}%</span>
                 </div>
-                <span className="ml-1 sm:ml-2 text-muted-foreground hidden sm:inline">from last month</span>
+                <span className="ml-1 sm:ml-2 text-muted-foreground hidden sm:inline">{lastMonthText}</span>
               </>
             ) : (
               <>
@@ -90,7 +105,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
                   <TrendingDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                   <span className="font-medium">{Math.abs(change)}%</span>
                 </div>
-                <span className="ml-1 sm:ml-2 text-muted-foreground hidden sm:inline">from last month</span>
+                <span className="ml-1 sm:ml-2 text-muted-foreground hidden sm:inline">{lastMonthText}</span>
               </>
             )}
           </div>

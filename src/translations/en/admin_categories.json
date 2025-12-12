@@ -1,0 +1,54 @@
+{
+  "title": "Categories",
+  "subtitle": "Manage product categories",
+  "addCategory": "Add Category",
+  "createCategory": "Create Category",
+  "editCategory": "Edit Category",
+  "newCategory": "New Category",
+  "category": "category",
+  "categories": "categories",
+  "active": "Active",
+  "inactive": "Inactive",
+  "noCategories": "No categories",
+  "noCategoriesDesc": "Start by creating your first product category.",
+  "form": {
+    "name": "Name",
+    "slug": "Slug",
+    "slugHint": "Unique identifier used in URLs",
+    "description": "Description",
+    "descriptionPlaceholder": "Category description...",
+    "displayOrder": "Display Order",
+    "isActive": "Active Category",
+    "namePlaceholder": "E.g: DTF Inks",
+    "slugPlaceholder": "dtf-inks"
+  },
+  "dialog": {
+    "editDesc": "Edit category information.",
+    "createDesc": "Create a new product category."
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "update": "Update",
+    "create": "Create",
+    "delete": "Delete"
+  },
+  "deleteDialog": {
+    "title": "Delete Category?",
+    "description": "This action cannot be undone. Associated products will not be deleted but will lose their category."
+  },
+  "toast": {
+    "error": "Error",
+    "loadError": "Unable to load categories.",
+    "validationError": "Validation Error",
+    "nameSlugRequired": "Name and slug are required.",
+    "categoryUpdated": "Category Updated",
+    "categoryCreated": "Category Created",
+    "categoryDeleted": "Category Deleted",
+    "duplicateError": "A category with this name or slug already exists.",
+    "saveError": "An error occurred while saving.",
+    "deleteError": "Unable to delete category. It may be used by products.",
+    "statusError": "Unable to change status.",
+    "activated": "Category Activated",
+    "deactivated": "Category Deactivated"
+  }
+}

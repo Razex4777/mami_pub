@@ -1,0 +1,26 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "categories": "Categories",
+    "orders": "Orders",
+    "banners": "Banners",
+    "coupons": "Promo Codes",
+    "settings": "Settings"
+  },
+  "footer": {
+    "backToSite": "Back to site",
+    "logout": "Logout"
+  },
+  "mobile": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "categories": "Categories",
+    "orders": "Orders",
+    "banners": "Banners",
+    "coupons": "Promo Codes",
+    "settings": "Settings",
+    "viewSite": "View site",
+    "more": "More"
+  }
+}

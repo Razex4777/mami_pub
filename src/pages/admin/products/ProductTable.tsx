@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/layout/card';
 import { Button } from '@/components/ui/interactive/button';
 import { Badge } from '@/components/ui/data-display/badge';
 import { Checkbox } from '@/components/ui/forms/checkbox';
+import { Switch } from '@/components/ui/forms/switch';
 import {
   Table,
   TableBody,
@@ -49,22 +51,62 @@ interface ProductTableProps {
   onSelectAll: () => void;
   onEdit: (product: AdminProduct) => void;
   onDelete: (productId: string) => void;
+  onToggleStatus: (product: AdminProduct) => void;
+  translations?: {
+    catalogTitle: string;
+    of: string;
+    products: string;
+    selectAll: string;
+    edit: string;
+    delete: string;
+    deleteTitle: string;
+    deleteConfirm: string;
+    cancel: string;
+    active: string;
+    inactive: string;
+    discontinued: string;
+    product: string;
+    ref: string;
+    category: string;
+    price: string;
+    views: string;
+    viewProduct: string;
+    status: string;
+    actions: string;
+  };
 }
 
-const getStockStatus = (product: AdminProduct) => {
-  if (product.stock === 0) return { status: 'out', color: 'destructive', icon: XCircle };
-  if (product.stock <= product.minStock) return { status: 'low', color: 'secondary', icon: AlertTriangle };
-  return { status: 'good', color: 'default', icon: CheckCircle };
+const defaultTranslations = {
+  catalogTitle: 'Catalogue produits',
+  of: 'sur',
+  products: 'produits',
+  selectAll: 'Tout sélectionner',
+  edit: 'Modifier',
+  delete: 'Supprimer',
+  deleteTitle: 'Supprimer le produit',
+  deleteConfirm: 'Cette action est irréversible.',
+  cancel: 'Annuler',
+  active: 'Actif',
+  inactive: 'Inactif',
+  discontinued: 'Arrêté',
+  product: 'Produit',
+  ref: 'Réf',
+  category: 'Catégorie',
+  price: 'Prix',
+  views: 'Vues',
+  viewProduct: 'Voir',
+  status: 'Statut',
+  actions: 'Actions',
 };
 
-const getStatusBadge = (status: string) => {
+const getStatusBadge = (status: string, translations: typeof defaultTranslations) => {
   switch (status) {
     case 'active':
-      return <Badge className="bg-green-100 text-green-800">Actif</Badge>;
+      return <Badge className="bg-green-100 text-green-800">{translations.active}</Badge>;
     case 'inactive':
-      return <Badge variant="secondary">Inactif</Badge>;
+      return <Badge variant="secondary">{translations.inactive}</Badge>;
     case 'discontinued':
-      return <Badge variant="destructive">Arrêté</Badge>;
+      return <Badge variant="destructive">{translations.discontinued}</Badge>;
     default:
       return <Badge variant="outline">{status}</Badge>;
   }
@@ -78,13 +120,18 @@ const ProductTable: React.FC<ProductTableProps> = ({
   onSelectAll,
   onEdit,
   onDelete,
+  onToggleStatus,
+  translations: propTranslations,
 }) => {
+  const navigate = useNavigate();
+  const t = { ...defaultTranslations, ...propTranslations };
+  
   return (
     <Card>
       <CardHeader className="p-3 sm:p-4 md:p-6">
-        <CardTitle className="text-sm sm:text-base md:text-lg">Catalogue produits</CardTitle>
+        <CardTitle className="text-sm sm:text-base md:text-lg">{t.catalogTitle}</CardTitle>
         <CardDescription className="text-xs sm:text-sm">
-          {products.length} sur {totalProducts} produits
+          {products.length} {t.of} {totalProducts} {t.products}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
@@ -95,13 +142,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
               checked={selectedProducts.size === products.length && products.length > 0}
               onCheckedChange={onSelectAll}
             />
-            <span className="text-xs text-muted-foreground">Tout sélectionner</span>
+            <span className="text-xs text-muted-foreground">{t.selectAll}</span>
           </div>
-          {products.map((product) => {
-            const stockStatus = getStockStatus(product);
-            const StockIcon = stockStatus.icon;
-            
-            return (
+          {products.map((product) => (
               <div key={product.id} className="border rounded-lg p-3 space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-start gap-2 min-w-0">
@@ -124,27 +167,27 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => onEdit(product)}>
                         <Edit className="h-4 w-4 mr-2" />
-                        Modifier
+                        {t.edit}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <DropdownMenuItem className="text-red-600" onSelect={(e) => e.preventDefault()}>
                             <Trash2 className="h-4 w-4 mr-2" />
-                            Supprimer
+                            {t.delete}
                           </DropdownMenuItem>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="w-[calc(100%-2rem)] max-w-md">
                           <AlertDialogHeader>
-                            <AlertDialogTitle className="text-base">Supprimer le produit</AlertDialogTitle>
+                            <AlertDialogTitle className="text-base">{t.deleteTitle}</AlertDialogTitle>
                             <AlertDialogDescription className="text-sm">
-                              Supprimer "{product.name}" ? Cette action est irréversible.
+                              {t.delete} "{product.name}" ? {t.deleteConfirm}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel className="h-9">Annuler</AlertDialogCancel>
+                            <AlertDialogCancel className="h-9">{t.cancel}</AlertDialogCancel>
                             <AlertDialogAction onClick={() => onDelete(product.id)} className="h-9 bg-red-600 hover:bg-red-700">
-                              Supprimer
+                              {t.delete}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -152,21 +195,24 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-                <div className="flex flex-wrap items-center gap-2 text-xs">
-                  <Badge variant="outline" className="text-[10px]">{product.category}</Badge>
-                  {getStatusBadge(product.status)}
-                  <div className="flex items-center gap-1">
-                    <StockIcon className={`h-3 w-3 ${
-                      stockStatus.status === 'out' ? 'text-red-500' :
-                      stockStatus.status === 'low' ? 'text-orange-500' : 'text-green-500'
-                    }`} />
-                    <span>{product.stock}</span>
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-[10px]">{product.category}</Badge>
+                    <span className="text-sm font-semibold text-primary">{product.price.toFixed(0)} DA</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={product.status === 'active'}
+                      onCheckedChange={() => onToggleStatus(product)}
+                      className="scale-75"
+                    />
+                    <span className="text-[10px] text-muted-foreground">
+                      {product.status === 'active' ? t.active : t.inactive}
+                    </span>
                   </div>
                 </div>
-                <div className="text-sm font-semibold text-primary">{product.price.toFixed(0)} DA</div>
               </div>
-            );
-          })}
+            ))}
         </div>
 
         {/* Desktop Table View */}
@@ -180,21 +226,17 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     onCheckedChange={onSelectAll}
                   />
                 </TableHead>
-                <TableHead>Produit</TableHead>
-                <TableHead>Réf</TableHead>
-                <TableHead>Catégorie</TableHead>
-                <TableHead>Prix</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead className="w-24">Actions</TableHead>
+                <TableHead>{t.product}</TableHead>
+                <TableHead>{t.ref}</TableHead>
+                <TableHead>{t.category}</TableHead>
+                <TableHead>{t.price}</TableHead>
+                <TableHead>{t.views}</TableHead>
+                <TableHead>{t.status}</TableHead>
+                <TableHead className="w-24">{t.actions}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product) => {
-                const stockStatus = getStockStatus(product);
-                const StockIcon = stockStatus.icon;
-                
-                return (
+              {products.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell>
                       <Checkbox
@@ -219,18 +261,23 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     <TableCell>{product.category}</TableCell>
                     <TableCell>{product.price.toFixed(0)} DA</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <StockIcon className={`h-4 w-4 ${
-                          stockStatus.status === 'out' ? 'text-red-500' :
-                          stockStatus.status === 'low' ? 'text-orange-500' : 'text-green-500'
-                        }`} />
-                        <span>{product.stock}</span>
-                        {stockStatus.status === 'low' && (
-                          <Badge variant="outline" className="text-xs">Faible</Badge>
-                        )}
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <Eye className="h-3.5 w-3.5" />
+                        <span className="text-sm">{product.viewer_count || 0}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{getStatusBadge(product.status)}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={product.status === 'active'}
+                          onCheckedChange={() => onToggleStatus(product)}
+                          className="scale-90"
+                        />
+                        <span className="text-xs text-muted-foreground">
+                          {product.status === 'active' ? t.active : t.inactive}
+                        </span>
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -241,31 +288,31 @@ const ProductTable: React.FC<ProductTableProps> = ({
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => onEdit(product)}>
                             <Edit className="h-4 w-4 mr-2" />
-                            Modifier
+                            {t.edit}
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigate(`/product/${product.id}`)}>
                             <Eye className="h-4 w-4 mr-2" />
-                            Voir détails
+                            {t.viewProduct}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <DropdownMenuItem className="text-red-600" onSelect={(e) => e.preventDefault()}>
                                 <Trash2 className="h-4 w-4 mr-2" />
-                                Supprimer
+                                {t.delete}
                               </DropdownMenuItem>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Supprimer le produit</AlertDialogTitle>
+                                <AlertDialogTitle>{t.deleteTitle}</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Voulez-vous vraiment supprimer "{product.name}" ? Cette action est irréversible.
+                                  {t.delete} "{product.name}" ? {t.deleteConfirm}
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
                                 <AlertDialogAction onClick={() => onDelete(product.id)} className="bg-red-600 hover:bg-red-700">
-                                  Supprimer
+                                  {t.delete}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -274,8 +321,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                );
-              })}
+                ))}
             </TableBody>
           </Table>
         </div>

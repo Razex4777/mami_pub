@@ -19,9 +19,20 @@ interface RevenueData {
 interface RevenueChartProps {
   data: RevenueData[];
   formatCurrency: (amount: number) => string;
+  title?: string;
+  description?: string;
+  revenueLabel?: string;
+  ordersLabel?: string;
 }
 
-const RevenueChart: React.FC<RevenueChartProps> = ({ data, formatCurrency }) => {
+const RevenueChart: React.FC<RevenueChartProps> = ({ 
+  data, 
+  formatCurrency,
+  title = 'Aperçu des revenus',
+  description = 'Tendances des revenus mensuels',
+  revenueLabel = 'Revenus',
+  ordersLabel = 'Commandes'
+}) => {
   return (
     <Card className="relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
       {/* Subtle animated background */}
@@ -30,9 +41,9 @@ const RevenueChart: React.FC<RevenueChartProps> = ({ data, formatCurrency }) => 
       <CardHeader className="relative z-10 p-3 sm:p-4 md:p-6">
         <div className="flex items-center gap-2">
           <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-          <CardTitle className="text-sm sm:text-base md:text-lg">Revenue Overview</CardTitle>
+          <CardTitle className="text-sm sm:text-base md:text-lg">{title}</CardTitle>
         </div>
-        <CardDescription className="text-xs sm:text-sm">Monthly revenue trends</CardDescription>
+        <CardDescription className="text-xs sm:text-sm">{description}</CardDescription>
       </CardHeader>
       
       <CardContent className="relative z-10 p-3 sm:p-4 md:p-6 pt-0">
@@ -58,7 +69,7 @@ const RevenueChart: React.FC<RevenueChartProps> = ({ data, formatCurrency }) => 
             <Tooltip 
               formatter={(value, name) => [
                 name === 'revenue' ? formatCurrency(value as number) : value,
-                name === 'revenue' ? 'Revenue' : 'Orders'
+                name === 'revenue' ? revenueLabel : ordersLabel
               ]}
               contentStyle={{
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',

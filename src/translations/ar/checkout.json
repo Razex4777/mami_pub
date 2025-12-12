@@ -1,0 +1,90 @@
+{
+  "success": {
+    "title": "تم تأكيد الطلب!",
+    "thankYou": "شكراً",
+    "orderRegistered": "تم تسجيل طلبك.",
+    "contactSoon": "سنتصل بك قريباً على",
+    "forConfirmation": "للتأكيد."
+  },
+  "email": {
+    "title": "استلام التحديثات عبر البريد الإلكتروني",
+    "optional": "(اختياري)",
+    "placeholder": "بريدك@email.com",
+    "saved": "تم حفظ البريد:",
+    "invalidEmail": "يرجى إدخال بريد إلكتروني صالح"
+  },
+  "tip": {
+    "title": "نصيحة مهمة",
+    "message": "سيتصل بك فريقنا قريباً لتأكيد طلبك. يرجى إبقاء هاتفك مفتوحاً ومتاحاً!"
+  },
+  "buttons": {
+    "continueShopping": "متابعة التسوق",
+    "backToHome": "العودة للرئيسية",
+    "back": "رجوع"
+  },
+  "summary": {
+    "label": "ملخص الطلب",
+    "yourOrder": "طلبك",
+    "subtotal": "المجموع الفرعي",
+    "delivery": "التوصيل (Kazi Tour Express)",
+    "deliveryShort": "التوصيل",
+    "promoCode": "كود الخصم",
+    "total": "المجموع الكلي",
+    "paymentNote": "الدفع عند الاستلام. تدفع فقط بعد استلام طلبك."
+  },
+  "form": {
+    "title": "معلومات التوصيل",
+    "personalInfo": "المعلومات الشخصية",
+    "contact": "الاتصال",
+    "lastName": "اللقب",
+    "lastNamePlaceholder": "لقبك",
+    "firstName": "الاسم",
+    "firstNamePlaceholder": "اسمك",
+    "phone": "رقم الهاتف",
+    "phonePlaceholder": "05 XX XX XX XX",
+    "deliveryAddress": "عنوان التوصيل",
+    "wilaya": "الولاية",
+    "wilayaPlaceholder": "اختر ولايتك",
+    "commune": "البلدية",
+    "communePlaceholder": "اختر بلديتك",
+    "address": "العنوان الكامل",
+    "addressPlaceholder": "الشارع، المبنى، الشقة...",
+    "deliveryType": "نوع التوصيل",
+    "deskDelivery": "توصيل للمكتب",
+    "homeDelivery": "توصيل للمنزل"
+  },
+  "deliveryService": {
+    "title": "خدمة التوصيل",
+    "deliveryTime": "التوصيل",
+    "notAvailable": "غير متوفر"
+  },
+  "coupon": {
+    "title": "كود الخصم",
+    "placeholder": "أدخل الكود",
+    "apply": "تطبيق",
+    "applied": "مطبق",
+    "remove": "إزالة",
+    "invalid": "كود غير صالح أو منتهي",
+    "success": "تم تطبيق الكود بنجاح!"
+  },
+  "validation": {
+    "requiredFields": "يرجى ملء جميع الحقول المطلوبة",
+    "invalidPhone": "يرجى إدخال رقم هاتف صالح",
+    "selectWilaya": "يرجى اختيار الولاية",
+    "selectCommune": "يرجى اختيار البلدية"
+  },
+  "processing": {
+    "title": "جاري معالجة طلبك...",
+    "pleaseWait": "يرجى الانتظار"
+  },
+  "placeOrder": "تأكيد الطلب",
+  "copyright": "© 2025 MAMI PUB. جميع الحقوق محفوظة.",
+  "toast": {
+    "orderSuccess": "تم تقديم الطلب بنجاح!",
+    "orderError": "خطأ في إنشاء الطلب",
+    "couponApplied": "تم تطبيق الكوبون بنجاح!",
+    "couponInvalid": "كود الكوبون غير صالح أو منتهي",
+    "emailSaved": "تم حفظ البريد",
+    "emailSavedDesc": "ستتلقى تحديثات التوصيل عبر البريد الإلكتروني."
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "title": "أكواد الخصم",
+  "subtitle": "إدارة أكواد الخصم الخاصة بك",
+  "newCode": "كود جديد",
+  "searchPlaceholder": "البحث عن كود...",
+  "stats": {
+    "total": "المجموع",
+    "active": "نشط",
+    "uses": "الاستخدامات"
+  },
+  "table": {
+    "code": "الكود",
+    "discount": "الخصم",
+    "minOrder": "الحد الأدنى للطلب",
+    "uses": "الاستخدامات",
+    "expiration": "انتهاء الصلاحية",
+    "status": "الحالة",
+    "actions": "الإجراءات",
+    "loading": "جاري التحميل...",
+    "noResults": "لم يتم العثور على كوبون"
+  },
+  "status": {
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "expired": "منتهي"
+  },
+  "dialog": {
+    "createTitle": "كوبون جديد",
+    "editTitle": "تعديل الكوبون",
+    "cancel": "إلغاء",
+    "create": "إنشاء",
+    "update": "تحديث"
+  },
+  "form": {
+    "code": "الكود",
+    "codeRequired": "الكود *",
+    "codePlaceholder": "مثال: PROMO20",
+    "codeTooltip": "الكود الفريد الذي سيدخله العملاء عند الدفع. سيتم تحويله تلقائياً إلى أحرف كبيرة.",
+    "description": "الوصف",
+    "descriptionPlaceholder": "مثال: عرض صيف 2025",
+    "descriptionTooltip": "وصف داخلي لمساعدتك في تحديد هذا الكوبون. غير مرئي للعملاء.",
+    "type": "النوع",
+    "typeRequired": "النوع *",
+    "typePercentage": "% نسبة مئوية",
+    "typeFixed": "دج مبلغ ثابت",
+    "typeTooltip": "%: خصم بالنسبة المئوية / دج: مبلغ ثابت",
+    "value": "القيمة",
+    "valueRequired": "القيمة *",
+    "valueTooltip": "مثال: 20 لـ 20%",
+    "valueTooltipFixed": "مثال: 500 لـ -500 دج",
+    "minOrder": "الحد الأدنى للطلب",
+    "minOrderTooltip": "الحد الأدنى لمبلغ الطلب. 0 = بدون حد.",
+    "maxUses": "الحد الأقصى للاستخدام",
+    "maxUsesTooltip": "الحد الأقصى لعدد الاستخدامات. فارغ = غير محدود.",
+    "expiration": "انتهاء الصلاحية",
+    "expirationTooltip": "تاريخ انتهاء صلاحية الكوبون."
+  },
+  "deleteDialog": {
+    "title": "حذف الكوبون؟",
+    "description": "هذا الإجراء لا يمكن التراجع عنه",
+    "cancel": "إلغاء",
+    "confirm": "حذف"
+  },
+  "toast": {
+    "error": "خطأ",
+    "loadError": "تعذر تحميل الكوبونات",
+    "validationError": "الكود وقيمة الخصم مطلوبان",
+    "updated": "نجاح",
+    "updatedDesc": "تم تحديث الكوبون",
+    "created": "نجاح",
+    "createdDesc": "تم إنشاء الكوبون",
+    "deleted": "نجاح",
+    "deletedDesc": "تم حذف الكوبون",
+    "deleteError": "تعذر حذف الكوبون",
+    "statusUpdated": "تم تحديث الحالة",
+    "activated": "تم تفعيل الكوبون",
+    "deactivated": "تم إلغاء تفعيل الكوبون",
+    "statusError": "تعذر تغيير الحالة",
+    "genericError": "حدث خطأ"
+  }
+}

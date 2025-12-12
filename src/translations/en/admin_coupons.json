@@ -1,0 +1,81 @@
+{
+  "title": "Promo Codes",
+  "subtitle": "Manage your discount codes",
+  "newCode": "New Code",
+  "searchPlaceholder": "Search a code...",
+  "stats": {
+    "total": "Total",
+    "active": "Active",
+    "uses": "Uses"
+  },
+  "table": {
+    "code": "Code",
+    "discount": "Discount",
+    "minOrder": "Min. Order",
+    "uses": "Uses",
+    "expiration": "Expiration",
+    "status": "Status",
+    "actions": "Actions",
+    "loading": "Loading...",
+    "noResults": "No coupon found"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "expired": "Expired"
+  },
+  "dialog": {
+    "createTitle": "New Coupon",
+    "editTitle": "Edit Coupon",
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update"
+  },
+  "form": {
+    "code": "Code",
+    "codeRequired": "Code *",
+    "codePlaceholder": "EX: PROMO20",
+    "codeTooltip": "The unique code customers will enter at checkout. Will be automatically converted to uppercase.",
+    "description": "Description",
+    "descriptionPlaceholder": "Ex: Summer promo 2025",
+    "descriptionTooltip": "Internal description to help you identify this coupon. Not visible to customers.",
+    "type": "Type",
+    "typeRequired": "Type *",
+    "typePercentage": "% Percentage",
+    "typeFixed": "DA Fixed",
+    "typeTooltip": "%: Percentage discount / DA: Fixed amount",
+    "value": "Value",
+    "valueRequired": "Value *",
+    "valueTooltip": "Ex: 20 for 20%",
+    "valueTooltipFixed": "Ex: 500 for -500 DA",
+    "minOrder": "Min. order",
+    "minOrderTooltip": "Minimum order amount. 0 = no limit.",
+    "maxUses": "Max. uses",
+    "maxUsesTooltip": "Maximum number of uses. Empty = unlimited.",
+    "expiration": "Expiration",
+    "expirationTooltip": "Coupon expiration date."
+  },
+  "deleteDialog": {
+    "title": "Delete coupon?",
+    "description": "This action is irreversible",
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  },
+  "toast": {
+    "error": "Error",
+    "loadError": "Unable to load coupons",
+    "validationError": "Code and discount value are required",
+    "updated": "Success",
+    "updatedDesc": "Coupon updated",
+    "created": "Success",
+    "createdDesc": "Coupon created",
+    "deleted": "Success",
+    "deletedDesc": "Coupon deleted",
+    "deleteError": "Unable to delete coupon",
+    "statusUpdated": "Status updated",
+    "activated": "Coupon activated",
+    "deactivated": "Coupon deactivated",
+    "statusError": "Unable to change status",
+    "genericError": "An error occurred"
+  }
+}

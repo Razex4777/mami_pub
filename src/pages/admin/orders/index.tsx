@@ -1,170 +1,173 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/layout/card';
 import { Button } from '@/components/ui/interactive/button';
 import { useToast } from '@/components/ui/feedback/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Plus,
   Download,
+  RefreshCw,
+  FileSpreadsheet,
 } from 'lucide-react';
-import { Order } from '@/supabase';
+import { 
+  getAllOrders, 
+  updateOrderStatus, 
+  deleteOrder as deleteOrderApi,
+  SupabaseOrder,
+  OrderStatus,
+  logActivity,
+} from '@/supabase';
 import OrderDetails from './OrderDetails';
 import OrderTable from './OrderTable';
 import OrderFilters from './OrderFilters';
 import OrderEdit from './OrderEdit';
 import StatsCard from '../dashboard/StatsCard';
+import {
+  exportOrdersToGoogleSheets,
+  type OrderForExport,
+} from '@/lib/googleSheets';
 import { useLottieAnimation } from '@/hooks/useLottieAnimation';
 
-// Mock data generator - same as before
-const generateMockOrders = (): Order[] => [
-  {
-    id: '1',
-    orderNumber: 'ORD-2024-001',
-    customer: {
-      id: '1',
-      name: 'John Doe',
-      email: 'john.doe@email.com',
-      phone: '+1-555-0123',
-    },
-    items: [
-      {
-        id: '1',
-        productId: '1',
-        productName: 'DTF Transfer Film',
-        quantity: 5,
-        price: 49.99,
-        total: 249.95,
-      },
-      {
-        id: '2',
-        productId: '2',
-        productName: 'Heat Press Machine Pro',
-        quantity: 1,
-        price: 299.99,
-        total: 299.99,
-      },
-    ],
-    status: 'processing',
-    total: 574.94,
-    subtotal: 549.94,
-    tax: 27.50,
-    shipping: 15.00,
-    createdAt: '2024-03-10T14:30:00Z',
-    updatedAt: '2024-03-10T16:45:00Z',
-    shippingAddress: {
-      street: '123 Main St',
-      city: 'New York',
-      state: 'NY',
-      zipCode: '10001',
-      country: 'USA',
-    },
-    paymentStatus: 'paid',
-    trackingNumber: 'TRK123456789',
-    notes: 'Customer requested express shipping',
+// Convert Supabase order to UI Order format
+const convertToUIOrder = (order: SupabaseOrder): any => ({
+  id: order.id,
+  orderNumber: order.order_number,
+  customer: {
+    id: (order.customer as any)?.id || order.id, // Use actual customer ID, fallback to order ID
+    name: `${order.customer.first_name} ${order.customer.last_name}`,
+    email: order.customer.email || '',
+    phone: order.customer.phone,
   },
-  {
-    id: '2',
-    orderNumber: 'ORD-2024-002',
-    customer: {
-      id: '2',
-      name: 'Sarah Wilson',
-      email: 'sarah.wilson@email.com',
-      phone: '+1-555-0456',
-    },
-    items: [
-      {
-        id: '3',
-        productId: '3',
-        productName: 'Vinyl Sheets - White',
-        quantity: 10,
-        price: 12.99,
-        total: 129.90,
-      },
-    ],
-    status: 'shipped',
-    total: 144.90,
-    subtotal: 129.90,
-    tax: 6.50,
-    shipping: 8.50,
-    createdAt: '2024-03-09T10:15:00Z',
-    updatedAt: '2024-03-11T09:20:00Z',
-    shippingAddress: {
-      street: '456 Oak Ave',
-      city: 'Los Angeles',
-      state: 'CA',
-      zipCode: '90210',
-      country: 'USA',
-    },
-    paymentStatus: 'paid',
-    trackingNumber: 'TRK987654321',
+  items: order.items.map(item => ({
+    id: item.id,
+    productId: item.product_id,
+    productName: item.product_name,
+    quantity: item.quantity,
+    price: item.price,
+    total: item.total,
+  })),
+  status: order.status,
+  total: order.total,
+  subtotal: order.subtotal,
+  tax: 0,
+  shipping: order.shipping,
+  createdAt: order.created_at,
+  updatedAt: order.updated_at,
+  shippingAddress: {
+    street: order.shipping_address.address,
+    city: order.shipping_address.commune,
+    state: order.shipping_address.wilaya,
+    zipCode: '',
+    country: 'Algérie',
   },
-  {
-    id: '3',
-    orderNumber: 'ORD-2024-003',
-    customer: {
-      id: '3',
-      name: 'Mike Johnson',
-      email: 'mike.johnson@email.com',
-      phone: '+1-555-0789',
-    },
-    items: [
-      {
-        id: '4',
-        productId: '4',
-        productName: 'Printer Ink Set - CMYK',
-        quantity: 2,
-        price: 89.99,
-        total: 179.98,
-      },
-    ],
-    status: 'pending',
-    total: 234.97,
-    subtotal: 214.97,
-    tax: 10.75,
-    shipping: 9.25,
-    createdAt: '2024-03-11T16:20:00Z',
-    updatedAt: '2024-03-11T16:20:00Z',
-    shippingAddress: {
-      street: '789 Pine St',
-      city: 'Chicago',
-      state: 'IL',
-      zipCode: '60601',
-      country: 'USA',
-    },
-    paymentStatus: 'pending',
-  },
-];
+  paymentStatus: order.payment_status,
+  trackingNumber: undefined,
+  notes: order.notes,
+  discount: order.discount,
+  couponCode: order.coupon_code,
+});
 
-const orderStatuses = [
-  { value: 'all', label: 'Toutes', color: 'default' },
-  { value: 'pending', label: 'En attente', color: 'secondary' },
-  { value: 'confirmed', label: 'Confirmée', color: 'default' },
-  { value: 'processing', label: 'En cours', color: 'default' },
-  { value: 'shipped', label: 'Expédiée', color: 'default' },
-  { value: 'delivered', label: 'Livrée', color: 'default' },
-  { value: 'cancelled', label: 'Annulée', color: 'destructive' },
-];
-
-const paymentStatuses = [
-  { value: 'all', label: 'Tous', color: 'default' },
-  { value: 'pending', label: 'En attente', color: 'secondary' },
-  { value: 'paid', label: 'Payé', color: 'default' },
-  { value: 'failed', label: 'Échoué', color: 'destructive' },
-  { value: 'refunded', label: 'Remboursé', color: 'outline' },
-];
+// French translations (default)
+const fr = {
+  title: 'Commandes',
+  subtitle: 'Gérer les commandes clients',
+  refresh: 'Actualiser',
+  export: 'Exporter',
+  stats: {
+    totalOrders: 'Total Commandes',
+    processing: 'En cours',
+    shipped: 'Expédiées',
+    revenue: "Chiffre d'affaires"
+  },
+  status: {
+    all: 'Toutes',
+    pending: 'En attente',
+    confirmed: 'Confirmée',
+    processing: 'En cours',
+    shipped: 'Expédiée',
+    delivered: 'Livrée',
+    cancelled: 'Annulée'
+  },
+  toast: {
+    error: 'Erreur',
+    loadError: 'Impossible de charger les commandes.',
+    orderUpdated: 'Commande mise à jour',
+    statusChanged: 'Statut changé en',
+    statusUpdateError: 'Impossible de mettre à jour le statut.',
+    orderDeleted: 'Commande supprimée',
+    deleteError: 'Impossible de supprimer la commande.',
+    noSelection: 'Aucune sélection',
+    selectOrders: 'Veuillez sélectionner des commandes.',
+    ordersConfirmed: 'Commandes confirmées',
+    inProcessing: 'En traitement',
+    ordersShipped: 'Commandes expédiées',
+    ordersArchived: 'Commandes archivées',
+    exportComplete: 'Export terminé',
+    ordersDeleted: 'Commandes supprimées',
+    partialOperation: 'Opération partielle',
+    partialDelete: 'Suppression partielle',
+    bulkError: "Une erreur est survenue lors de l'opération.",
+    googleSheetsExport: 'Export Google Sheets',
+    exportError: 'Erreur lors de l\'export'
+  }
+};
 
 const OrdersPage: React.FC = () => {
   const { toast } = useToast();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
+  const { t, language } = useLanguage();
+  
+  // Translation helper
+  const getFrenchText = (key: string): string => {
+    const keys = key.split('.');
+    let value: unknown = fr;
+    for (const k of keys) {
+      if (value && typeof value === 'object') {
+        value = (value as Record<string, unknown>)[k];
+      } else {
+        return key;
+      }
+    }
+    return typeof value === 'string' ? value : key;
+  };
+  
+  const getText = (key: string): string => {
+    if (language === 'fr') {
+      return getFrenchText(key);
+    }
+    const translated = t(key, 'admin_orders');
+    return translated === key ? getFrenchText(key) : translated;
+  };
+  
+  // Get status label based on language
+  const getStatusLabel = (status: string): string => {
+    return getText(`status.${status}`);
+  };
+  
+  // Dynamic order statuses based on language
+  const orderStatuses = [
+    { value: 'all', label: getStatusLabel('all'), color: 'default' },
+    { value: 'pending', label: getStatusLabel('pending'), color: 'secondary' },
+    { value: 'confirmed', label: getStatusLabel('confirmed'), color: 'default' },
+    { value: 'processing', label: getStatusLabel('processing'), color: 'default' },
+    { value: 'shipped', label: getStatusLabel('shipped'), color: 'default' },
+    { value: 'delivered', label: getStatusLabel('delivered'), color: 'default' },
+    { value: 'cancelled', label: getStatusLabel('cancelled'), color: 'destructive' },
+  ];
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [orders, setOrders] = useState<any[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState('all');
-  const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
-  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [viewingOrder, setViewingOrder] = useState<any | null>(null);
+  const [editingOrder, setEditingOrder] = useState<any | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [exporting, setExporting] = useState(false);
 
   // Load Lottie animations from public folder
   const { animationData: shoppingCartAnimation } = useLottieAnimation('/animations/shopping-cart.json');
@@ -172,39 +175,69 @@ const OrdersPage: React.FC = () => {
   const { animationData: deliveryTruckAnimation } = useLottieAnimation('/animations/delivery-truck.json');
   const { animationData: revenueAnimation } = useLottieAnimation('/animations/revenue.json');
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const mockOrders = generateMockOrders();
-      setOrders(mockOrders);
-      setFilteredOrders(mockOrders);
+  // Fetch orders from Supabase
+  const fetchOrders = useCallback(async () => {
+    try {
+      const supabaseOrders = await getAllOrders();
+      const uiOrders = supabaseOrders.map(convertToUIOrder);
+      setOrders(uiOrders);
+      setFilteredOrders(uiOrders);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      toast({
+        title: getText('toast.error'),
+        description: getText('toast.loadError'),
+        variant: 'destructive',
+      });
+    } finally {
       setLoading(false);
-    }, 1000);
+      setRefreshing(false);
+    }
+  }, [toast]);
 
-    return () => clearTimeout(timer);
-  }, []);
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
+
+  // Handle viewOrder URL parameter to auto-open order details
+  useEffect(() => {
+    const viewOrderId = searchParams.get('viewOrder');
+    if (viewOrderId && orders.length > 0) {
+      const orderToView = orders.find((order: any) => order.id === viewOrderId);
+      if (orderToView) {
+        setViewingOrder(orderToView);
+        setIsViewDialogOpen(true);
+        // Clear the URL parameter after opening
+        searchParams.delete('viewOrder');
+        setSearchParams(searchParams, { replace: true });
+      }
+    }
+  }, [orders, searchParams, setSearchParams]);
+
+  // Refresh orders
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchOrders();
+  };
 
   useEffect(() => {
     let filtered = orders;
 
     if (searchQuery) {
-      filtered = filtered.filter(order =>
+      filtered = filtered.filter((order: any) =>
         order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.customer.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.trackingNumber?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     if (selectedStatus !== 'all') {
-      filtered = filtered.filter(order => order.status === selectedStatus);
-    }
-
-    if (selectedPaymentStatus !== 'all') {
-      filtered = filtered.filter(order => order.paymentStatus === selectedPaymentStatus);
+      filtered = filtered.filter((order: any) => order.status === selectedStatus);
     }
 
     setFilteredOrders(filtered);
-  }, [orders, searchQuery, selectedStatus, selectedPaymentStatus]);
+  }, [orders, searchQuery, selectedStatus]);
 
   const handleSelectOrder = (orderId: string) => {
     const newSelected = new Set(selectedOrders);
@@ -220,37 +253,76 @@ const OrdersPage: React.FC = () => {
     if (selectedOrders.size === filteredOrders.length) {
       setSelectedOrders(new Set());
     } else {
-      setSelectedOrders(new Set(filteredOrders.map(o => o.id)));
+      setSelectedOrders(new Set(filteredOrders.map((o: any) => o.id)));
     }
   };
 
-  const handleViewOrder = (order: Order) => {
+  const handleViewOrder = (order: any) => {
     setViewingOrder(order);
     setIsViewDialogOpen(true);
   };
 
-  const handleEditOrder = (order: Order) => {
+  const handleEditOrder = (order: any) => {
     setEditingOrder(order);
     setIsEditDialogOpen(true);
   };
 
-  const handleUpdateOrderStatus = (orderId: string, status: Order['status']) => {
-    setOrders(orders.map(o => o.id === orderId ? { ...o, status, updatedAt: new Date().toISOString() } : o));
-    toast({
-      title: 'Commande mise à jour',
-      description: `Statut changé en ${status}.`,
-    });
+  const handleUpdateOrderStatus = async (orderId: string, status: OrderStatus) => {
+    try {
+      await updateOrderStatus(orderId, status);
+      await logActivity({
+        type: 'order',
+        action: 'status_update',
+        entity_id: orderId,
+        entity_name: `Order ${orderId}`,
+        details: { status },
+        performed_by: null,
+        performed_by_name: 'Admin'
+      });
+      setOrders(orders.map((o: any) => o.id === orderId ? { ...o, status, updatedAt: new Date().toISOString() } : o));
+      
+      toast({
+        title: getText('toast.orderUpdated'),
+        description: `${getText('toast.statusChanged')} "${getStatusLabel(status)}".`,
+      });
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      toast({
+        title: getText('toast.error'),
+        description: getText('toast.statusUpdateError'),
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handleDeleteOrder = (orderId: string) => {
-    const order = orders.find(o => o.id === orderId);
+  const handleDeleteOrder = async (orderId: string) => {
+    const order = orders.find((o: any) => o.id === orderId);
     if (order) {
-      setOrders(orders.filter(o => o.id !== orderId));
-      setSelectedOrders(new Set([...selectedOrders].filter(id => id !== orderId)));
-      toast({
-        title: 'Commande supprimée',
-        description: `Commande ${order.orderNumber} supprimée.`,
-      });
+      try {
+        await deleteOrderApi(orderId);
+        await logActivity({
+          type: 'order',
+          action: 'delete',
+          entity_id: orderId,
+          entity_name: order.orderNumber,
+          details: null,
+          performed_by: null,
+          performed_by_name: 'Admin'
+        });
+        setOrders(orders.filter((o: any) => o.id !== orderId));
+        setSelectedOrders(new Set([...selectedOrders].filter(id => id !== orderId)));
+        toast({
+          title: getText('toast.orderDeleted'),
+          description: `${order.orderNumber}`,
+        });
+      } catch (error) {
+        console.error('Error deleting order:', error);
+        toast({
+          title: getText('toast.error'),
+          description: getText('toast.deleteError'),
+          variant: 'destructive',
+        });
+      }
     }
   };
 
@@ -259,48 +331,173 @@ const OrdersPage: React.FC = () => {
       setOrders(orders.map(o => o.id === editingOrder.id ? editingOrder : o));
       setIsEditDialogOpen(false);
       setEditingOrder(null);
+      // Log activity for manual edit
+      logActivity({
+        type: 'order',
+        action: 'update',
+        entity_id: editingOrder.id,
+        entity_name: editingOrder.orderNumber,
+        details: { changes: editingOrder },
+        performed_by: null,
+        performed_by_name: 'Admin'
+      });
       toast({
-        title: 'Commande mise à jour',
-        description: `Commande ${editingOrder.orderNumber} mise à jour.`,
+        title: getText('toast.orderUpdated'),
+        description: `${editingOrder.orderNumber}`,
       });
     }
   };
 
-  const handleBulkAction = (action: string) => {
+  const handleBulkAction = async (action: string) => {
     if (selectedOrders.size === 0) {
       toast({
-        title: 'Aucune sélection',
-        description: 'Veuillez sélectionner des commandes.',
+        title: getText('toast.noSelection'),
+        description: getText('toast.selectOrders'),
         variant: 'destructive',
       });
       return;
     }
 
-    switch (action) {
-      case 'confirm':
-        setOrders(orders.map(o => 
-          selectedOrders.has(o.id) ? { ...o, status: 'confirmed' as const, updatedAt: new Date().toISOString() } : o
-        ));
-        toast({ title: 'Commandes confirmées', description: `${selectedOrders.size} commandes confirmées.` });
-        break;
-      case 'process':
-        setOrders(orders.map(o => 
-          selectedOrders.has(o.id) ? { ...o, status: 'processing' as const, updatedAt: new Date().toISOString() } : o
-        ));
-        toast({ title: 'En traitement', description: `${selectedOrders.size} commandes en traitement.` });
-        break;
-      case 'ship':
-        setOrders(orders.map(o => 
-          selectedOrders.has(o.id) ? { ...o, status: 'shipped' as const, updatedAt: new Date().toISOString() } : o
-        ));
-        toast({ title: 'Commandes expédiées', description: `${selectedOrders.size} commandes expédiées.` });
-        break;
-      case 'archive':
-        toast({ title: 'Commandes archivées', description: `${selectedOrders.size} commandes archivées.` });
-        break;
-      case 'export':
-        toast({ title: 'Export terminé', description: `${selectedOrders.size} commandes exportées.` });
-        break;
+    const selectedIds = Array.from(selectedOrders);
+    
+    try {
+      switch (action) {
+        case 'confirm': {
+          const results = await Promise.allSettled(selectedIds.map(id => updateOrderStatus(id, 'confirmed')));
+          const succeededIds = selectedIds.filter((_, i) => results[i].status === 'fulfilled');
+          const failedCount = results.filter(r => r.status === 'rejected').length;
+          
+          if (succeededIds.length > 0) {
+            await logActivity({
+              type: 'order',
+              action: 'bulk_confirm',
+              entity_id: null,
+              entity_name: `${succeededIds.length} orders`,
+              details: { ids: succeededIds },
+              performed_by: null,
+              performed_by_name: 'Admin'
+            });
+            setOrders(orders.map((o: any) => 
+              succeededIds.includes(o.id) ? { ...o, status: 'confirmed', updatedAt: new Date().toISOString() } : o
+            ));
+          }
+          
+          if (failedCount > 0) {
+            toast({ 
+              title: getText('toast.partialOperation'), 
+              description: `${succeededIds.length} / ${failedCount}`,
+              variant: failedCount === selectedIds.length ? 'destructive' : 'default'
+            });
+          } else {
+            toast({ title: getText('toast.ordersConfirmed'), description: `${succeededIds.length}` });
+          }
+          break;
+        }
+        case 'process': {
+          const results = await Promise.allSettled(selectedIds.map(id => updateOrderStatus(id, 'processing')));
+          const succeededIds = selectedIds.filter((_, i) => results[i].status === 'fulfilled');
+          const failedCount = results.filter(r => r.status === 'rejected').length;
+          
+          if (succeededIds.length > 0) {
+            await logActivity({
+              type: 'order',
+              action: 'bulk_process',
+              entity_id: null,
+              entity_name: `${succeededIds.length} orders`,
+              details: { ids: succeededIds },
+              performed_by: null,
+              performed_by_name: 'Admin'
+            });
+            setOrders(orders.map((o: any) => 
+              succeededIds.includes(o.id) ? { ...o, status: 'processing', updatedAt: new Date().toISOString() } : o
+            ));
+          }
+          
+          if (failedCount > 0) {
+            toast({ 
+              title: getText('toast.partialOperation'), 
+              description: `${succeededIds.length} / ${failedCount}`,
+              variant: failedCount === selectedIds.length ? 'destructive' : 'default'
+            });
+          } else {
+            toast({ title: getText('toast.inProcessing'), description: `${succeededIds.length}` });
+          }
+          break;
+        }
+        case 'ship': {
+          const results = await Promise.allSettled(selectedIds.map(id => updateOrderStatus(id, 'shipped')));
+          const succeededIds = selectedIds.filter((_, i) => results[i].status === 'fulfilled');
+          const failedCount = results.filter(r => r.status === 'rejected').length;
+          
+          if (succeededIds.length > 0) {
+            await logActivity({
+              type: 'order',
+              action: 'bulk_ship',
+              entity_id: null,
+              entity_name: `${succeededIds.length} orders`,
+              details: { ids: succeededIds },
+              performed_by: null,
+              performed_by_name: 'Admin'
+            });
+            setOrders(orders.map((o: any) => 
+              succeededIds.includes(o.id) ? { ...o, status: 'shipped', updatedAt: new Date().toISOString() } : o
+            ));
+          }
+          
+          if (failedCount > 0) {
+            toast({ 
+              title: getText('toast.partialOperation'), 
+              description: `${succeededIds.length} / ${failedCount}`,
+              variant: failedCount === selectedIds.length ? 'destructive' : 'default'
+            });
+          } else {
+            toast({ title: getText('toast.ordersShipped'), description: `${succeededIds.length}` });
+          }
+          break;
+        }
+        case 'archive':
+          toast({ title: getText('toast.ordersArchived'), description: `${selectedOrders.size}` });
+          break;
+        case 'export':
+          toast({ title: getText('toast.exportComplete'), description: `${selectedOrders.size}` });
+          break;
+        case 'delete': {
+          const results = await Promise.allSettled(selectedIds.map(id => deleteOrderApi(id)));
+          const succeededIds = selectedIds.filter((_, i) => results[i].status === 'fulfilled');
+          const failedCount = results.filter(r => r.status === 'rejected').length;
+          
+          if (succeededIds.length > 0) {
+            await logActivity({
+              type: 'order',
+              action: 'bulk_delete',
+              entity_id: null,
+              entity_name: `${succeededIds.length} orders`,
+              details: { ids: succeededIds },
+              performed_by: null,
+              performed_by_name: 'Admin'
+            });
+            setOrders(orders.filter((o: any) => !succeededIds.includes(o.id)));
+          }
+          
+          if (failedCount > 0) {
+            toast({ 
+              title: getText('toast.partialDelete'), 
+              description: `${succeededIds.length} / ${failedCount}`,
+              variant: failedCount === selectedIds.length ? 'destructive' : 'default'
+            });
+          } else {
+            toast({ title: getText('toast.ordersDeleted'), description: `${succeededIds.length}` });
+          }
+          break;
+        }
+      }
+    } catch (error) {
+      console.error('Error in bulk action:', error);
+      toast({
+        title: getText('toast.error'),
+        description: getText('toast.bulkError'),
+        variant: 'destructive',
+      });
     }
     
     setSelectedOrders(new Set());
@@ -313,6 +510,64 @@ const OrdersPage: React.FC = () => {
     }).format(amount) + ' DA';
   };
 
+  // Convert UI orders to export format
+  const getOrdersForExport = useCallback((): OrderForExport[] => {
+    const ordersToExport = selectedOrders.size > 0 
+      ? orders.filter(o => selectedOrders.has(o.id))
+      : filteredOrders;
+    
+    return ordersToExport.map(order => ({
+      id: order.id,
+      orderNumber: order.orderNumber,
+      customer: {
+        name: order.customer.name,
+        email: order.customer.email || '',
+        phone: order.customer.phone,
+      },
+      items: order.items.map((item: any) => ({
+        productName: item.productName,
+        quantity: item.quantity,
+        price: item.price,
+        total: item.total,
+      })),
+      status: order.status,
+      total: order.total,
+      subtotal: order.subtotal,
+      shipping: order.shipping,
+      discount: order.discount,
+      couponCode: order.couponCode,
+      createdAt: order.createdAt,
+      shippingAddress: {
+        street: order.shippingAddress?.street || '',
+        city: order.shippingAddress?.city || '',
+        state: order.shippingAddress?.state || '',
+      },
+      notes: order.notes,
+    }));
+  }, [orders, filteredOrders, selectedOrders]);
+
+  // Export to Google Sheets - send data directly and open sheet
+  const handleExportToGoogleSheets = useCallback(async () => {
+    setExporting(true);
+    try {
+      const ordersToExport = getOrdersForExport();
+      const result = await exportOrdersToGoogleSheets(ordersToExport);
+      
+      if (result.success) {
+        toast({ 
+          title: getText('toast.googleSheetsExport'), 
+          description: result.message
+        });
+      } else {
+        toast({ title: getText('toast.error'), description: result.message, variant: 'destructive' });
+      }
+    } catch (error) {
+      toast({ title: getText('toast.error'), description: getText('toast.exportError'), variant: 'destructive' });
+    } finally {
+      setExporting(false);
+    }
+  }, [getOrdersForExport, toast]);
+
   const totalOrders = orders.length;
   const pendingOrders = orders.filter(o => o.status === 'pending').length;
   const processingOrders = orders.filter(o => o.status === 'processing').length;
@@ -322,7 +577,7 @@ const OrdersPage: React.FC = () => {
   if (loading) {
     return (
       <div className="space-y-4 sm:space-y-6">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Commandes</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">{getText('title')}</h1>
         <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
             <Card key={i} className="animate-pulse">
@@ -343,24 +598,37 @@ const OrdersPage: React.FC = () => {
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">Commandes</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground">Gérer les commandes clients</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">{getText('title')}</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">{getText('subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => handleBulkAction('export')} disabled={selectedOrders.size === 0} className="h-8 sm:h-9 text-xs sm:text-sm">
-            <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-            <span className="hidden sm:inline">Exporter</span> ({selectedOrders.size})
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleRefresh} 
+            disabled={refreshing}
+            className="h-8 sm:h-9 text-xs sm:text-sm"
+          >
+            <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">{getText('refresh')}</span>
           </Button>
-          <Button size="sm" className="h-8 sm:h-9 text-xs sm:text-sm">
-            <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-            <span className="hidden sm:inline">Nouvelle</span> Commande
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleExportToGoogleSheets}
+            disabled={exporting}
+            className="h-8 sm:h-9 text-xs sm:text-sm"
+          >
+            <FileSpreadsheet className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 ${exporting ? 'animate-pulse' : ''}`} />
+            <span className="hidden sm:inline">{getText('export')}</span>
+            <span className="ml-1">({selectedOrders.size > 0 ? selectedOrders.size : filteredOrders.length})</span>
           </Button>
         </div>
       </div>
 
       <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <StatsCard
-          title="Total Commandes"
+          title={getText('stats.totalOrders')}
           value={totalOrders}
           change={undefined}
           lottieAnimation={shoppingCartAnimation || undefined}
@@ -370,7 +638,7 @@ const OrdersPage: React.FC = () => {
         />
         
         <StatsCard
-          title="En cours"
+          title={getText('stats.processing')}
           value={processingOrders}
           change={undefined}
           lottieAnimation={packageAnimation || undefined}
@@ -380,7 +648,7 @@ const OrdersPage: React.FC = () => {
         />
         
         <StatsCard
-          title="Expédiées"
+          title={getText('stats.shipped')}
           value={shippedOrders}
           change={undefined}
           lottieAnimation={deliveryTruckAnimation || undefined}
@@ -390,7 +658,7 @@ const OrdersPage: React.FC = () => {
         />
         
         <StatsCard
-          title="Chiffre d'affaires"
+          title={getText('stats.revenue')}
           value={formatCurrency(totalRevenue)}
           change={undefined}
           lottieAnimation={revenueAnimation || undefined}
@@ -405,12 +673,22 @@ const OrdersPage: React.FC = () => {
         onSearchChange={setSearchQuery}
         selectedStatus={selectedStatus}
         onStatusChange={setSelectedStatus}
-        selectedPaymentStatus={selectedPaymentStatus}
-        onPaymentStatusChange={setSelectedPaymentStatus}
         orderStatuses={orderStatuses}
-        paymentStatuses={paymentStatuses}
         selectedCount={selectedOrders.size}
         onBulkAction={handleBulkAction}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        translations={{
+          search: getText('filters.search') || 'Rechercher...',
+          statusPlaceholder: getText('filters.statusPlaceholder') || 'Statut',
+          selected: getText('filters.selected') || 'sélect.',
+          bulkActions: getText('filters.bulkActions') || 'Actions groupées',
+          exportAction: getText('filters.exportAction') || 'Exporter',
+          deleteAction: getText('filters.deleteAction') || 'Supprimer',
+          deleteDialogTitle: getText('deleteDialog.title') || 'Supprimer',
+          deleteDialogDesc: getText('deleteDialog.description') || 'Cette action est irréversible.',
+          cancel: getText('deleteDialog.cancel') || 'Annuler',
+        }}
       />
 
       <OrderTable
@@ -423,12 +701,86 @@ const OrdersPage: React.FC = () => {
         onEdit={handleEditOrder}
         onDelete={handleDeleteOrder}
         onUpdateStatus={handleUpdateOrderStatus}
+        viewMode={viewMode}
+        translations={{
+          title: getText('table.title') || 'Gestion des commandes',
+          selectAll: getText('table.selectAll') || 'Tout sélectionner',
+          order: getText('table.order') || 'Commande',
+          customer: getText('table.customer') || 'Client',
+          phone: getText('table.phone') || 'Téléphone',
+          statusHeader: getText('table.statusHeader') || 'Statut',
+          total: getText('table.total') || 'Total',
+          date: getText('table.date') || 'Date',
+          actions: getText('table.actions') || 'Actions',
+          tracking: getText('table.tracking') || 'Suivi',
+          items: getText('table.items') || 'article',
+          itemsPlural: getText('table.itemsPlural') || 'articles',
+          viewDetails: getText('table.viewDetails') || 'Voir détails',
+          edit: getText('table.edit') || 'Modifier',
+          delete: getText('table.delete') || 'Supprimer',
+          deleteDialogTitle: getText('deleteDialog.titleSingle') || 'Supprimer la commande',
+          deleteDialogDesc: getText('deleteDialog.descriptionSingle') || 'Supprimer',
+          cancel: getText('deleteDialog.cancel') || 'Annuler',
+          statusPending: getStatusLabel('pending'),
+          statusConfirmed: getStatusLabel('confirmed'),
+          statusProcessing: getStatusLabel('processing'),
+          statusShipped: getStatusLabel('shipped'),
+          statusDelivered: getStatusLabel('delivered'),
+          statusCancelled: getStatusLabel('cancelled'),
+        }}
       />
 
       <OrderDetails
         open={isViewDialogOpen}
         onOpenChange={setIsViewDialogOpen}
         order={viewingOrder}
+        translations={{
+          title: getText('details.title') || 'Commande',
+          description: getText('details.description') || 'Détails et informations de livraison',
+          tabs: {
+            details: getText('details.tabs.details') || 'Détails',
+            items: getText('details.tabs.items') || 'Articles',
+            customer: getText('details.tabs.customer') || 'Client',
+            tracking: getText('details.tabs.tracking') || 'Suivi',
+          },
+          info: {
+            title: getText('details.info.title') || 'Informations',
+            orderNumber: getText('details.info.orderNumber') || 'N° Commande:',
+            status: getText('details.info.status') || 'Statut:',
+            created: getText('details.info.created') || 'Créée:',
+            modified: getText('details.info.modified') || 'Modifiée:',
+            tracking: getText('details.info.tracking') || 'Suivi:',
+          },
+          summary: {
+            title: getText('details.summary.title') || 'Récapitulatif',
+            subtotal: getText('details.summary.subtotal') || 'Sous-total:',
+            tax: getText('details.summary.tax') || 'TVA:',
+            shipping: getText('details.summary.shipping') || 'Livraison:',
+            total: getText('details.summary.total') || 'Total:',
+          },
+          notes: getText('details.notes') || 'Notes',
+          itemsOrdered: getText('details.itemsOrdered') || 'Articles commandés',
+          product: getText('details.product') || 'Produit',
+          quantity: getText('details.quantity') || 'Quantité',
+          price: getText('details.price') || 'Prix',
+          customerInfo: {
+            title: getText('details.customerInfo.title') || 'Informations client',
+            customerId: getText('details.customerInfo.customerId') || 'ID Client:',
+            email: getText('details.customerInfo.email') || 'Adresse email',
+            phone: getText('details.customerInfo.phone') || 'Téléphone',
+            shippingAddress: getText('details.customerInfo.shippingAddress') || 'Adresse de livraison',
+          },
+          progress: {
+            title: getText('details.progress.title') || 'Progression',
+            currentStatus: getText('details.progress.currentStatus') || 'Statut actuel',
+          },
+          statusPending: getStatusLabel('pending'),
+          statusConfirmed: getStatusLabel('confirmed'),
+          statusProcessing: getStatusLabel('processing'),
+          statusShipped: getStatusLabel('shipped'),
+          statusDelivered: getStatusLabel('delivered'),
+          statusCancelled: getStatusLabel('cancelled'),
+        }}
       />
 
       <OrderEdit
@@ -438,7 +790,20 @@ const OrdersPage: React.FC = () => {
         onUpdate={setEditingOrder}
         onSave={handleSaveEdit}
         orderStatuses={orderStatuses}
-        paymentStatuses={paymentStatuses}
+        translations={{
+          title: getText('edit.title') || 'Modifier Commande',
+          description: getText('edit.description') || 'Mettre à jour le statut de livraison',
+          noEmail: getText('edit.noEmail') || "Pas d'email - notifications désactivées",
+          noEmailWarning: getText('edit.noEmailWarning') || "Ce client n'a pas fourni d'email.",
+          deliveryStatus: getText('edit.deliveryStatus') || 'Statut de livraison',
+          notes: getText('edit.notes') || 'Notes',
+          notesOptional: getText('edit.notesOptional') || '(optionnel)',
+          notesPlaceholder: getText('edit.notesPlaceholder') || 'Ajouter des notes pour le client...',
+          emailNotice: getText('edit.emailNotice') || 'Un email sera envoyé au client.',
+          cancel: getText('edit.cancel') || 'Annuler',
+          save: getText('edit.save') || 'Enregistrer',
+          sending: getText('edit.sending') || 'Envoi...',
+        }}
       />
     </div>
   );

@@ -1,0 +1,28 @@
+{
+  "empty": {
+    "title": "سلة التسوق فارغة",
+    "description": "اكتشف أحدث مجموعاتنا وابدأ بملء سلتك.",
+    "exploreBtn": "استكشف المتجر"
+  },
+  "header": {
+    "title": "السلة",
+    "itemsSelected": "منتجات مختارة",
+    "continueShopping": "متابعة التسوق"
+  },
+  "item": {
+    "total": "المجموع",
+    "remove": "حذف"
+  },
+  "summary": {
+    "title": "الملخص",
+    "subtotal": "المجموع الفرعي",
+    "totalToPay": "المبلغ الإجمالي",
+    "taxIncluded": "شامل الضرائب",
+    "orderBtn": "اطلب الآن",
+    "paymentOnDelivery": "الدفع عند الاستلام"
+  },
+  "mobile": {
+    "totalToPay": "المبلغ الإجمالي",
+    "orderBtn": "اطلب الآن"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "loading": "Loading product...",
+  "notFound": "Product not found",
+  "backToStore": "Back to store",
+  "missingId": "Missing product ID",
+  "loadError": "Error loading product",
+  "loadErrorDesc": "Unable to load product details.",
+  "breadcrumb": {
+    "home": "Home",
+    "store": "Store"
+  },
+  "condition": {
+    "new": "New",
+    "used": "Used"
+  },
+  "views": "views",
+  "price": {
+    "paymentOnDelivery": "Payment on delivery",
+    "shippingCalc": "Shipping calculated at checkout"
+  },
+  "actions": {
+    "addToCart": "Add to cart",
+    "buyNow": "Buy now",
+    "add": "Add"
+  },
+  "trust": {
+    "delivery": "48h Delivery",
+    "guarantee": "100% Guarantee",
+    "returns": "Easy Returns"
+  },
+  "tabs": {
+    "description": "Description",
+    "specs": "Specifications"
+  },
+  "noDescription": "No description available.",
+  "noSpecs": "No specifications available.",
+  "tags": "Tags",
+  "related": {
+    "title": "You may also like",
+    "viewAll": "View all"
+  },
+  "mobile": {
+    "total": "Total"
+  },
+  "toast": {
+    "addedToCart": "Added to cart"
+  }
+}

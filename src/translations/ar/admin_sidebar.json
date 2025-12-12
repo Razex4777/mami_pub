@@ -1,0 +1,26 @@
+{
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "products": "المنتجات",
+    "categories": "الفئات",
+    "orders": "الطلبات",
+    "banners": "البانرات",
+    "coupons": "أكواد الخصم",
+    "settings": "الإعدادات"
+  },
+  "footer": {
+    "backToSite": "العودة للموقع",
+    "logout": "تسجيل الخروج"
+  },
+  "mobile": {
+    "dashboard": "لوحة التحكم",
+    "products": "المنتجات",
+    "categories": "الفئات",
+    "orders": "الطلبات",
+    "banners": "البانرات",
+    "coupons": "أكواد الخصم",
+    "settings": "الإعدادات",
+    "viewSite": "عرض الموقع",
+    "more": "المزيد"
+  }
+}

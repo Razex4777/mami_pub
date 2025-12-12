@@ -15,11 +15,14 @@ mami_pub/
 │   ├── placeholder.svg       # Placeholder image
 │   └── robots.txt            # SEO robots file
 ├── src/                      # Source code
+│   ├── ai/                   # AI utilities (Gemini integration)
 │   ├── assets/               # Image assets
 │   ├── components/           # React components
+│   ├── contexts/             # React contexts
 │   ├── hooks/                # Custom React hooks
 │   ├── lib/                  # Utility libraries
-│   └── pages/                # Page components
+│   ├── pages/                # Page components
+│   └── supabase/             # Supabase client and queries
 ├── index.html                # HTML entry point
 ├── package.json              # Dependencies
 ├── vite.config.ts           # Vite configuration
@@ -93,10 +96,23 @@ Organized into domain-specific folders for maintainability.
 ### /src/hooks
 - `use-mobile.tsx` - Mobile detection hook
 - `use-toast.ts` - Toast notification hook
+- `useAISearch.ts` - AI-powered search hook with Gemini integration
+
+### /src/ai
+AI utilities for intelligent features powered by Google Gemini.
+- `index.ts` - Main exports for AI module
+- `gemini.ts` - Gemini API client (gemini-2.5-flash-lite)
+- `vite-env.d.ts` - TypeScript declarations for .txt imports
+- `/system-instructions/` - AI prompt templates
+  - `search-assistant.txt` - Search query interpretation prompt (handles typos, Algerian dialect, Arabic, French)
 
 ### /src/lib
 - `utils.ts` - Utility functions
 - `currency.ts` - Algerian Dinar (DA) currency formatting utilities
+- `pdfExport.ts` - PDF report generation using jsPDF for dashboard export
+- `telegram.ts` - Telegram Bot API utility for order notifications
+- `email.ts` - Email notification utility
+- `googleSheets.ts` - Google Sheets export utility for orders (CSV, clipboard, direct link)
 
 ### /src/pages
 - `Index.tsx` - Landing page
@@ -141,15 +157,42 @@ Organized into domain-specific folders for maintainability.
 - `AdminSidebar.tsx` - Collapsible navigation sidebar with theme support
 - `AdminTopbar.tsx` - Top navigation with search, notifications, and user menu
 
+### /src/translations - Multi-language Support
+French is the default/main language (hardcoded in components). Only English and Arabic have translation files.
+
+- `/en/` - English translations
+  - `home.json` - Home page sections (hero, pillars, timeline, contact, stats)
+  - `navbar.json` - Topbar contact labels and admin dialog
+  - `sidebar.json` - Sidebar navigation and help section
+  - `mobiletabbar.json` - Mobile tab bar labels
+  - `store.json` - Store page (filters, search, sort, empty states)
+  - `cart.json` - Cart page (empty state, summary, checkout)
+  - `productview.json` - Product detail page (breadcrumbs, actions, trust badges)
+  - `admin_navbar.json` - Admin topbar search, sections, status
+  - `admin_sidebar.json` - Admin sidebar nav, footer, mobile tab bar
+  - `overview.json` - Admin dashboard stats, charts, tables, quick actions
+  - `toast.json` - All toast messages (cart, favorites, auth, CRUD operations, errors)
+  - `checkout.json` - Checkout page (order confirmation, form fields, coupon, validation)
+  - `admin_products.json` - Admin products management (filters, table, form, bulk actions)
+
+- `/ar/` - Arabic translations (same structure as English, uses Algeria 🇩🇿 flag)
+
 ### /src/contexts - React Context Providers
 - `AuthContext.tsx` - Authentication state management with localStorage persistence
+- `CartContext.tsx` - Shopping cart state management with localStorage persistence
+- `FavoritesContext.tsx` - Favorites/wishlist management with localStorage persistence
+- `SiteSettingsContext.tsx` - Dynamic site settings with Supabase sync and caching
+- `LanguageContext.tsx` - Multi-language support with French default, English/Arabic translations
 
 ### /src/supabase - Supabase Integration
 - `core.ts` - Supabase client initialization
 - `index.ts` - Main exports for all Supabase APIs
 - `banners.ts` - Banner CRUD operations
+- `categories.ts` - Category CRUD operations with slug generation
 - `products.ts` - Product CRUD operations with PGRST116 error handling
-- `/types/index.ts` - All TypeScript types (Product, AdminProduct, User, Order, etc.)
+- `storage.ts` - Supabase Storage utilities for image upload/delete
+- `settings.ts` - Site settings CRUD and asset upload operations
+- `/types/index.ts` - All TypeScript types (Product, Category, AdminProduct, User, Order, etc.)
 
 ## Admin Dashboard Features
 
@@ -169,9 +212,15 @@ Organized into domain-specific folders for maintainability.
 - **CRUD Operations**: Create, Read, Update, Delete products
 - **Advanced Search**: Multi-field search across all product data
 - **Bulk Operations**: Multi-select with batch actions
-- **Inventory Tracking**: Real-time stock levels with alerts
-- **Categories**: Films, Equipment, Vinyl, Ink, Tools, Accessories
+- **Image Upload**: Drag-and-drop image upload with cropping
+- **Dynamic Categories**: Database-driven category system
 - **CSV Export**: Bulk export functionality
+
+### 📁 Category Management
+- **CRUD Operations**: Create, Read, Update, Delete categories
+- **Slug Generation**: Auto-generated URL-friendly slugs
+- **Display Order**: Configurable category ordering
+- **Active/Inactive**: Toggle category visibility
 
 ### 🛒 Order Management
 - **Status Tracking**: Pending → Confirmed → Processing → Shipped → Delivered

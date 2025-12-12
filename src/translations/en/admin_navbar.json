@@ -1,0 +1,31 @@
+{
+  "search": {
+    "placeholder": "Search...",
+    "searching": "Searching...",
+    "noResults": "No results for",
+    "sections": "Sections",
+    "orders": "Orders",
+    "products": "Products",
+    "categories": "Categories",
+    "coupons": "Promo Codes",
+    "navigation": "↑↓ to navigate • Enter to select • Esc to close",
+    "navigationMobile": "Tap to select"
+  },
+  "sections": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "categories": "Categories",
+    "orders": "Orders",
+    "banners": "Banners",
+    "coupons": "Promo Codes",
+    "settings": "Settings",
+    "settingsGeneral": "Settings - General",
+    "settingsContact": "Settings - Contact",
+    "settingsSocial": "Settings - Social Media",
+    "settingsSeo": "Settings - SEO",
+    "settingsNotifications": "Settings - Notifications"
+  },
+  "status": {
+    "online": "Online"
+  }
+}
