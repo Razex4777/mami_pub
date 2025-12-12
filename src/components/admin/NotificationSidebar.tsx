@@ -24,6 +24,24 @@ const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
   const { t, language } = useLanguage();
   const { unreadOrders, markAsRead, isLoading } = useNotifications();
 
+  // French translations (hardcoded like other components)
+  const frNotifications = {
+    newOrders: 'Nouvelles commandes',
+    unread: 'non lue',
+    markAll: 'Tout marquer comme lu',
+    noNewOrders: 'Aucune nouvelle commande',
+    allCaughtUp: 'Vous êtes à jour !',
+    paymentPending: 'Paiement en attente',
+    paymentConfirmed: 'Paiement confirmé',
+    view: 'Voir',
+  };
+
+  // Get text based on language
+  const getText = (key: keyof typeof frNotifications) => {
+    if (language === 'fr') return frNotifications[key];
+    return t(`notifications.${key}`, 'components');
+  };
+
   // Close on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -147,11 +165,11 @@ const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
               <ShoppingBag className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold">
-                {t('notifications.newOrders', 'components')}
+              <h2 className="text-base sm:text-lg font-semibold">
+                {getText('newOrders')}
               </h2>
-              <p className="text-sm text-muted-foreground">
-                {unreadOrders.length} {t('notifications.unread', 'components')}{unreadOrders.length > 1 ? 's' : ''}
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                {unreadOrders.length} {getText('unread')}{unreadOrders.length > 1 && language !== 'fr' ? 's' : unreadOrders.length > 1 && language === 'fr' ? 's' : ''}
               </p>
             </div>
           </div>
@@ -164,7 +182,7 @@ const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
                 className="text-xs hover:bg-muted/50"
               >
                 <CheckCircle className="h-3 w-3 mr-1" />
-                {t('notifications.markAll', 'components')}
+                {getText('markAll')}
               </Button>
             )}
             <Button
@@ -185,15 +203,15 @@ const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
               <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
             </div>
           ) : unreadOrders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 text-center">
+            <div className="flex flex-col items-center justify-center h-64 text-center px-4">
               <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-3">
                 <CheckCircle className="h-6 w-6 text-muted-foreground" />
               </div>
-              <h3 className="font-medium mb-1">
-                {t('notifications.noNewOrders', 'components')}
+              <h3 className="font-medium mb-1 text-sm sm:text-base">
+                {getText('noNewOrders')}
               </h3>
-              <p className="text-sm text-muted-foreground">
-                {t('notifications.allCaughtUp', 'components')}
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                {getText('allCaughtUp')}
               </p>
             </div>
           ) : (
@@ -244,8 +262,8 @@ const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
                           <Clock className="h-3 w-3" />
                           <span>
                             {order.payment_status === 'pending' 
-                              ? t('notifications.paymentPending', 'components')
-                              : t('notifications.paymentConfirmed', 'components')
+                              ? getText('paymentPending')
+                              : getText('paymentConfirmed')
                             }
                           </span>
                         </div>
@@ -263,7 +281,7 @@ const NotificationSidebar: React.FC<NotificationSidebarProps> = ({
                             className="h-6 px-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             <Eye className="h-3 w-3 mr-1" />
-                            {t('notifications.view', 'components')}
+                            {getText('view')}
                           </Button>
                         </div>
                       </div>
