@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Settings, Globe, Phone, Share2, Search, Save, Loader2, RefreshCw, Bell, Send, Languages, Check } from 'lucide-react';
+import { Settings, Globe, Phone, Share2, Search, Save, Loader2, RefreshCw, Bell, Send, Languages, Check, Lock, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/interactive/button';
 import { Input } from '@/components/ui/forms/input';
 import { Label } from '@/components/ui/forms/label';
@@ -13,15 +13,25 @@ import { testTelegramConnection } from '@/lib/telegram';
 import { testEmailConnection } from '@/lib/email';
 import type { SettingKey } from '@/supabase';
 import { useLanguage, languages } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const SettingsPage = () => {
   const { settings, isLoading, updateSettingValue, uploadAsset, refreshSettings } = useSiteSettings();
   const { language, setLanguage, currentLanguage, t: translate } = useLanguage();
+  const { user } = useAuth();
   const t = (key: string) => translate(key, 'admin_settings');
   const [isSaving, setIsSaving] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
   const [isTestingEmail, setIsTestingEmail] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<Record<string, File[]>>({});
+  
+  // Password change state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   
   // Local form state
   const [formData, setFormData] = useState<Record<SettingKey, string | null>>({} as any);
@@ -93,6 +103,66 @@ const SettingsPage = () => {
       });
     } finally {
       setIsTestingEmail(false);
+    }
+  };
+
+  // Handle password change
+  const handleChangePassword = async () => {
+    // Validation
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error(language === 'fr' ? 'Tous les champs sont requis' : t('security.allFieldsRequired'));
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error(language === 'fr' ? 'Les mots de passe ne correspondent pas' : t('security.passwordMismatch'));
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      toast.error(language === 'fr' ? 'Le mot de passe doit contenir au moins 8 caractères' : t('security.passwordTooShort'));
+      return;
+    }
+
+    if (!user?.id) {
+      toast.error(language === 'fr' ? 'Utilisateur non connecté' : t('security.notLoggedIn'));
+      return;
+    }
+
+    setIsChangingPassword(true);
+    try {
+      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          currentPassword,
+          newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(language === 'fr' ? 'Mot de passe modifié avec succès' : t('security.passwordChanged'));
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        toast.error(language === 'fr' ? 'Erreur' : t('security.error'), {
+          description: data.error || (language === 'fr' ? 'Impossible de modifier le mot de passe' : t('security.passwordChangeFailed')),
+        });
+      }
+    } catch (error) {
+      toast.error(language === 'fr' ? 'Erreur' : t('security.error'), {
+        description: language === 'fr' ? 'Une erreur est survenue' : t('security.unexpectedError'),
+      });
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -341,6 +411,98 @@ const SettingsPage = () => {
                   </button>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Security - Password Change */}
+          <Card>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-sm sm:text-base flex items-center gap-2">
+                <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                {language === 'fr' ? 'Sécurité' : t('security.title')}
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                {language === 'fr' ? 'Modifier votre mot de passe administrateur' : t('security.description')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="current_password" className="text-xs sm:text-sm">
+                  {language === 'fr' ? 'Mot de passe actuel' : t('security.currentPassword')}
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="current_password"
+                    type={showCurrentPassword ? 'text' : 'password'}
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder={language === 'fr' ? 'Entrez votre mot de passe actuel' : t('security.currentPasswordPlaceholder')}
+                    className="h-9 sm:h-10 text-sm pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="new_password" className="text-xs sm:text-sm">
+                  {language === 'fr' ? 'Nouveau mot de passe' : t('security.newPassword')}
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="new_password"
+                    type={showNewPassword ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder={language === 'fr' ? 'Entrez le nouveau mot de passe' : t('security.newPasswordPlaceholder')}
+                    className="h-9 sm:h-10 text-sm pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">
+                  {language === 'fr' ? 'Minimum 8 caractères' : t('security.passwordHint')}
+                </p>
+              </div>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="confirm_password" className="text-xs sm:text-sm">
+                  {language === 'fr' ? 'Confirmer le mot de passe' : t('security.confirmPassword')}
+                </Label>
+                <Input
+                  id="confirm_password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder={language === 'fr' ? 'Confirmez le nouveau mot de passe' : t('security.confirmPasswordPlaceholder')}
+                  className="h-9 sm:h-10 text-sm"
+                />
+              </div>
+              <Button
+                onClick={handleChangePassword}
+                disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
+                className="w-full sm:w-auto"
+              >
+                {isChangingPassword ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {language === 'fr' ? 'Modification...' : t('security.changing')}
+                  </>
+                ) : (
+                  <>
+                    <Lock className="mr-2 h-4 w-4" />
+                    {language === 'fr' ? 'Modifier le mot de passe' : t('security.changePassword')}
+                  </>
+                )}
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>

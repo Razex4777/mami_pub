@@ -112,6 +112,27 @@
       "hint": "Recommended size: 1200x630 pixels"
     }
   },
+  "security": {
+    "title": "Security",
+    "description": "Change your admin password",
+    "currentPassword": "Current password",
+    "currentPasswordPlaceholder": "Enter your current password",
+    "newPassword": "New password",
+    "newPasswordPlaceholder": "Enter new password",
+    "confirmPassword": "Confirm password",
+    "confirmPasswordPlaceholder": "Confirm new password",
+    "passwordHint": "Minimum 8 characters",
+    "changePassword": "Change password",
+    "changing": "Changing...",
+    "allFieldsRequired": "All fields are required",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "notLoggedIn": "User not logged in",
+    "passwordChanged": "Password changed successfully",
+    "error": "Error",
+    "passwordChangeFailed": "Unable to change password",
+    "unexpectedError": "An error occurred"
+  },
   "toast": {
     "saved": "Settings saved",
     "savedDesc": "{count} setting(s) updated",

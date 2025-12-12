@@ -274,12 +274,6 @@ const Topbar = ({ onMenuClick }: TopbarProps) => {
                 className="h-10 sm:h-11 lg:h-12 text-sm sm:text-base"
               />
             </div>
-            <div className="bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 rounded-xl p-3 sm:p-4">
-              <p className="font-semibold text-purple-700 dark:text-purple-300 mb-2 text-sm sm:text-base">{language === 'fr' ? frNavbar.admin.demo : t('adminModal.demo', 'components')}</p>
-              <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm">
-                {language === 'fr' ? 'Utilisez les identifiants fournis par votre administrateur' : t('adminModal.demoCredentials', 'components')}
-              </p>
-            </div>
             <Button
               type="submit"
               className="w-full h-10 sm:h-11 lg:h-12 text-sm sm:text-base bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-600 hover:from-purple-600 hover:via-blue-600 hover:to-indigo-700 font-semibold"
